@@ -2,7 +2,8 @@
   (:require [ring.adapter.jetty :refer [run-jetty]]
             [compojure.api.sweet :refer [api context routes]]
             [jumblerg.middleware.cors :refer [wrap-cors]]
-            [groove-api.choice :refer [choice-routes]]))
+            [groove-api.choice :refer [choice-routes]]
+            [ring.middleware.reload :refer [wrap-reload]]))
 
 (def swagger-config
   {:ui "/swagger"
@@ -18,3 +19,7 @@
   "I don't do a whole lot ... yet."
   [& args]
   (run-jetty app {:port 3000}))
+
+(defn -dev-main
+  [& args]
+  (run-jetty (wrap-reload #'app) {:port 3000}))

@@ -10,7 +10,9 @@
                  [ring/ring-jetty-adapter "1.6.3"]
                  [jumblerg/ring-cors "2.0.0"]
                  [org.clojure/data.json "0.2.7"]
-                 [ring/ring-json "0.5.0"]]
+                 [ring/ring-json "0.5.0"]
+                 [ring "1.7.1"]]
   :main ^:skip-aot groove-api.core
   :target-path "target/%s"
-  :profiles {:uberjar {:aot :all}})
+  :profiles {:dev {:main groove-api.core/-dev-main}
+             :uberjar {:aot :all}})
