@@ -1,32 +1,32 @@
 (ns groove-api.util.validation
   (:require [buddy.core.hash :as hash]
+            [toucan.db :as db]
+            [groove-api.models.user :refer [User]]
             [buddy.core.codecs :refer :all]
             [clj-http.client :as client]))
 
-(def breach_limit 1)
-(def lower_limit 8)
-(def upper_limit 128)
+(def ^:private states #{"none", "fail", "success", "pass"})
+(def ^:private breach_limit 1)
+(def ^:private lower_limit 8)
+(def ^:private upper_limit 128)
+(def ^:private email-regex
+  #"(?i)[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
 
+(defn- filter-dgst [suffix dgsts] (filter (fn [dgst] (= suffix (.toLowerCase (:hash dgst)))) dgsts))
 
-(defn get-digest [^String pwd]
-  (-> (hash/sha1 pwd)
-      (bytes->hex)))
+(defn- match [suffix dgsts] (:freq (first (filter-dgst suffix dgsts))))
 
-(defn- find-matches [suffix digests] (filter (fn [digest] (= suffix (.toLowerCase (:hash digest)))) digests))
-
-(defn- get-match [suffix digests] (:freq (first (find-matches suffix digests))))
-
-(defn- digest-in-digests? [suffix digests] ;-- only one match
-  (let [match (get-match  suffix digests)]
+(defn- digest-in-digests? [suffix dgsts] ;-- only one match
+  (let [match (match suffix dgsts)]
     (if (empty? match)
       false
       (> (Integer/parseInt match) breach_limit))))
   
-(defn- get-prefix [^String digest]
-  (subs digest 0 5))
+(defn- get-prefix [^String dgst]
+  (subs dgst 0 5))
 
-(defn- get-suffix [^String digest]
-  (subs digest 5))
+(defn- get-suffix [^String dgst]
+  (subs dgst 5))
 
 (defn- structure [body]
   (re-seq #"(\w+):(\d+)\r\n" body))
@@ -37,18 +37,48 @@
       (map (fn [x] {:hash (nth x 1) :freq (nth x 2)}) body-map)
       {})))
 
-(defn- get-db [prefix] 
+(defn- fetch-db [prefix] 
   (client/get (str "https://api.pwnedpasswords.com/range/" prefix)))
 
-(defn- breached? [^String pwd]
-  (let [digest (get-digest pwd)]
+(defn- digest [^String pwd]
+  (-> (hash/sha1 pwd)
+      (bytes->hex)))
+
+(defn valid-name? [^String name]
+  (<= (.length name) 50))
+(defn valid-username? [^String name]
+  (valid-name? name))
+
+
+
+(defn valid-email? [^String email]
+  (boolean (and 
+             (string? email) 
+             (re-matches email-regex email)
+             (empty? (db/select User :email email)))))
+
+(defn valid-groove? [state]
+  (contains? states (.toLowerCase state)))
+
+(defn valid-date? [date]
+  (if date
+    true
+    false))
+
+(defn valid-user-id? [id]
+  (> id 0))
+(defn valid-habit-id? [id]
+  (> id 0))
+
+(defn- found-in-breach? [^String pwd]
+  (let [dgst (digest pwd)]
   (digest-in-digests? 
-    (get-suffix digest) 
+    (get-suffix dgst) 
     (build-map 
-      (:body (get-db (get-prefix digest)))))))
+      (:body (fetch-db (get-prefix dgst)))))))
                             
 (defn valid-password? [^String pwd]
   (and 
     (> (.length pwd) lower_limit)
     (< (.length pwd) upper_limit)
-    (not (breached? pwd))))
+    (not (found-in-breach? pwd))))
