@@ -8,10 +8,12 @@
   },
   "dependencies": {
     "axios": "^0.19.0",
-    "gridsome": "^0.7.11"
+    "gridsome": "^0.7.11",
+    "serialize-javascript": ">=2.1.1"
   },
   "devDependencies": {
     "gridsome-plugin-tailwindcss": "^2.2.27",
-    "http-proxy-middleware": "^0.20.0"
+    "http-proxy-middleware": "^0.20.0",
+    "serialize-javascript": ">=2.1.1"
   }
 }
