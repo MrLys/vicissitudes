@@ -82,3 +82,6 @@
     (> (.length pwd) lower_limit)
     (< (.length pwd) upper_limit)
     (not (found-in-breach? pwd))))
+
+
+(defn valid-auth-scheme?  [request] 0)

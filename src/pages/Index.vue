@@ -28,18 +28,6 @@
     </div>
   </Layout>
 </template>
-<page-query>
-  query {
-    choices: allChoices {
-      edges {
-        node { 
-          day
-          choice
-        }
-      }
-    }
-  }
-</page-query>
 <script>
 export default {
   metaInfo: {
