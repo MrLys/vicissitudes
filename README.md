@@ -3,7 +3,10 @@ Groove is a very simple habit tracker. You can create your own habits and each d
 check the habit of as success (✅), failure (❌) or pass (⚪️).
 
 
-This is a personal project, and is mostly for educational purposes.
+This is a personal project, and is mostly for educational purposes. And what a journey it has been!
+
+
+## What is it?
 I decided to make this because I've been eager to create something using
 Clojure. While considering this, I stumbled upon TailwindCSS and thought that it would potentially
 make my life easier regarding frontend development. As a result, the stack ended up being this weird
