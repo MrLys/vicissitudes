@@ -3,7 +3,7 @@
             [toucan.db :as db]
             [groove-api.models.groove :refer [Groove]]
             [groove-api.handlers.groove :refer :all]
-            [groove-api.middleware :refer [wrap-basic-auth wrap-token-auth]]
+            [groove-api.middleware :refer [wrap-basic-auth wrap-token-auth auth-credentials-reponse]]
             [groove-api.util.utils :refer [convert-date]]
             [compojure.api.sweet :refer [GET POST PATCH]]
             [groove-api.util.validation :refer :all]))
@@ -15,26 +15,16 @@
    :date (s/constrained java.util.Date valid-date?)})
 
 (def groove-routes
-  [(-> (GET "/login" [:as request]
-            :header-params [authorization :- String]
-            :middleware [wrap-basic-auth]
-            (auth-credentials-reponse request)))
-   (-> (GET "/grooves" []
+  [(-> (GET "/grooves/:user_id/:habit_id"  [:as request]
             :header-params [authorization :- String]
             :tags ["grooves"]
-            :summary "get all grooves"
             :middleware [wrap-token-auth]
-            (get-grooves-handler)))
+            :path-params [user_id :- Long, habit_id :- Long]
+            :query-params [start_date :- s/Str, end_date :- s/Str]
+            (get-grooves-handler request user_id habit_id start_date end_date)))
    (-> (POST "/groove/" []
              :header-params [authorization :- String]
              :middleware [wrap-token-auth]
              :tags ["grooves"]
              :body [create-groove-req GrooveRequestSchema]
-             (create-groove-handler (convert-date create-groove-req))))
-   (-> (PATCH "/groove/:id" []
-              :header-params [authorization :- String]
-              :middleware [wrap-token-auth]
-              :tags ["grooves"]
-              :path-params [id :- s/Int]
-              :body [update-groove-req GrooveRequestSchema]
-              (update-groove-handler id update-groove-req)))])
+             (create-groove-handler (convert-date create-groove-req))))])
