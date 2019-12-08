@@ -2,6 +2,8 @@
   (:require [groove-api.handlers.user :refer :all]
             [groove-api.util.validation :refer :all]
             [compojure.api.sweet :refer [GET POST PATCH]]
+            [groove-api.middleware :refer [auth-credentials-reponse wrap-basic-auth]]
+            [ring.util.http-response :refer [created ok]]
             [schema.core :as s]))
 
 (s/defschema UserRequestSchema
@@ -10,7 +12,11 @@
    :password (s/constrained s/Str valid-password?)})
 
 (def user-routes
-  [(POST "/users" []
+  [(-> (GET "/login" [:as request]
+            :header-params [authorization :- String]
+            :middleware [wrap-basic-auth]
+            (auth-credentials-reponse request)))
+   (POST "/users" []
          :tags ["User"]
          :body [create-user-req UserRequestSchema]
          (create-user-handler2 create-user-req))
