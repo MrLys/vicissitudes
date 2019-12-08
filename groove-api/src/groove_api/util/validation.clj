@@ -46,10 +46,9 @@
 
 (defn valid-name? [^String name]
   (<= (.length name) 50))
+
 (defn valid-username? [^String name]
   (valid-name? name))
-
-
 
 (defn valid-email? [^String email]
   (boolean (and 
@@ -85,3 +84,4 @@
 
 
 (defn valid-auth-scheme?  [request] 0)
+
