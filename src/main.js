@@ -19,7 +19,7 @@ export default function (Vue, { router, head, isClient, appOptions}) {
         state: {
             status: '',
             token:  localStorage.getItem('token') || '',
-            id: localStorage.getItem('user_id') || '',
+            id: localStorage.getItem('user_id') || ''
         },
         mutations: {
             auth_request(state){
@@ -33,55 +33,75 @@ export default function (Vue, { router, head, isClient, appOptions}) {
             auth_error(state){
                 state.status = 'error'
             },
+            register_success(state) {
+              state.status = "success";
+            },
             logout(state){
                 state.status = ''
                 state.token = ''
             },
         },
         actions: {
-            login({commit}, data){
-                return new Promise((resolve, reject) => {
-                    commit('auth_request')
-                    let options = {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': "Basic " + data,
-                        }}
-                    Vue.prototype.$http('/api/login', options)
-                        .then(resp => {
-                            const token = resp.data.token
-                            const user_id = resp.data.id
-                            console.log(user_id);
-                            localStorage.setItem('token', token)
-                            localStorage.setItem('user_id', user_id)
-                            Vue.prototype.$http.defaults.headers.common['Authorization'] = 'Bearer ' + token
-                            commit('auth_success', { token: token, user_id: user_id})
-                            resolve(resp)
-                        })
-                        .catch(err => {
-                            commit('auth_error')
-                            localStorage.removeItem('token')
-                            reject(err)
-                        })
+          login({commit}, data){
+            return new Promise((resolve, reject) => {
+              commit('auth_request')
+              let options = {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': "Basic " + data,
+                }}
+              Vue.prototype.$http('/api/login', options)
+                .then(resp => {
+                  const token = resp.data.token
+                  const user_id = resp.data.id
+                  console.log(user_id);
+                  localStorage.setItem('token', token)
+                  localStorage.setItem('user_id', user_id)
+                  Vue.prototype.$http.defaults.headers.common['Authorization'] = 'Bearer ' + token
+                  commit('auth_success', { token: token, user_id: user_id})
+                  resolve(resp)
                 })
-            },
-            logout({commit}){
-                return new Promise((resolve, reject) => {
-                    commit('logout')
-                    localStorage.removeItem('token')
-                    localStorage.removeItem('user_id')
-                    delete Vue.prototype.$http.defaults.headers.common['Authorization']
-                    resolve()
+                .catch(err => {
+                  commit('auth_error')
+                  localStorage.removeItem('token')
+                  reject(err)
                 })
-            }
+            })
+          },
+          logout({commit}){
+            return new Promise((resolve, reject) => {
+              commit('logout')
+              localStorage.removeItem('token')
+              localStorage.removeItem('user_id')
+              delete Vue.prototype.$http.defaults.headers.common['Authorization']
+              resolve()
+            })
+
+          },
+          register({commit}, data) {
+            return new Promise((resolve, reject) => {
+              commit('auth_request')
+              Vue.prototype.$http.post('/api/register', data)
+                .then(resp => {
+                  commit('register_success');
+                  resolve(resp);
+                })
+                .catch(err => {
+                  commit('auth_error')
+                  localStorage.removeItem('token')
+                  reject(err)
+                })
+            })
+          },
+
 
         },
-        getters : {
-            isLoggedIn: state => !!state.token,
-            authStatus: state => state.status,
-            id: state => state.id,
-        }
+      getters : {
+        isLoggedIn: state => !!state.token,
+        authStatus: state => state.status,
+        id: state => state.id,
+      }
 
     })
 }
