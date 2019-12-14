@@ -16,10 +16,12 @@
          :middleware [wrap-token-auth]
          :body [create-habit-req HabitRequestSchema]
          (create-habit-handler create-habit-req request))
-   (GET "/habits/:id" []
-         :tags ["Habits"]
+   (GET "/habits/:id" [:as request]
+        :tags ["Habits"]
+        :header-params [authorization :- String]
+        :middleware [wrap-token-auth]
         :path-params [id :- s/Int]
-        (get-habit-handler id))
+        (get-habit-handler id request))
    (GET "/habits" []
          :tags ["Habits"]
         (get-habits-handler))])
