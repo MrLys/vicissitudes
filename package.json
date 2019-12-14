@@ -16,5 +16,8 @@
     "gridsome-plugin-tailwindcss": "^2.2.27",
     "http-proxy-middleware": "^0.20.0",
     "serialize-javascript": ">=2.1.1"
+  },
+  "scripts": {
+   "lint": "eslint ."
   }
 }
