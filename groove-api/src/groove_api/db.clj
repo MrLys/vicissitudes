@@ -39,8 +39,14 @@
 (defn get-grooves-by-date-range [user_id habit start end]
   (db/select Groove :owner_id user_id :habit_id habit :date [:> start] :date [:< end]))
 
+(defn get-all-grooves-by-date-range [user_id start end]
+  (db/select Groove :owner_id user_id :date [:>= start] :date [:<= end]))
+
 (defn get-groove-by-user-habit-date [userId habitId date]
   (db/select Groove  :owner_id userId :habit_id habitId :date date))
+
+(defn groove-id-by-user-habit-date [userId habitId date] 
+  (db/select-one-id Groove  :owner_id userId :habit_id habitId :date date))
 
 (defn create-groove [groove]
   (db/insert! Groove groove))
