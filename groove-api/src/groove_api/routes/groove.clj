@@ -29,9 +29,9 @@
             :path-params [userId :- Long]
             :query-params [start_date :- java.util.Date , end_date :- java.util.Date]
             (get-all-grooves-handler request userId start_date end_date)) 
-   (-> (PATCH "/groove" [:as request]
+   (PATCH "/groove" [:as request]
              :header-params [authorization :- String]
              :middleware [wrap-token-auth]
              :tags ["grooves"]
              :body [create-groove-req GrooveRequestSchema]
-             (update-groove-handler create-groove-req request)))])
+             (update-groove-handler create-groove-req request))])
