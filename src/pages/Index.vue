@@ -1,11 +1,21 @@
 <template>
   <Layout>
-    <div class="flex container">
-      Welcome!
-      <button class="bg-green-500 hover:bg-blue-700 text-white font-bold py-2
-      x-4 rounded my-2 mx-2 mx-auto" v-on:click="toLogin()"><p class="px-2"
-      v-if="!loggedIn">Log in</p>
-      </button>
+    <div class="flex container center">
+      <div>Welcome!</div>
+      <div class="my-4 block center mx-auto">
+        <div>
+        <button class="bg-green-500 hover:bg-blue-700 text-white font-bold py-2
+        x-4 rounded my-2 mx-2 mx-auto" v-on:click="toLogin()">
+          <p class="px-2" v-if="!loggedIn">Log in</p>
+        </button>
+        </div>
+        <div>
+        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2
+        x-4 rounded my-2 mx-2 mx-auto" v-on:click="toRegister()">
+          <p class="px-2" v-if="!loggedIn">Register</p>
+        </button>
+        </div>
+      </div>
     </div>
   </Layout>
 </template>
@@ -24,6 +34,11 @@ export default {
       } else {
         this.$router.push('/login');
       }
+    },
+    toRegister: function () {
+      this.$store.dispatch('logout').then(() => {
+        this.$router.push('/register')
+      });
     }
   }
 }
