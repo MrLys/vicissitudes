@@ -9,6 +9,7 @@
             [groove-api.models.groove :refer [Groove]]))
 
 (defn create-groove-handler [req]
+  (println req)
   (id->created (db/insert! Groove (format-groove req))))
 
 (defn get-grooves-handler [request user habit start end]
