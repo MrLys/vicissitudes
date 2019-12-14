@@ -56,8 +56,6 @@
                       (st/dissoc :refresh_token))
        :password (:digest user)})))
 
-(defn get-user-habit [userId habitId]
-  (db/select User_habit :owner_id userId :habit_id habitId))
 
 (defn create-habit [habit]
   (let [hbt (db/insert! Habit :name habit)]
@@ -67,5 +65,17 @@
 (defn get-habit-by-name [name]
   (db/select Habit :name name)) 
 
+(defn get-all-habits-by-userId [userId]
+  (db/query {:select [:habit.id :habit.name] 
+             :from [:habit]
+             :join [:user_habit [:= :habit.id :user_habit.habit_id]]}))
+
+
 (defn create-user-habit [habit ownerId]
   (db/insert! User_habit :owner_id ownerId :habit_id (:id habit)))
+
+(defn get-user-habit [userId habitId]
+  (db/select User_habit :owner_id userId :habit_id habitId))
+
+(defn get-user-habits [userId]
+  (db/select User_habit :owner_id userId))
