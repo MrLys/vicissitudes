@@ -16,18 +16,8 @@
             :header-params [authorization :- String]
             :middleware [wrap-basic-auth]
             (auth-credentials-reponse request)))
-   (POST "/users" []
-         :tags ["User"]
-         :body [create-user-req UserRequestSchema]
-         (create-user-handler2 create-user-req))
-    (POST "/user" []
+   (POST "/register" []
          :tags ["User"]
          :body [user UserRequestSchema]
-         (create-user-handler2 user))
-   (GET "/users/:id" []
-         :tags ["User"]
-        :path-params [id :- s/Int]
-        (get-user-handler id))
-   (GET "/users" []
-         :tags ["User"]
-        (get-users-handler))])
+         (create-user-handler2 user))])
+
