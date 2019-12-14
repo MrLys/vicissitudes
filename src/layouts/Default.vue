@@ -5,8 +5,10 @@
         <g-link to="/">{{ $static.metadata.siteName }}</g-link>
       </strong>
       <nav class="nav">
-        <g-link class="nav__link" to="/">Home</g-link>
-        <g-link class="nav__link" to="/about/">About</g-link>
+        <g-link class="ml-2" to="/">Home</g-link>
+        <a v-if="loggedIn" class="ml-2 cursor-pointer" v-on:click="logout()">Logout</a>
+        <a v-if="loggedIn" class="ml-2 cursor-pointer" v-on:click="toHabits()">Habits</a>
+        <g-link class="ml-2" to="/about/">About</g-link>
       </nav>
     </header>
     <slot class="container mx-auto"/>
@@ -20,7 +22,30 @@ query {
   }
 }
 </static-query>
-
+<script>
+export default {
+  metaInfo: {
+    title: 'Welcome!'
+  },
+  data () {
+    return {loggedIn: this.$store.getters.isLoggedIn}
+  },
+  methods: {
+    logout: function () {
+      console.log("logging out");
+      this.$store.dispatch('logout').then(() => {
+        this.$router.push('/login')
+      });
+    },
+    toHabits: function () {
+      if (this.$router.history.current.path !== '/habits'){
+        console.log("visiting habits");
+        this.$router.push('/habits')
+      }
+    }
+  }
+}
+</script>
 <style>
 body {
   font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;

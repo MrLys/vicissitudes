@@ -12,7 +12,7 @@
    :password (s/constrained s/Str valid-password?)})
 
 (def user-routes
-  [(-> (GET "/login" [:as request]
+  [(-> (POST "/login" [:as request]
             :header-params [authorization :- String]
             :middleware [wrap-basic-auth]
             (auth-credentials-reponse request)))

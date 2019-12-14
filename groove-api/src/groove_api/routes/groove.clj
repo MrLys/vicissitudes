@@ -22,7 +22,7 @@
             :path-params [user_id :- Long, habit_id :- Long]
             :query-params [start_date :- s/Str, end_date :- s/Str]
             (get-grooves-handler request user_id habit_id start_date end_date)))
-   (-> (POST "/groove/" []
+   (-> (POST "/groove" []
              :header-params [authorization :- String]
              :middleware [wrap-token-auth]
              :tags ["grooves"]
