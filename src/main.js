@@ -4,12 +4,14 @@
 import DefaultLayout from '~/layouts/Default.vue';
 import AxiosPlugin from '~/axios.js';
 import Vuex from 'vuex';
+import moment from 'moment';
 
 export default function (Vue, { router, head, isClient, appOptions}) {
     // Set default layout as a global component
     Vue.component('Layout', DefaultLayout);
     Vue.use(AxiosPlugin);
     Vue.use(Vuex);
+    Vue.prototype.$moment = moment;
     const token = localStorage.getItem('token')
     if (token) {
       Vue.prototype.$http.defaults.headers.common['Authorization'] = 'Bearer ' + token
