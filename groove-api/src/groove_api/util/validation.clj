@@ -53,8 +53,7 @@
 (defn valid-email? [^String email]
   (boolean (and 
              (string? email) 
-             (re-matches email-regex email)
-             (empty? (db/select User :email email)))))
+             (re-matches email-regex email))))
 
 (defn valid-groove? [state]
   (contains? states (.toLowerCase state)))
