@@ -1,14 +1,15 @@
 (ns groove-api.handlers.habit
   (:require [ring.util.http-response :refer [ok not-found created]]
             [groove-api.models.habit :refer [Habit]]
+            [groove-api.bulwark :refer [create-habit]]
             [toucan.db :as db]))
 
 (defn id->created [id]
   (created (str "/habits/" id) {:id id}))
 
 
-(defn create-habit-handler [create-habit-req]
-  (id->created (get (db/insert! Habit create-habit-req) :id)))
+(defn create-habit-handler [habit request]
+  (create-habit habit request))
 
 (defn habit->response [habit]
   (if habit
