@@ -44,6 +44,11 @@
           (conflict {:error "You are already tracking that habit"}))))
     (unauthorized {:error "unauthorized"})))
 
+(defn get-habits [userId request]
+  (if (validate-user-permission request userId)
+    (let [habits (db/get-all-habits-by-userId userId)]
+      (ok habits))
+    (unauthorized {:error "unauthorized"})))
 
 ;;(defn select [user req model])
 ;;(defn update! [])
