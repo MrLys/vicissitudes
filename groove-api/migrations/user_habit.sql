@@ -1,0 +1,5 @@
+CREATE TABLE IF NOT EXISTS "user_habit" (
+    id SERIAL PRIMARY KEY NOT NULL,
+    habit_id INTEGER REFERENCES public.habit(id) ON DELETE CASCADE,
+    owner_id INTEGER REFERENCES public.user(id) ON DELETE CASCADE
+);
