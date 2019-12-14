@@ -2,6 +2,7 @@
   (:require [schema.core :as s]
             [groove-api.handlers.habit :refer :all]
             [groove-api.util.validation :refer :all]
+            [groove-api.middleware :refer [wrap-token-auth]]
             [compojure.api.sweet :refer [GET POST PATCH]]))
 
 (s/defschema HabitRequestSchema
@@ -9,10 +10,12 @@
    :name (s/constrained s/Str valid-name?)})
 
 (def habit-routes
-  [(POST "/habits" []
+  [(POST "/habit" [:as request]
          :tags ["Habits"]
+         :header-params [authorization :- String]
+         :middleware [wrap-token-auth]
          :body [create-habit-req HabitRequestSchema]
-         (create-habit-handler create-habit-req))
+         (create-habit-handler create-habit-req request))
    (GET "/habits/:id" []
          :tags ["Habits"]
         :path-params [id :- s/Int]
