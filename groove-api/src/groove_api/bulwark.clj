@@ -3,7 +3,8 @@
             [groove-api.models.groove :refer [Groove]]
             [groove-api.db :refer [get-grooves-by-date-range]]
             [schema-tools.core :as st]
-            [ring.util.http-response :refer [ok unauthorized conflict created]]
+            [ring.util.http-response :refer [ok unauthorized conflict created no-content not-modified]]
+            [groove-api.util.validation :refer [valid-token?]]
             [groove-api.util.utils :refer [format-groove parseLong convert-date]]))
 
 (defn- validate-permission [user id]
@@ -57,7 +58,13 @@
       (ok habits))
     (unauthorized {:error "unauthorized"})))
 
-;;(defn select [user req model])
-;;(defn update! [])
-;;(defn delete! [])
-;;(defn insert! [])
+(defn- activation-helper [id]
+  (if (db/activate-user id)
+    (no-content)
+    (not-modified)))
+(defn activate-user [token request]
+  (let [token (db/get-token-by-token token)]
+    (if (not (nil? token)) ;; user can be activated
+      (activation-helper (:user_id token)) 
+      (unauthorized {:error "unauthorized"}))))
+
