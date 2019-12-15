@@ -5,6 +5,7 @@
             [groove-api.models.user_habit :refer [User_habit]]
             [groove-api.models.habit :refer [Habit]]
             [groove-api.models.groove :refer [Groove]]
+            [groove-api.models.activation_token :refer [Activation_token]]
             [groove-api.util.validation :refer :all]
             [buddy.hashers :as hashers]
             [schema-tools.core :as st]
@@ -62,6 +63,9 @@
                       (st/dissoc :refresh_token))
        :password (:digest user)})))
 
+(defn get-user-id-by-email [email]
+  (db/select-one-id User :email email))
+
 
 (defn create-habit [habit]
   (let [hbt (db/insert! Habit :name habit)]
@@ -86,3 +90,7 @@
 
 (defn get-user-habits [userId]
   (db/select User_habit :owner_id userId))
+
+
+(defn new-activation-token [token userId date]
+  (db/insert! Activation_token :user_id userId :token token :expiration date))
