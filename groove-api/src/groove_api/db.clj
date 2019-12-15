@@ -94,3 +94,9 @@
 
 (defn new-activation-token [token userId date]
   (db/insert! Activation_token :user_id userId :token token :expiration date))
+
+(defn get-token-by-token [token]
+  (db/select-one Activation_token :token token))
+
+(defn activate-user [userId]
+  (db/update! User userId :activated true))
