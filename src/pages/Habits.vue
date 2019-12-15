@@ -1,8 +1,20 @@
 <template>
   <Layout>
-
+    <div>
+      <button class="bg-white border-2 hover:bg-blue-700 text-white font-bold py-2
+      px-4 rounded my-2 mx-2 mx-auto" v-on:click="newHabit()">
+        ➕
+      </button>
+        <div class="block py-2" v-if="creating">
+          <label class="px-1">Habit name </label>
+          <input class="bg-white focus:outline-none focus:shadow-outline border
+          border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none
+          leading-normal" v-model="habitName" type="text"
+          placeholder="exercising" v-on:keyup.enter="createHabit()">
+        </div>
+        <p class="text-red-500"> {{ feedback }}</p>
+    </div>
     <div class="flex container">
-
         <div class="py-2 w-1/6 block border-r last:border-r-0 text-center bg-gray-100" v-for="day in week">
           {{ day.day }} 
         </div>
@@ -40,8 +52,11 @@ export default {
   },
   data () {
     return {
+      feedback: "",
       items:  [],
       monday: dates.getMonday(new Date()),
+      creating: false,
+      habitName: "",
       week: [
         {day:'Monday'},
         {day:'Tuesday'}, 
@@ -66,7 +81,7 @@ export default {
     const id = this.$store.getters.id;
     this.$http
     .get('/api/habits/'+ id)
-      .then(response => (this.mapHabits(response)));
+      .then(response => (this.mapHabitsResp(response)));
     let startDate = this.monday.format();
     let endDate = dates.addDays(this.monday, 6).format();
     console.log(startDate);
@@ -76,6 +91,22 @@ export default {
     this.$http.get(url).then(response => (this.mapper(response)));
   },
   methods: {
+    newHabit: function() {
+      this.creating = true;
+    },
+    createHabit: function (){
+      if (this.habitName.length < 2) {
+        this.feedback = "Please enter a longer habit name";
+        return;
+      }
+      let id = localStorage.getItem('user_id');
+      this.$http.post('/api/habit',{owner_id: parseInt(id), name:
+        this.habitName}).then(response => {
+          location.reload();
+          //this.habits = this.habits.concat(response.data);
+          //this.mapHabits(this.items.concat(response.data));
+        });
+    },
     generateWeek: function (habit_id) {
       let monday = this.monday;
       return [{day:'Monday', date: monday, clicked:false, groove: 'none',
@@ -88,9 +119,7 @@ export default {
       {day:'Saturday',date: dates.addDays(monday, 5), clicked:false, groove: 'none', habit: habit_id},
       {day:'Sunday',date: dates.addDays(monday, 6), clicked:false, groove: 'none', habit: habit_id}];
     },
-    mapHabits: function (resp) {
-      let habits = resp.data;
-      this.habits = habits;
+    mapHabits: function (habits) {
       let items = [];
       console.log(habits);
       for (let i= 0; i < habits.length; i++) {
@@ -99,6 +128,11 @@ export default {
         this.iMap[habits[i].id] = i;
       }
       this.items = items;
+    },
+    mapHabitsResp: function (resp) {
+      let habits = resp.data;
+      this.habits = habits;
+      this.mapHabits(habits);
     },
     mapper: function (data) {
       var items = data.data;
