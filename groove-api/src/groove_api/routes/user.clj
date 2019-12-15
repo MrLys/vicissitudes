@@ -19,5 +19,9 @@
    (POST "/register" []
          :tags ["User"]
          :body [user UserRequestSchema]
-         (create-user-handler2 user))])
+         (create-user-handler2 user))
+   (POST "/activate" [:as request]
+         :tags ["User"]
+         :query-params [activation_token :- String]
+         (activate-user-handler activation_token request))])
 
