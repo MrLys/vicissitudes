@@ -6,8 +6,8 @@
         props (java.util.Properties.)]
 
     (doto props
-      (.setProperty "mail.smtp.host" (str (:host mail)))
-      (.setProperty "mail.smtp.port" (str (:port mail))))
+      (.setProperty "mail.smtp.host" "mail.smtpbucket.com")
+      (.setProperty "mail.smtp.port" "8025"))
 
       (if (= (:ssl mail) true)
         (doto props
@@ -21,7 +21,7 @@
              msg     (javax.mail.internet.MimeMessage. session)
              recipients (reduce #(str % "," %2) (:to mail))]
 
-        (.setFrom msg (javax.mail.internet.InternetAddress. (str (:from mail))))
+        (.setFrom msg (javax.mail.internet.InternetAddress. "noreply@rutta.no"))
 
         (.addRecipient msg 
                         (javax.mail.Message$RecipientType/TO)

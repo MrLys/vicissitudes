@@ -10,7 +10,7 @@
       (.put "mail.smtp.port" (:port mail))
       (.put "mail.smtp.user" (:user mail))
       (.put "mail.smtp.socketFactory.port"  (:port mail))
-      (.put "mail.smtp.auth" "true"))
+      (when-not (empty? (:password mail)) (.put "mail.smtp.auth" "true")))
 
     (if (= (:ssl mail) true)
       (doto props
@@ -18,9 +18,21 @@
               "javax.net.ssl.SSLSocketFactory")
         (.setProperty "mail.smtp.socketFactory.fallback" "false")
         (.setProperty "mail.smtp.socketFactory.port" (str (:port mail)))
-        (.put "mail.smtp.starttls.enable" "true")
-        ))
+        (.put "mail.smtp.starttls.enable" "true")))
+    (if (empty? (:password mail))
+          (let [recipients (reduce #(str % "," %2) (:to mail))
+                session (javax.mail.Session/getDefaultInstance props)
+                msg     (javax.mail.internet.MimeMessage. session)]
+            
+      (.setFrom msg (javax.mail.internet.InternetAddress. (:user mail)))
 
+      (.setRecipients msg 
+                      (javax.mail.Message$RecipientType/TO)
+                      (javax.mail.internet.InternetAddress/parse recipients))
+
+      (.setSubject msg (:subject mail))
+      (.setText msg (:text mail))
+      (javax.mail.Transport/send msg))
     (let [authenticator (proxy [javax.mail.Authenticator] [] 
                           (getPasswordAuthentication 
                             []
@@ -38,4 +50,4 @@
 
       (.setSubject msg (:subject mail))
       (.setText msg (:text mail))
-      (javax.mail.Transport/send msg))))
+      (javax.mail.Transport/send msg)))))
