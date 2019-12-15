@@ -1,11 +1,10 @@
 (ns groove-api.bulwark
   (:require [groove-api.db :as db]
             [groove-api.models.groove :refer [Groove]]
-            [groove-api.util.utils :refer [format-groove]]
             [groove-api.db :refer [get-grooves-by-date-range]]
             [schema-tools.core :as st]
             [ring.util.http-response :refer [ok unauthorized conflict created]]
-            [groove-api.util.utils :refer [parseLong convert-date]]))
+            [groove-api.util.utils :refer [format-groove parseLong convert-date]]))
 
 (defn- validate-permission [user id]
   (println (str "Userid: " user " accessing data for user " id))
