@@ -8,7 +8,7 @@
 
 
 (defn create-new-user [user]
-  (ok (new-user [user])))
+  (ok (new-user user)))
   
 (defn user->response [user]
   (if user

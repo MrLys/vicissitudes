@@ -55,7 +55,7 @@
 
 (defn auth-mw [handler]
   (fn [request]
-    (print request)
+    (println request)
     (if (authenticated? request)
       (handler request)
       (unauthorized {:error "Not authorized"}))))
