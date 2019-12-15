@@ -52,12 +52,14 @@
     (assoc (ok data) :cookies {"groove_cookie" {:value (:token data)}})))
   ;--(assoc (ok (:res data)) :cookies {"payload_cookie" {:value (:payload data)}
   ;--                          "signature_cookie" {:value (:signature data), :http-only true}})))
-
+(defn- activated? [request]
+  (:activated (:identity request)))
 (defn auth-mw [handler]
   (fn [request]
-    (println request)
     (if (authenticated? request)
-      (handler request)
+      (if (not (activated?))
+        (unauthorized {:error "Account is not activated"})
+        (handler request))
       (unauthorized {:error "Not authorized"}))))
 
 
