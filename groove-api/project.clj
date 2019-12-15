@@ -15,6 +15,7 @@
                  [ring/ring-defaults "0.3.2"]
                  [ring/ring-anti-forgery "1.2.0"]
                  [clj-http "3.10.0"]
+                 [org.clojars.nakkaya.javax.mail/mail "1.4.3"]
                  [toucan "1.1.9"]
                  [clj-time "0.15.2"]
                  [metosin/schema-tools "0.12.0"]
