@@ -2,6 +2,7 @@
   (:require [clojure.string :as str]
             [ring.util.http-response :refer [ok not-found conflict created]]
             [groove-api.db :as db]
+            [groove-api.bulwark :refer [activate-user]]
             [groove-api.models.user :refer [User]]
             [groove-api.mail-test :refer [mail]]
             [groove-api.util.utils :refer [convert-date]]
@@ -44,3 +45,5 @@
      email-exists? (conflict {:error "Email already exist"})                                   
      :else (create-new-user user))))
 
+(defn activate-user-handler [token request]
+  (activate-user token request))  
