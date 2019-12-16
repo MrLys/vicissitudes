@@ -28,5 +28,5 @@
                         (javax.mail.internet.InternetAddress. (str (:to mail))))
 
         (.setSubject msg (:subject mail))
-        (.setText msg (:text mail))
+        (.setContent msg (:text mail) "text/html")
         (javax.mail.Transport/send msg))))

@@ -84,11 +84,11 @@
 
 (defn valid-auth-scheme?  [request] 0)
 
-(defn- valid-token? [token]
+(defn valid-token? [token]
   (if (nil? token)
     false
     (let [calendarNow (java.util.Calendar/getInstance) 
-          calendarToken (java.util.Calendar/getInstance)
-          (.setTime calendarToken (:expiration token))]
-    (.after calendarNow calendarToken)))) 
+          calendarToken (java.util.Calendar/getInstance)]
+      (.setTime calendarToken (:expiration token))
+      (.after calendarNow calendarToken)))) 
 

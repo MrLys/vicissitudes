@@ -10,14 +10,15 @@
 
 
 (defn create-new-user [user]
-  (let [activation_token (java.util.UUID/randomUUID)
+  (let [user (assoc user :email (.toLowerCase (:email user)))
+        activation_token (java.util.UUID/randomUUID)
         calendar (java.util.Calendar/getInstance)
         _ (.add calendar (java.util.Calendar/HOUR) 24)
         date (convert-date (.getTime calendar))
         dbUser (db/new-user user)
-        userId (db/get-user-id-by-email (:email user))]
+        userId (db/get-user-id-by-email (.toLowerCase (:email user)))]
     (db/new-activation-token activation_token userId date)
-    (mail :to (:email user) :subject "Welcome to rutta!" :text (str "Welcome to rutta!\n" "please follow this link for activation\n" "localhost:3000/activation?token=" activation_token))
+    (mail :to (:email user) :subject "Welcome to rutta!" :text (str "<h1>Welcome to rutta!</h1>\n" "Please follow this link for activation\n" "<a href=\"http://localhost:3000/activation?token=" activation_token"\">Click here</a>"))
           (ok dbUser)))
   
 (defn user->response [user]
