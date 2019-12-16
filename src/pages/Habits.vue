@@ -1,6 +1,8 @@
 <template>
   <Layout>
     <div>
+      <p class="h1 text-center" v-if="!hasHabits"> You don't track any habits yet! Click the
+      button below to create your very first habit 🎉 </p>
       <button class="bg-white border-2 hover:bg-blue-700 text-white font-bold py-2
       px-4 rounded my-2 mx-2 mx-auto" v-on:click="newHabit()">
         ➕
@@ -14,12 +16,13 @@
         </div>
         <p class="text-red-500"> {{ feedback }}</p>
     </div>
-    <div class="flex container">
+    <div class="flex container" v-if="hasHabits">
         <div class="py-2 w-1/6 block border-r last:border-r-0 text-center bg-gray-100" v-for="day in week">
           {{ day.day }} 
         </div>
   </div>
-  <div class="block container  py-2" v-for="(habit, habit_index) in habits">  
+  <div class="block container  py-2" v-for="(habit, habit_index) in habits"
+    v-if="hasHabits">  
     <p class="py-2"> {{ habit.name }}</p>
     <div class="flex container">
       <div class="w-1/6 block border-r last:border-r-0" v-for="item in items[habit_index]">
@@ -28,17 +31,17 @@
       </div>
     </div>
     </div>
-    <div class="flex container">
+    <div class="flex container" v-if="hasHabits">
       <button class="bg-green-500 hover:bg-blue-700 text-white font-bold py-2
       px-4 rounded my-2 mx-2 mx-auto" v-on:click="action('success')">
         ✅
       </button>
       <button class="bg-red-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-2 mx-2 mx-auto" 
-              v-on:click="action('fail')">
+              v-on:click="action('fail')" v-if="hasHabits">
         ❌
       </button>
       <button class="bg-gray-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-2 mx-2 mx-auto"
-              v-on:click="action('pass')">
+              v-on:click="action('pass')" v-if="hasHabits">
         ⚪️
       </button>
   </div>
@@ -57,6 +60,7 @@ export default {
       monday: dates.getMonday(new Date()),
       creating: false,
       habitName: "",
+      hasHabits: false,
       week: [
         {day:'Monday'},
         {day:'Tuesday'}, 
@@ -80,15 +84,16 @@ export default {
   mounted () {
     const id = this.$store.getters.id;
     this.$http
-    .get('/api/habits/'+ id)
-      .then(response => (this.mapHabitsResp(response)));
-    let startDate = this.monday.format();
-    let endDate = dates.addDays(this.monday, 6).format();
-    console.log(startDate);
-    let url = '/api/grooves/' + id +
-      '?start_date=' + startDate + '&end_date=' + endDate;
-    console.log(url);
-    this.$http.get(url).then(response => (this.mapper(response)));
+      .get('/api/habits')
+      .then(response => {
+        this.hasHabits = true;
+        this.mapHabitsResp(response);
+        let startDate = this.monday.hours(0).format();
+        let endDate = dates.addDays(this.monday, 6).hours(23).format();
+        let url = '/api/grooves/' + id +
+          '?start_date=' + startDate + '&end_date=' + endDate;
+        this.$http.get(url).then(response => (this.mapper(response))).catch((error) => {console.log(error)});
+      }).catch((error) => {console.log(error)});
   },
   methods: {
     newHabit: function() {
@@ -103,8 +108,6 @@ export default {
       this.$http.post('/api/habit',{owner_id: parseInt(id), name:
         this.habitName}).then(response => {
           location.reload();
-          //this.habits = this.habits.concat(response.data);
-          //this.mapHabits(this.items.concat(response.data));
         });
     },
     generateWeek: function (habit_id) {
@@ -127,6 +130,7 @@ export default {
         console.log("Creating entry ("+i+", " + habits[i].id+ ")");
         this.iMap[habits[i].id] = i;
       }
+      console.log(this.iMap[1]);
       this.items = items;
     },
     mapHabitsResp: function (resp) {
@@ -136,11 +140,14 @@ export default {
     },
     mapper: function (data) {
       var items = data.data;
+      console.log("inside mapper");
       console.log(data.data);
       for(var i = 0; i < items.length; i++){
-        let current_date = new Date(items[i].date);
+        console.log(items[i].date);
+        let current_date = this.$moment(items[i].date).utc();
+        console.log(current_date.date());
+        let n = items[i].habit_id;
         let k = this.iMap[items[i].habit_id];
-        console.log(k);
         for(var j = 0; j < this.items[k].length; j++) {
           if(dates.sameDate(this.items[k][j].date, current_date)){
             this.items[k][j].groove = items[i].state;
@@ -150,6 +157,7 @@ export default {
     },
     select: function (item) {
       item.clicked = !item.clicked;
+      console.log(item);
       //this.items[habit_index][index].clicked = !this.items[habit_index][index].clicked;
     },
     computedClass: function(item) {
