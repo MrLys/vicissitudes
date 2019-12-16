@@ -66,6 +66,8 @@
 (defn get-user-id-by-email [email]
   (db/select-one-id User :email email))
 
+(defn get-user [userId]
+  (db/select-one User :id userId))
 
 (defn create-habit [habit]
   (let [hbt (db/insert! Habit :name habit)]
@@ -76,17 +78,24 @@
   (db/select Habit :name name)) 
 
 (defn get-all-habits-by-userId [userId]
+  (println (str "getting all habits for " userId))
+  (db/debug-print-queries (db/query {:select [:habit.id :habit.name] 
+             :from [:habit]
+             :where [:= :user_habit.owner_id userId]
+             :join [:user_habit [:= :habit.id :user_habit.habit_id]]}))
   (db/query {:select [:habit.id :habit.name] 
              :from [:habit]
              :where [:= :user_habit.owner_id userId]
              :join [:user_habit [:= :habit.id :user_habit.habit_id]]}))
 
+(defn get-habit-by-id [habitId]
+  (db/select-one Habit habitId))
 
 (defn create-user-habit [habit ownerId]
   (db/insert! User_habit :owner_id ownerId :habit_id (:id habit)))
 
 (defn get-user-habit [userId habitId]
-  (db/select User_habit :owner_id userId :habit_id habitId))
+  (db/select-one User_habit :owner_id userId :habit_id habitId))
 
 (defn get-user-habits [userId]
   (db/select User_habit :owner_id userId))
