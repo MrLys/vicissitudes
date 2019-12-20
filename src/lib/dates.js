@@ -9,12 +9,12 @@ var dates = {
 
   getMonday: function (d) {
     d = moment(d).utc();
-    return d.day(0);
+    return d.day(1); // First day of week is sunday -.-
   },
   addDays: function (monday, days) {
     var date = moment(monday).utc();
     date.add(days, 'day');
-    return date;
+    return date.utc();
   }
 };
 

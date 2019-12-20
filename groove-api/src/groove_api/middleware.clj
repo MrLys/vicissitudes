@@ -4,6 +4,7 @@
             [groove-api.models.user :refer :all]
             [groove-api.auth.token :refer :all]
             [groove-api.db :refer [update-refresh-token]]
+            [groove-api.bulwark :refer [get-user]]
             [ring.util.http-response :refer [unauthorized]]
             [ring.util.http-response :refer [created ok not-found]]
             [buddy.hashers :as hashers]
@@ -52,13 +53,24 @@
     (assoc (ok data) :cookies {"groove_cookie" {:value (:token data)}})))
   ;--(assoc (ok (:res data)) :cookies {"payload_cookie" {:value (:payload data)}
   ;--                          "signature_cookie" {:value (:signature data), :http-only true}})))
+(defn- activated? [user]
+  (println (str "\n\n\n" (:activated user) "\n\n\n"))
+  (:activated user))
+
+(defn auth-mw-activated [handler]
+  (fn [request]
+    (if (authenticated? request)
+      (let [user (get-user (:id (:identity request)))]
+        (if (not (activated? user))
+          (unauthorized {:error "Account is not activated"})
+          (handler request)))
+        (unauthorized {:error "Not authorized"}))))
 
 (defn auth-mw [handler]
   (fn [request]
-    (println request)
     (if (authenticated? request)
       (handler request)
-      (unauthorized {:error "Not authorized"}))))
+    (unauthorized {:error "Not authorized - invalid token"}))))
 
 
 ;; The jws-backend does a lot of magic.
@@ -79,7 +91,7 @@
 (defn wrap-basic-auth [handler]
 	(let [backend (http-basic-backend {:authfn basic-auth})]
 	(-> handler
-		(auth-mw)
+		(auth-mw-activated)
 		(wrap-authorization backend)
 		(wrap-authentication backend))))
 

@@ -1,11 +1,16 @@
 (ns groove-api.bulwark
   (:require [groove-api.db :as db]
             [groove-api.models.groove :refer [Groove]]
-            [groove-api.util.utils :refer [format-groove]]
             [groove-api.db :refer [get-grooves-by-date-range]]
             [schema-tools.core :as st]
-            [ring.util.http-response :refer [ok unauthorized conflict created]]
-            [groove-api.util.utils :refer [parseLong convert-date]]))
+            [ring.util.http-response :refer [ok unauthorized conflict created no-content not-modified not-found]]
+            [groove-api.util.validation :refer [valid-token?]]
+            [groove-api.util.utils :refer [format-groove parseLong convert-date]]))
+(defn- get-userId [request]
+  (parseLong (:id (:identity request))))
+
+(defn get-user [userId]
+  (db/get-user userId))
 
 (defn- validate-permission [user id]
   (println (str "Userid: " user " accessing data for user " id))
@@ -52,13 +57,26 @@
           (conflict {:error "You are already tracking that habit"}))))
     (unauthorized {:error "unauthorized"})))
 
-(defn get-habits [userId request]
-  (if (validate-user-permission request userId)
-    (let [habits (db/get-all-habits-by-userId userId)]
-      (ok habits))
-    (unauthorized {:error "unauthorized"})))
+(defn get-habits [request]
+  (let [habits (db/get-all-habits-by-userId (get-userId request))]
+    (if (empty? habits)
+      (not-found)
+      (ok habits))))
 
-;;(defn select [user req model])
-;;(defn update! [])
-;;(defn delete! [])
-;;(defn insert! [])
+(defn get-habit [habitId request]
+  (let [userHabit (db/get-user-habit (get-userId request) habitId )]
+    (if (not (nil? userHabit))
+      (ok (db/get-habit-by-id habitId))
+      (unauthorized {:error "Unauthorized"}))))
+
+(defn- activation-helper [id]
+  (if (db/activate-user id)
+    (no-content)
+    (not-modified)))
+
+(defn activate-user [token request]
+  (let [token (db/get-token-by-token token)]
+    (if valid-token? ;; user can be activated
+      (activation-helper (:user_id token)) 
+      (unauthorized {:error "unauthorized"}))))
+
