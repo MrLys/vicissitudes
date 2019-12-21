@@ -36,4 +36,4 @@
   [& args]
   (db/set-default-db-connection! db-spec)
   (models/set-root-namespace! 'groove-api.models)
-  (run-server (wrap-reload #'app) {:port (env :port)}))
+  (run-server (wrap-reload #'app) {:port (parseLong (env :port))}))
