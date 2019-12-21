@@ -93,7 +93,7 @@ export default {
       }
       this.$store.dispatch('register', {username: email, email: email,
         password: pwd}).then(() =>
-          this.$router.push('/login'))
+          this.$router.push('/waiting'))
           .catch(err => {this.positive_feedback = false;  this.feedback = err});
     }
   }

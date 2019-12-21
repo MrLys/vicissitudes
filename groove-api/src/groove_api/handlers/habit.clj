@@ -1,8 +1,7 @@
 (ns groove-api.handlers.habit
   (:require [ring.util.http-response :refer [ok not-found created]]
             [groove-api.models.habit :refer [Habit]]
-            [groove-api.bulwark :refer [create-habit get-habits]]
-            [toucan.db :as db]))
+            [groove-api.bulwark :refer [create-habit get-habits]]))
 
 (defn id->created [id]
   (created (str "/habits/" id) {:id id}))

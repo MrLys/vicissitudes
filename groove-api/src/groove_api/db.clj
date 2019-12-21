@@ -70,9 +70,7 @@
   (db/select-one User :id userId))
 
 (defn create-habit [habit]
-  (let [hbt (db/insert! Habit :name habit)]
-    (println hbt)
-    hbt))
+  (db/insert! Habit :name habit))
 
 (defn get-habit-by-name [name]
   (db/select Habit :name name)) 
@@ -80,9 +78,9 @@
 (defn get-all-habits-by-userId [userId]
   (println (str "getting all habits for " userId))
   (db/debug-print-queries (db/query {:select [:habit.id :habit.name] 
-             :from [:habit]
-             :where [:= :user_habit.owner_id userId]
-             :join [:user_habit [:= :habit.id :user_habit.habit_id]]}))
+                                     :from [:habit]
+                                     :where [:= :user_habit.owner_id userId]
+                                     :join [:user_habit [:= :habit.id :user_habit.habit_id]]}))
   (db/query {:select [:habit.id :habit.name] 
              :from [:habit]
              :where [:= :user_habit.owner_id userId]

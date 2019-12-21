@@ -5,7 +5,7 @@
             [schema-tools.core :as st]
             [ring.util.http-response :refer [ok unauthorized conflict created no-content not-modified not-found]]
             [groove-api.util.validation :refer [valid-token?]]
-            [groove-api.util.utils :refer [format-groove parseLong convert-date]]))
+            [groove-api.util.utils :refer [format-groove parseLong convert-date sanitize]]))
 (defn- get-userId [request]
   (parseLong (:id (:identity request))))
 
@@ -40,20 +40,20 @@
         validUser (validate-permission loggedInUser ownerId)
         habit (db/get-user-habit loggedInUser habitId)
         grooveId (db/groove-id-by-user-habit-date loggedInUser habitId (convert-date (:date groove)))]
-  (if (and validUser (not (empty? habit)))
-    (if (nil? grooveId)
-        (created (str "/groove/" ) (db/create-groove (format-groove groove))) ; this should probably use the id as param after groove/
-        (do (db/update-groove grooveId {:state (:state groove)}) 
-          (ok groove)))
-    (unauthorized {:error "Not authorized"}))))
+   (if (and validUser (not (empty? habit)))
+     (if (nil? grooveId)
+         (created (str "/groove/" ) (db/create-groove (format-groove groove))) ; this should probably use the id as param after groove/
+         (do (db/update-groove grooveId {:state (:state groove)}) 
+           (ok groove)))
+     (unauthorized {:error "Not authorized"}))))
 
 (defn create-habit [habit req] ;; One only gets this far if the user is authenticated
   (if (validate-user-permission req (:owner_id habit))
     (let [dbHabit (db/get-habit-by-name (:name habit))]
       (if (empty? dbHabit)
-        (ok (db/create-user-habit (db/create-habit (:name habit)) (:owner_id habit)))
+        (ok (sanitize (db/create-user-habit (db/create-habit (:name habit)) (:owner_id habit))))
         (if (empty? (db/get-user-habit (:owner_id habit) (:id dbHabit)))
-          (ok (db/create-user-habit dbHabit (:owner_id habit)))
+          (ok (sanitize (db/create-user-habit dbHabit (:owner_id habit))))
           (conflict {:error "You are already tracking that habit"}))))
     (unauthorized {:error "unauthorized"})))
 
@@ -64,7 +64,7 @@
       (ok habits))))
 
 (defn get-habit [habitId request]
-  (let [userHabit (db/get-user-habit (get-userId request) habitId )]
+  (let [userHabit (db/get-user-habit (get-userId request) habitId)]
     (if (not (nil? userHabit))
       (ok (db/get-habit-by-id habitId))
       (unauthorized {:error "Unauthorized"}))))
