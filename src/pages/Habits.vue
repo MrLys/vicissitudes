@@ -1,7 +1,6 @@
 <template>
   <Layout>
     <div>
-      <button class="bg-max_blue-light hover:bg-max_blue-dark text-white font-bold py-2
       <p class="h1 text-center" v-if="!hasHabits"> You don't track any habits yet! Click the
       button below to create your very first habit 🎉 </p>
       <button class="bg-max_blue-light hover:bg-max_blue-dark text-white font-bold py-2
@@ -12,8 +11,7 @@
           <label class="px-1">Habit name </label>
           <input class="bg-white focus:outline-none focus:shadow-outline border
           border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none
-          leading-normal" v-model="habitName" type="text"
-          placeholder="Name your new habit! E.g exercising" v-on:keyup.enter="createHabit()">
+          leading-normal" v-model="habitName" type="text" minlength="2" maxlength="255" placeholder="Name your new habit! E.g exercising" v-on:keyup.enter="createHabit()">
         </div>
         <p class="text-red-500"> {{ feedback }}</p>
     </div>
@@ -37,16 +35,16 @@
     <div class="flex container" v-if="hasHabits">
       <button class="bg-ocean_green-light hover:bg-ocean_green-dark  text-white font-bold py-2
       px-4 rounded my-2 mx-2 mx-auto" v-on:click="action('success')">
-        <icon_success class="w-5"/>
+        <icon_success class="w-6"/>
       </button>
 
       <button class="bg-tango_pink-light hover:bg-tango_pink-dark text-white font-bold py-2 px-4 rounded my-2 mx-2 mx-auto" 
               v-on:click="action('fail')">
-        <icon_fail class="w-5"/>
+        <icon_fail class="w-6"/>
       </button>
       <button class="bg-gray-300 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded my-2 mx-2 mx-auto"
               v-on:click="action('pass')">
-        <icon_pass class="w-5"/>
+        <icon_pass class="w-6"/>
       </button>
   </div>
   </Layout>
