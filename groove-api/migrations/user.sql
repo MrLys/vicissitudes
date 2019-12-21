@@ -4,5 +4,6 @@ CREATE TABLE IF NOT EXISTS "user" (
     email CITEXT NOT NULL UNIQUE,
     digest TEXT NOT NULL,
     failed_attempts INTEGER default 0,
-    refresh_token TEXT
+    refresh_token TEXT,
+    activated BOOLEAN DEFAULT false NOT NULL
 );

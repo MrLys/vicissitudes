@@ -48,7 +48,9 @@ export default {
       const base64data = usernamePasswordBuffer.toString('base64');
       this.$store.dispatch('login', base64data).then(() =>
         this.$router.push('/habits'))
-       .catch(err => console.log(err));
+          .catch(err => {
+            console.log(err);
+            console.log(err.data)});
     }
   }
 }

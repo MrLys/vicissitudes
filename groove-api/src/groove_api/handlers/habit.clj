@@ -16,10 +16,9 @@
     (ok habit)
     (not-found)))
 
-(defn get-habit-handler [userId request]
-  (get-habits userId request))
+(defn get-habit-handler [habitId request]
+  (get-habits habitId request))
 
-(defn get-habits-handler []
-  (->> (db/select Habit)
-       ok))
+(defn get-habits-handler [request]
+  (get-habits request))
 
