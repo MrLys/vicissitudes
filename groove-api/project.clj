@@ -25,17 +25,18 @@
                  [buddy/buddy-hashers "1.4.0"]
                  [buddy/buddy-auth "2.2.0"]
                  [ring/ring-ssl "0.3.0"]
+                 [http-kit "2.3.0"]
                  [environ "1.1.0"]]
   :plugins [[lein-environ "1.1.0"]]
   :main ^:skip-aot groove-api.core
   :target-path "target/%s"
   :profiles { :dev [:project/dev :profiles/dev]
-	     :test [:project/test :profiles/test]
-	     ;; only edit :profiles/* in profiles.clj
-	     :profiles/dev  {}
-	     :profiles/test {}
-	     :project/dev {:source-paths ["src" "tool-src"]
-			   :dependencies [[midje "1.6.3"]]
-			   :plugins [[lein-auto "0.1.3"]]}
-	     :project/test {}
-	     :uberjar {:aot :all}})
+             :test [:project/test :profiles/test]
+        	     ;; only edit :profiles/* in profiles.clj
+             :profiles/dev  {}
+             :profiles/test {}
+             :project/dev {:source-paths ["src" "tool-src"]
+                           :dependencies [[midje "1.6.3"]]
+                           :plugins [[lein-auto "0.1.3"]]}
+             :project/test {}
+             :uberjar {:aot :all}})

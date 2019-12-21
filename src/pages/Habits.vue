@@ -1,18 +1,19 @@
 <template>
   <Layout>
     <div>
+      <button class="bg-max_blue-light hover:bg-max_blue-dark text-white font-bold py-2
       <p class="h1 text-center" v-if="!hasHabits"> You don't track any habits yet! Click the
       button below to create your very first habit 🎉 </p>
-      <button class="bg-white border-2 hover:bg-blue-700 text-white font-bold py-2
+      <button class="bg-max_blue-light hover:bg-max_blue-dark text-white font-bold py-2
       px-4 rounded my-2 mx-2 mx-auto" v-on:click="newHabit()">
-        ➕
+        <icon_plus class="w-5"/>
       </button>
         <div class="block py-2" v-if="creating">
           <label class="px-1">Habit name </label>
           <input class="bg-white focus:outline-none focus:shadow-outline border
           border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none
           leading-normal" v-model="habitName" type="text"
-          placeholder="exercising" v-on:keyup.enter="createHabit()">
+          placeholder="Name your new habit! E.g exercising" v-on:keyup.enter="createHabit()">
         </div>
         <p class="text-red-500"> {{ feedback }}</p>
     </div>
@@ -21,6 +22,7 @@
           {{ day.day }} 
         </div>
   </div>
+
   <div class="block container  py-2" v-for="(habit, habit_index) in habits"
     v-if="hasHabits">  
     <p class="py-2"> {{ habit.name }}</p>
@@ -31,28 +33,39 @@
       </div>
     </div>
     </div>
+
     <div class="flex container" v-if="hasHabits">
-      <button class="bg-green-500 hover:bg-blue-700 text-white font-bold py-2
+      <button class="bg-ocean_green-light hover:bg-ocean_green-dark  text-white font-bold py-2
       px-4 rounded my-2 mx-2 mx-auto" v-on:click="action('success')">
-        ✅
+        <icon_success class="w-5"/>
       </button>
-      <button class="bg-red-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-2 mx-2 mx-auto" 
-              v-on:click="action('fail')" v-if="hasHabits">
-        ❌
+
+      <button class="bg-tango_pink-light hover:bg-tango_pink-dark text-white font-bold py-2 px-4 rounded my-2 mx-2 mx-auto" 
+              v-on:click="action('fail')">
+        <icon_fail class="w-5"/>
       </button>
-      <button class="bg-gray-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded my-2 mx-2 mx-auto"
-              v-on:click="action('pass')" v-if="hasHabits">
-        ⚪️
+      <button class="bg-gray-300 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded my-2 mx-2 mx-auto"
+              v-on:click="action('pass')">
+        <icon_pass class="w-5"/>
       </button>
   </div>
   </Layout>
 </template>
 <script>
 import dates from '../lib/dates.js';
+import icon_success from '~/assets/svgs/success.svg'
+import icon_fail from '~/assets/svgs/error.svg'
+import icon_pass from '~/assets/svgs/minus.svg'
+import icon_plus from '~/assets/svgs/plus.svg'
 export default {
   metaInfo: {
     title: 'Hello, world!'
-  },
+  },components: {
+     icon_success,
+     icon_fail,
+     icon_pass,
+    icon_plus
+    },
   data () {
     return {
       feedback: "",
@@ -75,9 +88,9 @@ export default {
       grooves: {
         'default': 'py-4 border-2 ',
         'none': 'bg-gray-200 border-gray-200 ',
-        'selected': 'border-blue-500 ', 
-        'success': 'bg-green-500 border-green-500 ',
-        'fail': 'bg-red-500 border-red-500 ',
+        'selected': 'border-max_blue-dark ', 
+        'success': 'bg-ocean_green-light border-ocean_green-light ',
+        'fail': 'bg-tango_pink-light border-tango_pink-light',
         'pass': 'stripes border-white '}
     }
   },
