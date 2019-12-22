@@ -16,6 +16,24 @@
             border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none
             leading-normal" v-model="email" type="email" placeholder="jane@example.com">
           </div>
+          <div class="block py-2 hidden">
+            <label class="px-1 text-violet">Website:</label>
+            <input class="bg-white focus:outline-none focus:shadow-outline border
+            border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none
+            leading-normal" v-model="website" type="text">
+          </div>
+          <div class="block py-2 hidden">
+            <label class="px-1 text-violet">First name:</label>
+            <input class="bg-white focus:outline-none focus:shadow-outline border
+            border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none
+            leading-normal" v-model="firstname" type="text">
+          </div>
+          <div class="block py-2 hidden">
+            <label class="px-1 text-violet">Last name:</label>
+            <input class="bg-white focus:outline-none focus:shadow-outline border
+            border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none
+            leading-normal" v-model="lastname" type="text" >
+          </div>
           <div class="block py-2">
             <label class="px-1 text-violet">Password:</label>
             <input class="bg-white focus:outline-none focus:shadow-outline border
@@ -77,6 +95,9 @@ export default {
       feedback_suggestion: "",
       response: "",
       response_h1: "",
+      website: "",
+      firstname: "",
+      lastname: "",
       positive_feedback: true,
       finished: false
     }
@@ -92,17 +113,23 @@ export default {
     computeFeedbackClass: function () {
       return (this.positive_feedback) ? 'text-white' : 'text-red-500';
     },
-    valideEmail: function (email) {
+    validEmail: function (email) {
       return true;
+    },
+    validFields: function () {
+      return this.lastname.length === 0 && this.website.length === 0 &&
+        this.firstname.length === 0;
     },
     validPassword: function (pwd, pwd2) {
       if (pwd !== pwd2) {
+        console.log("inequal pwds");
         this.positive_feedback = false;
         this.feedback = "The two passwords you entered are not equal";
         return false;
       }
 
       if (pwd.length < 8) {
+        console.log("short pwds");
         this.positive_feedback = false;
         this.feedback = "The password must contain at least 8 characters";
         return false;
@@ -121,18 +148,27 @@ export default {
         }
         return false;
       }
+      return true;
     },
     register: function () {
       // register account
       let email = this.email;
       let pwd = this.password;
       let pwd2 = this.password2;
-      if (!this.validatePassword(pwd, pwd2)){
+      console.log("validating");
+      if (!this.validFields()){
+        console.log("invalid fields");
         return;
       }
-      if (!this.validEmail(email)) {
-        return
+      console.log("validating1");
+      if (!this.validPassword(pwd, pwd2)){
+        return;
       }
+      console.log("validating2");
+      if (!this.validEmail(email)) {
+        return;
+      }
+      console.log("validating3");
 
       this.$store.dispatch('register', {username: email, email: email,
         password: pwd}).then(() =>
