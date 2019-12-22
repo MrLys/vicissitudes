@@ -14,7 +14,6 @@
             [buddy.auth.backends.httpbasic :refer [http-basic-backend]]
             [buddy.auth.middleware :refer [wrap-authentication wrap-authorization]]))
 
-(defn access-error [req val] (unauthorized val))
 
 (defn get-user-data [identifier]
   (let [user (User :username identifier)]
@@ -25,28 +24,28 @@
                  :password (:digest user)))))
 
 (defn basic-auth [request, auth-data]
-  (let [identifier        	(:username auth-data)])
-  password        	(:password auth-data)
-  username         	(:username auth-data)
-  user-info          	(get-user-data identifier)
-  (if (and user-info (hashers/check password (:password user-info))))
-  (:user-data user-info)
-  false)
+  (let [identifier (:username auth-data)
+        password (:password auth-data)
+        username (:username auth-data)
+        user-info (get-user-data identifier)]
+    (if (and user-info (hashers/check password (:password user-info)))
+      (:user-data user-info)
+      false)))
 
 
 (defn auth-credentials-reponse [request]
   (let [user          (:identity request)
         refresh-token (str (java.util.UUID/randomUUID))
         _ (update-refresh-token user refresh-token)]
-    (ok {:id                		(:id user)})
-    :username      (:username user)
-    :token         (create-token user)
-    :refreshToken  refresh-token))
+    (ok {:id (:id user)
+         :username      (:username user)
+         :token         (create-token user)
+         :refreshToken  refresh-token})))
 
 (defn- format-cookies [request]
   (let [token (:token request)
-        tokens (re-seq #"[\w-_]+" token)
-        {:payload (str (nth tokens 0) "." (nth tokens 1)) :signature (nth tokens 2) :res token}]))
+        tokens (re-seq #"[\w-_]+" token)]
+        {:payload (str (nth tokens 0) "." (nth tokens 1)) :signature (nth tokens 2) :res token}))
 
 (defn login-authenticate [request]
   (let [data (auth-credentials-reponse request)]
@@ -89,13 +88,10 @@
 
 
 (defn wrap-basic-auth [handler]
-  (let [backend (http-basic-backend {:authfn basic-auth})])
-  (-> handler
-      (auth-mw-activated)
-      (wrap-authorization backend)
-      (wrap-authentication backend)))
+  (let [backend (http-basic-backend {:authfn basic-auth})]
+    (-> handler
+        (auth-mw-activated)
+        (wrap-authorization backend)
+        (wrap-authentication backend))))
 
 
-(defn wrap-restricted [handler rule]
-  (restrict handler {:handler  rule}
-            :on-error access-error))
