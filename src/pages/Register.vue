@@ -36,10 +36,9 @@
         </div>
         <div id="feedback" class="bg-red-100 border border-red-400 text-red-700
         px-4 py-3 rounded relative" role="alert" v-if="!positive_feedback">
-          <span class="block sm:inline">{{ feedback }}</span>
-          <span class="absolute top-0 bottom-0 right-0 px-4 py-3">
-            <svg class="fill-current h-6 w-6 text-red-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><title>Close</title><path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/></svg>
-          </span>
+          <p class="block sm:inline">{{ feedback }}</p>
+          <br/>
+          <p class="block sm:inline">{{ feedback_suggestion }}</p>
         </div>
       </div>
       <div class="container block mx-auto">
@@ -63,6 +62,7 @@
 </template>
 <script>
 import handler from '../lib/responseHandler.js';
+import passwordStrength from 'zxcvbn';
 
 export default {
   metaInfo: {
@@ -74,6 +74,7 @@ export default {
       password: "",
       password2: "",
       feedback: "",
+      feedback_suggestion: "",
       response: "",
       response_h1: "",
       positive_feedback: true,
@@ -91,22 +92,48 @@ export default {
     computeFeedbackClass: function () {
       return (this.positive_feedback) ? 'text-white' : 'text-red-500';
     },
-    register: function () {
-      // register account
-      let email = this.email;
-      let pwd = this.password;
-      let pwd2 = this.password2;
+    valideEmail: function (email) {
+      return true;
+    },
+    validPassword: function (pwd, pwd2) {
       if (pwd !== pwd2) {
         this.positive_feedback = false;
         this.feedback = "The two passwords you entered are not equal";
-        return;
+        return false;
       }
 
       if (pwd.length < 8) {
         this.positive_feedback = false;
         this.feedback = "The password must contain at least 8 characters";
+        return false;
+      }
+      let strength_result = passwordStrength(pwd);
+      if (strength_result.score < 3) {
+        this.positive_feedback = false;
+        console.log(strength_result.feedback.warning);
+        if (strength_result.feedback.warning !== undefined) {
+          this.feedback = strength_result.feedback.warning;
+        } else {
+          this.feedback = "Please choose a stronger password!";
+        }
+        if (strength_result.feedback.suggestions !== undefined) {
+          this.feedback_suggestion = strength_result.feedback.suggestions[0];
+        }
+        return false;
+      }
+    },
+    register: function () {
+      // register account
+      let email = this.email;
+      let pwd = this.password;
+      let pwd2 = this.password2;
+      if (!this.validatePassword(pwd, pwd2)){
         return;
       }
+      if (!this.validEmail(email)) {
+        return
+      }
+
       this.$store.dispatch('register', {username: email, email: email,
         password: pwd}).then(() =>
           { 
