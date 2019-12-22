@@ -4,11 +4,10 @@
             [groove-api.models.groove :refer [Groove]]
             [groove-api.handlers.groove :refer :all]
             [groove-api.middleware :refer [wrap-token-auth]]
-            [groove-api.util.utils :refer [convert-date]]
             [compojure.api.sweet :refer [GET POST PATCH]]
             [groove-api.util.validation :refer :all]))
 
-(s/defschema GrooveRequestSchema 
+(s/defschema GrooveRequestSchema
   {:owner_id (s/constrained s/Int valid-user-id?)
    :state (s/constrained s/Str valid-groove?)
    :habit_id (s/constrained s/Int valid-habit-id?)
@@ -28,7 +27,7 @@
             :middleware [wrap-token-auth]
             :path-params [userId :- Long]
             :query-params [start_date :- java.time.LocalDate, end_date :- java.time.LocalDate]
-            (get-all-grooves-handler request userId start_date end_date)) 
+            (get-all-grooves-handler request userId start_date end_date))
    (PATCH "/groove" [:as request]
              :header-params [authorization :- String]
              :middleware [wrap-token-auth]
