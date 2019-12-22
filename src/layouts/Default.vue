@@ -1,22 +1,22 @@
 <template>
   <div class="container mx-auto rounded-lg shadow-xl">
-    <div class="container my-4 mx-auto p-6" >
-    <header class="header flex-shrink-0">
-    <icon style="height:150px" v-on:click="toHome()"/>
-      <nav class="nav">
-        <g-link class="ml-2 text-violet" to="/">Home</g-link>
-        <a v-if="loggedIn" class="ml-2 cursor-pointer text-violet" v-on:click="logout()">Logout</a>
-        <a v-if="loggedIn" class="ml-2 cursor-pointer text-violet" v-on:click="toHabits()">Habits</a>
-        <g-link class="ml-2 text-violet" to="/about/">About</g-link>
-      </nav>
-    </header>
-    <slot class="container mx-auto"/>
-  </div>
-  <div class="pt-16 ">
-  <footer class="w-full text-center border-t border-grey p-2 pin-b bg-glitter-light">
-   <div>Icons made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div> 
-  </footer>
-  </div>
+    <div class="container my-4 p-6" >
+      <header class="header flex-shrink-0">
+        <icon style="height:150px" v-on:click="toHome()"/>
+        <nav class="nav">
+          <g-link class="ml-2 text-violet" to="/">Home</g-link>
+          <a v-if="loggedIn" class="ml-2 cursor-pointer text-violet" v-on:click="logout()">Logout</a>
+          <a v-if="loggedIn" class="ml-2 cursor-pointer text-violet" v-on:click="toHabits()">Habits</a>
+          <g-link class="ml-2 text-violet" to="/about/">About</g-link>
+        </nav>
+      </header>
+      <slot class=""/>
+    </div>
+    <div class="pt-16 ">
+      <footer class="w-full text-center border-t border-grey p-2 pin-b bg-glitter-light">
+        <div>Icons made by <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div> 
+      </footer>
+    </div>
   </div>
 </template>
 

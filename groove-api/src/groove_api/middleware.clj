@@ -19,40 +19,40 @@
 (defn get-user-data [identifier]
   (let [user (User :username identifier)]
     (when-not (nil? user)
-      {:user-data (-> user 
-			(st/dissoc :digest)
-			(st/dissoc :refresh_token))
-       :password (:digest user)})))
+      {:user-data (-> user)}
+      (st/dissoc :digest)
+      (st/dissoc :refresh_token
+                 :password (:digest user)))))
 
 (defn basic-auth [request, auth-data]
-  (let [identifier	(:username auth-data)
-	password	(:password auth-data)
-	username 	(:username auth-data)
-	user-info  	(get-user-data identifier)]
-      (if (and user-info (hashers/check password (:password user-info)))
-	(:user-data user-info)
-	false)))
+  (let [identifier        	(:username auth-data)])
+  password        	(:password auth-data)
+  username         	(:username auth-data)
+  user-info          	(get-user-data identifier)
+  (if (and user-info (hashers/check password (:password user-info))))
+  (:user-data user-info)
+  false)
 
 
 (defn auth-credentials-reponse [request]
   (let [user          (:identity request)
         refresh-token (str (java.util.UUID/randomUUID))
         _ (update-refresh-token user refresh-token)]
-    (ok {:id		(:id user)
-	 :username      (:username user)
-	 :token         (create-token user)
-	 :refreshToken  refresh-token})))
+    (ok {:id                		(:id user)})
+    :username      (:username user)
+    :token         (create-token user)
+    :refreshToken  refresh-token))
 
 (defn- format-cookies [request]
   (let [token (:token request)
-        tokens (re-seq #"[\w-_]+" token)]
-        {:payload (str (nth tokens 0) "." (nth tokens 1)) :signature (nth tokens 2) :res token}))
+        tokens (re-seq #"[\w-_]+" token)
+        {:payload (str (nth tokens 0) "." (nth tokens 1)) :signature (nth tokens 2) :res token}]))
 
 (defn login-authenticate [request]
   (let [data (auth-credentials-reponse request)]
     (assoc (ok data) :cookies {"groove_cookie" {:value (:token data)}})))
-  ;--(assoc (ok (:res data)) :cookies {"payload_cookie" {:value (:payload data)}
-  ;--                          "signature_cookie" {:value (:signature data), :http-only true}})))
+;--(assoc (ok (:res data)) :cookies {"payload_cookie" {:value (:payload data)}
+;--                          "signature_cookie" {:value (:signature data), :http-only true}})))
 (defn- activated? [user]
   (println (str "\n\n\n" (:activated user) "\n\n\n"))
   (:activated user))
@@ -63,14 +63,14 @@
       (let [user (get-user (:id (:identity request)))]
         (if (not (activated? user))
           (unauthorized {:error "Account is not activated"})
-          (handler request)))
-        (unauthorized {:error "Not authorized"}))))
+          (handler request))
+        (unauthorized {:error "Not authorized"})))))
 
 (defn auth-mw [handler]
   (fn [request]
     (if (authenticated? request)
-      (handler request)
-    (unauthorized {:error "Not authorized - invalid token"}))))
+      (handler request))
+    (unauthorized {:error "Not authorized - invalid token"})))
 
 
 ;; The jws-backend does a lot of magic.
@@ -89,13 +89,13 @@
 
 
 (defn wrap-basic-auth [handler]
-	(let [backend (http-basic-backend {:authfn basic-auth})]
-	(-> handler
-		(auth-mw-activated)
-		(wrap-authorization backend)
-		(wrap-authentication backend))))
+  (let [backend (http-basic-backend {:authfn basic-auth})])
+  (-> handler
+      (auth-mw-activated)
+      (wrap-authorization backend)
+      (wrap-authentication backend)))
 
 
 (defn wrap-restricted [handler rule]
-  (restrict handler {:handler  rule
-		     :on-error access-error}))
+  (restrict handler {:handler  rule}
+            :on-error access-error))

@@ -5,7 +5,7 @@
             [schema-tools.core :as st]
             [ring.util.http-response :refer [ok unauthorized conflict created no-content not-modified not-found]]
             [groove-api.util.validation :refer [valid-token?]]
-            [groove-api.util.utils :refer [format-groove parseLong convert-date sanitize]]))
+            [groove-api.util.utils :refer [format-groove parseLong sanitize]]))
 (defn- get-userId [request]
   (parseLong (:id (:identity request))))
 
@@ -25,12 +25,12 @@
 
 (defn get-by-dates [request userId habit startDate endDate]
   (if (validate-user-permission request userId)
-    (ok (db/get-grooves-by-date-range userId habit (convert-date startDate) (convert-date endDate)))
+    (ok (db/get-grooves-by-date-range userId habit startDate endDate))
     (unauthorized {:error "Not authorized"})))
 
 (defn get-all-by-dates [request userId startDate endDate]
   (if (validate-user-permission request userId)
-    (ok (db/get-all-grooves-by-date-range userId (convert-date startDate) (convert-date endDate)))
+    (ok (db/get-all-grooves-by-date-range userId startDate endDate))
     (unauthorized {:error "Not authorized"})))
 
 (defn update-groove [groove request]
@@ -39,7 +39,7 @@
         ownerId (parseLong (:owner_id groove))
         validUser (validate-permission loggedInUser ownerId)
         habit (db/get-user-habit loggedInUser habitId)
-        grooveId (db/groove-id-by-user-habit-date loggedInUser habitId (convert-date (:date groove)))]
+        grooveId (db/groove-id-by-user-habit-date loggedInUser habitId (:date groove))]
    (if (and validUser (not (empty? habit)))
      (if (nil? grooveId)
          (created (str "/groove/" ) (db/create-groove (format-groove groove))) ; this should probably use the id as param after groove/

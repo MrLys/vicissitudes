@@ -3,19 +3,13 @@
             [clj-time.core :as t]
             [ring.util.codec :as codec]
             [clj-time.coerce :as c]))
-            
 
 
-(defn convert-date [date]
-  (if (instance? Long date)
-    (java.sql.Timestamp. date))
-  (java.sql.Timestamp. (c/to-long date)))
 
-(defn convert-date-groove [groove]
-  (assoc groove :date (convert-date (:date groove))))
+
 
 (defn format-groove [groove]
-  (assoc groove :state (.toLowerCase (:state groove)) :date (convert-date (:date groove))))
+  (assoc groove :state (.toLowerCase (:state groove))))
 
 (defn parseLong [s]
   (println (str "this cannot be nil " s))
@@ -24,7 +18,7 @@
     (if (re-matches #"\d+" s)
       (Long/valueOf s)
       (throw (.IllegalArgumentException (str s " is not a valid Long"))))))
-       
+
 
 (defn sanitize [m & args]
   "Updates each value in a map with the url-encoded variation"

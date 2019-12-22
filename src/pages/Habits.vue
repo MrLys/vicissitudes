@@ -99,8 +99,8 @@ export default {
       .then(response => {
         this.hasHabits = true;
         this.mapHabitsResp(response);
-        let startDate = this.monday.hours(0).format();
-        let endDate = dates.addDays(this.monday, 6).hours(23).format();
+        let startDate = this.monday.format("YYYY-MM-DD");
+        let endDate = dates.addDays(this.monday, 6).format("YYYY-MM-DD");
         let url = '/api/grooves/' + id +
           '?start_date=' + startDate + '&end_date=' + endDate;
         this.$http.get(url).then(response => (this.mapper(response))).catch((error) => {console.log(error)});
@@ -141,7 +141,6 @@ export default {
         console.log("Creating entry ("+i+", " + habits[i].id+ ")");
         this.iMap[habits[i].id] = i;
       }
-      console.log(this.iMap[1]);
       this.items = items;
     },
     mapHabitsResp: function (resp) {
@@ -151,25 +150,20 @@ export default {
     },
     mapper: function (data) {
       var items = data.data;
-      console.log("inside mapper");
-      console.log(data.data);
       for(var i = 0; i < items.length; i++){
-        console.log(items[i].date);
-        let current_date = this.$moment(items[i].date).utc();
-        console.log(current_date.date());
+        let current_date = this.$moment(items[i].date);
         let n = items[i].habit_id;
         let k = this.iMap[items[i].habit_id];
         for(var j = 0; j < this.items[k].length; j++) {
           if(dates.sameDate(this.items[k][j].date, current_date)){
             this.items[k][j].groove = items[i].state;
+            break;
           }
         }
       }
     },
     select: function (item) {
       item.clicked = !item.clicked;
-      console.log(item);
-      //this.items[habit_index][index].clicked = !this.items[habit_index][index].clicked;
     },
     computedClass: function(item) {
       var ret = this.grooves['default'];
@@ -184,9 +178,9 @@ export default {
           {owner_id: parseInt(localStorage.getItem('user_id')), 
             state: groove.groove, 
             habit_id: parseInt(groove.habit),
-            date: groove.date}).then((response) => {
+            date: groove.date.format("YYYY-MM-DD")}).then((response) => {
               console.log(response)
-            }).catch((error) => {console.log(error)});
+            }).catch((error) => {console.log(error.response)});
     },
     action: function (groove) {
       console.log(this.items[0][0] + " " + groove);

@@ -94,16 +94,17 @@ export default {
     }
   },
   methods: {
-    getHabits: function () {
-    this.$http
-      .get('/api/habits')
-        .then(response => {
-          this.habits = response.data;
-        }).catch((error) => {console.log(error)});
+    getProfile: function () {
+
+    //this.$http
+    //  .get('/api/user/' + id)
+    //    .then(response => {
+    //      this.habits = response.data;
+    //    }).catch((error) => {console.log(error.response)});
     }
   },
   mounted () {
-    this.getHabits();
+    this.getProfile();
   }
 }
 </script>
