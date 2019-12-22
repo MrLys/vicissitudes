@@ -12,7 +12,7 @@
   {:owner_id (s/constrained s/Int valid-user-id?)
    :state (s/constrained s/Str valid-groove?)
    :habit_id (s/constrained s/Int valid-habit-id?)
-   :date (s/constrained java.util.Date valid-date?)})
+   :date (s/constrained java.time.LocalDate valid-date?)})
 
 (def groove-routes
   [(-> (GET "/grooves/:userId/:habit_id"  [:as request]
@@ -20,14 +20,14 @@
             :tags ["grooves"]
             :middleware [wrap-token-auth]
             :path-params [userId :- Long, habit_id :- Long]
-            :query-params [start_date :- s/Str, end_date :- s/Str]
+            :query-params [start_date :- java.time.LocalDate, end_date :- java.time.LocalDate]
             (get-grooves-handler request userId habit_id start_date end_date)))
    (GET "/grooves/:userId"  [:as request]
             :header-params [authorization :- String]
             :tags ["grooves"]
             :middleware [wrap-token-auth]
             :path-params [userId :- Long]
-            :query-params [start_date :- java.util.Date , end_date :- java.util.Date]
+            :query-params [start_date :- java.time.LocalDate, end_date :- java.time.LocalDate]
             (get-all-grooves-handler request userId start_date end_date)) 
    (PATCH "/groove" [:as request]
              :header-params [authorization :- String]
