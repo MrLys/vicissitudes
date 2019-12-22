@@ -21,12 +21,18 @@
         <button class="bg-ocean_green-light hover:bg-ocean_green-dark text-white font-bold py-2
         px-4 rounded my-2 mx-2" v-on:click="login()" v-on:keyup.enter="login()">Login</button>
       </div>
+      <div id="feedback" class="bg-red-100 border border-red-400 text-red-700
+        px-4 py-3 rounded relative" role="alert" v-if="!positive_feedback">
+        <span class="block sm:inline">{{ feedback }}</span>
+      </div>
       <p class="text-center text-xs text-violet" v-on:click="forgotPwd()">Forgot password?</p> 
     </div>
   </div>
   </Layout>
 </template>
 <script>
+import handler from '../lib/responseHandler.js';
+
 export default {
   metaInfo: {
     title: 'Welcome!'
@@ -34,7 +40,9 @@ export default {
   data () {
     return {
       email: "",
-      password: ""
+      password: "",
+      feedback: "",
+      positive_feedback: true
       }
   },
   methods: {
@@ -49,8 +57,10 @@ export default {
       this.$store.dispatch('login', base64data).then(() =>
         this.$router.push('/habits'))
           .catch(err => {
-            console.log(err);
-            console.log(err.data)});
+            this.positive_feedback = false;  
+              this.feedback = handler.handleError(err, 
+                "Login failed; Invalid email/username or password");
+          });
     }
   }
 }

@@ -26,7 +26,7 @@ export default {
           .post('/api/activate?' + param)
           .then(response => {
             this.$router.push('/login');
-          }).catch((error) => {console.log(error); this.loading = false;});
+          }).catch((error) => {console.log(error.response); this.loading = false;});
       } else {
         this.loading = false;
       }
