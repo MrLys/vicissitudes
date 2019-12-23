@@ -36,10 +36,12 @@ jobs:
       - run: whoami
       - run: |
           psql \
+          -U $POSTGRES_USER \
           -d $TEST_DATABASE_URL \
           -f 'migrations/create_tables.sql'
       - run: |
           psql \
+          -U $POSTGRES_USER \
           -d $TEST_DATABASE_URL \
           -c "INSERT INTO public.user VALUES ('e8ms2cu1fese7h8k6fcog@test.no', \
               'e8ms2cu1fese7h8k6fcog@test.no', 'e8ms2cu1fese7h8k6fcog', \
