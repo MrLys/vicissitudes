@@ -6,9 +6,9 @@ var handler = {
     } else if (err.response.status === 500) {
       return "An unexcpected error occured!";
     } else if (err.response.status === 400){
-      if (err.response.data.errors.email) {
+      if (err.response.data.errors.email !== undefined) {
       return "Please enter a valid email! 🤓";
-      } else if (err.response.data.errors.username){
+      } else if (err.response.data.errors.username !== undefined){
         return "Invalid username";
       } else {
         return err.response.data.errors;
