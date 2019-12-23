@@ -32,10 +32,11 @@ jobs:
       - run: sudo apt-get update
       - run: sudo apt-get install postgresql-client-9.6
       - run: whoami
+      - run: cd groove-api/
       - run: |
           psql \
           -d $TEST_DATABASE_URL \
-          -f 'groove-api/migrations/create_tables.sql'
+          -f '/migrations/create_tables.sql'
       - run: |
           psql \
           -d $TEST_DATABASE_URL \
