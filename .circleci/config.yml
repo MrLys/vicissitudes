@@ -5,8 +5,9 @@
 version: 2
 jobs:
   build:
+    working_directory: ~/repo/groove-api
+
     docker:
-      working_directory: ~/repo/groove-api
 
       # specify the version you desire here
       - image: circleci/clojure:lein-2.7.1
