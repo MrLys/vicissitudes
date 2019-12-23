@@ -14,10 +14,9 @@ jobs:
 
       - image: circleci/postgres:9.6.5-alpine-ram
         environment:
-          TEST_DATABASE_URL: postgresql://root@localhost/circle_test
-          DATABASE_NAME: groove-api
+          TEST_DATABASE_URL: postgresql://root@localhost/groove_api
           POSTGRES_USER: root
-          POSTGRES_DB: circle-test_test
+          POSTGRES_DB: groove_api
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -35,11 +34,6 @@ jobs:
       - run: sudo apt-get update
       - run: sudo apt-get install postgresql-client-9.6
       - run: cd groove-api
-      - run: echo "CREATE DATABASE groove-api"
-      - run: |
-            psql \
-            -h localhost \
-            $POSTGRES_USER
       - run:
           psql \
           -h localhost \
