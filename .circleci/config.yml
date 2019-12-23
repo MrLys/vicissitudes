@@ -37,7 +37,9 @@ jobs:
       - run: cd groove-api
       - run: echo "CREATE DATABASE groove-api"
       - run: |
-        psql -h localhost $POSTGRES_USER
+            psql \
+            -h localhost \
+            $POSTGRES_USER
       - run:
           psql \
           -h localhost \
