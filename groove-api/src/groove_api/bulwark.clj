@@ -43,7 +43,7 @@
    (if (and validUser (not (empty? habit)))
      (if (nil? grooveId)
          (created (str "/groove/" ) (db/create-groove (format-groove groove))) ; this should probably use the id as param after groove/
-         (do (db/update-groove grooveId {:state (:state groove)}) 
+         (do (db/update-groove grooveId {:state (:state groove)})
            (ok groove)))
      (unauthorized {:error "Not authorized"}))))
 
@@ -52,7 +52,7 @@
     (let [dbHabit (db/get-habit-by-name (:name habit))]
       (if (empty? dbHabit)
         (ok (sanitize (db/create-user-habit (db/create-habit (:name habit)) (:owner_id habit))))
-        (if (empty? (db/get-user-habit (:owner_id habit) (:id dbHabit)))
+        (if (nil? (db/get-user-habit (:owner_id habit) (:id dbHabit)))
           (ok (sanitize (db/create-user-habit dbHabit (:owner_id habit))))
           (conflict {:error "You are already tracking that habit"}))))
     (unauthorized {:error "unauthorized"})))
@@ -77,6 +77,6 @@
 (defn activate-user [token request]
   (let [token (db/get-token-by-token token)]
     (if valid-token? ;; user can be activated
-      (activation-helper (:user_id token)) 
+      (activation-helper (:user_id token))
       (unauthorized {:error "unauthorized"}))))
 

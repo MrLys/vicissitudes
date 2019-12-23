@@ -25,7 +25,7 @@
     (println (assoc user :password digest))
     (user->created (db/insert! User (rename-keys (assoc user :password digest) {:password :digest})))))
 
-(defn update-refresh-token [user refresh-token] 
+(defn update-refresh-token [user refresh-token]
   (db/update! User (:id user) :refresh_token refresh-token))
 
 (defn get-registered-user-by-email [field]
@@ -46,7 +46,7 @@
 (defn get-groove-by-user-habit-date [userId habitId date]
   (db/select Groove  :owner_id userId :habit_id habitId :date date))
 
-(defn groove-id-by-user-habit-date [userId habitId date] 
+(defn groove-id-by-user-habit-date [userId habitId date]
   (db/select-one-id Groove  :owner_id userId :habit_id habitId :date date))
 
 (defn create-groove [groove]
@@ -73,15 +73,15 @@
   (db/insert! Habit :name habit))
 
 (defn get-habit-by-name [name]
-  (db/select Habit :name name)) 
+  (db/select-one Habit :name name))
 
 (defn get-all-habits-by-userId [userId]
   (println (str "getting all habits for " userId))
-  (db/debug-print-queries (db/query {:select [:habit.id :habit.name] 
+  (db/debug-print-queries (db/query {:select [:habit.id :habit.name]
                                      :from [:habit]
                                      :where [:= :user_habit.owner_id userId]
                                      :join [:user_habit [:= :habit.id :user_habit.habit_id]]}))
-  (db/query {:select [:habit.id :habit.name] 
+  (db/query {:select [:habit.id :habit.name]
              :from [:habit]
              :where [:= :user_habit.owner_id userId]
              :join [:user_habit [:= :habit.id :user_habit.habit_id]]}))
