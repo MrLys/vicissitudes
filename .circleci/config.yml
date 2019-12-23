@@ -7,9 +7,6 @@ jobs:
   build:
     working_directory: ~/repo/groove-api
 
-    shell: /bin/sh -leo pipefail
-    environment:
-      - BASH_ENV: /etc/profile
     docker:
 
       # specify the version you desire here
@@ -34,13 +31,11 @@ jobs:
     # Sorry, this is manual. Couldn't figure out how to use env variables
     steps:
       - checkout
-      - run: echo "POSTGRES_USER=root" >> BASH_ENV
-      - run: echo "POSTGRES_DB=groove_api" >> BASH_ENV
       - run: sudo apt-get update
       - run: sudo apt-get install postgresql-client-9.6
       - run: cd groove-api
-      - run: psql -h localhost -U $POSTGRES_USER -d $POSTGRES_DB -f 'migrations/create_tables.sql'
-      - run: psql -h localhost -U $POSTGRES_USER -d $POSTGRES_DB -c "INSERT INTO public.user VALUES ('e8ms2cu1fese7h8k6fcog@test.no', 'e8ms2cu1fese7h8k6fcog@test.no', 'e8ms2cu1fese7h8k6fcog', 'bcrypt+sha512$807266fb5c8ec5cc034f6e4798c26dca$12$a35644b9caa3a92c217e35b22ea88b93b767f76b2fe793eb', 0,'2f604c4c-4f8f-49ec-88ef-d9e73b0b0815', t);"
+      - run: psql -h localhost -U root -d groove_api -f 'migrations/create_tables.sql'
+      - run: psql -h localhost -U root -d groove_api -c "INSERT INTO public.user VALUES ('e8ms2cu1fese7h8k6fcog@test.no', 'e8ms2cu1fese7h8k6fcog@test.no', 'e8ms2cu1fese7h8k6fcog', 'bcrypt+sha512$807266fb5c8ec5cc034f6e4798c26dca$12$a35644b9caa3a92c217e35b22ea88b93b767f76b2fe793eb', 0,'2f604c4c-4f8f-49ec-88ef-d9e73b0b0815', t);"
       # Download and cache dependencies
       - restore_cache:
           keys:
