@@ -34,20 +34,17 @@ jobs:
       - checkout
       - run: sudo apt-get update
       - run: sudo apt-get install postgresql-client-9.6
-      - run: whoami
       - run: cd groove-api
+      - run: echo "CREATE DATABASE groove-api"
       - run: |
-          psql \
-          -h localhost \
-          $POSTGRES_USER \
-          -c "CREATE DATABASE groove-api;"
-      - run: |
+        psql -h localhost $POSTGRES_USER
+      - run:
           psql \
           -h localhost \
           -U $POSTGRES_USER \
           -d $DATABASE_NAME \
           -f 'migrations/create_tables.sql'
-      - run: |
+      - run:
           psql \
           -h localhost \
           -U $POSTGRES_USER \
