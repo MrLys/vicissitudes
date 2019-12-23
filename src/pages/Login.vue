@@ -6,20 +6,20 @@
       <div class="container">
         <div class="block py-2">
           <label class="px-1 text-violet">Email:</label>
-          <input class="bg-white focus:outline-none focus:shadow-outline border
+          <input id="email" class="bg-white focus:outline-none focus:shadow-outline border
           border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none
           leading-normal" v-model="email" type="email" placeholder="jane@example.com">
         </div>
         <div class="block py-2">
           <label class="px-1 text-violet">Password:</label>
-          <input class="bg-white focus:outline-none focus:shadow-outline border
+          <input id="password" class="bg-white focus:outline-none focus:shadow-outline border
           border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none
           leading-normal" v-model="password" type="password" placeholder="************" v-on:keyup.enter="login()">
         </div>
       </div>
       <div class="container text-center">
         <button class="bg-ocean_green-light hover:bg-ocean_green-dark text-white font-bold py-2
-        px-4 rounded my-2 mx-2" v-on:click="login()" v-on:keyup.enter="login()">Login</button>
+        px-4 rounded my-2 mx-2" v-on:click="login()" v-on:keyup.enter="login()">Log in</button>
       </div>
       <div id="feedback" class="bg-red-100 border border-red-400 text-red-700
         px-4 py-3 rounded relative" role="alert" v-if="!positive_feedback">
