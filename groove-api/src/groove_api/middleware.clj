@@ -18,10 +18,10 @@
 (defn get-user-data [identifier]
   (let [user (User :username identifier)]
     (when-not (nil? user)
-      {:user-data (-> user)}
-      (st/dissoc :digest)
-      (st/dissoc :refresh_token
-                 :password (:digest user)))))
+      {:user-data (-> user
+                      (st/dissoc :digest)
+                      (st/dissoc :refresh_token))
+       :password (:digest user)})))
 
 (defn basic-auth [request, auth-data]
   (let [identifier (:username auth-data)
@@ -45,7 +45,7 @@
 (defn- format-cookies [request]
   (let [token (:token request)
         tokens (re-seq #"[\w-_]+" token)]
-        {:payload (str (nth tokens 0) "." (nth tokens 1)) :signature (nth tokens 2) :res token}))
+       {:payload (str (nth tokens 0) "." (nth tokens 1)) :signature (nth tokens 2) :res token}))
 
 (defn login-authenticate [request]
   (let [data (auth-credentials-reponse request)]
@@ -58,18 +58,19 @@
 
 (defn auth-mw-activated [handler]
   (fn [request]
+    (print request)
     (if (authenticated? request)
       (let [user (get-user (:id (:identity request)))]
         (if (not (activated? user))
           (unauthorized {:error "Account is not activated"})
-          (handler request))
-        (unauthorized {:error "Not authorized"})))))
+          (handler request)))
+        (unauthorized {:error "Not authorized"}))))
 
 (defn auth-mw [handler]
   (fn [request]
     (if (authenticated? request)
-      (handler request))
-    (unauthorized {:error "Not authorized - invalid token"})))
+      (handler request)
+    (unauthorized {:error "Not authorized - invalid token"}))))
 
 
 ;; The jws-backend does a lot of magic.
