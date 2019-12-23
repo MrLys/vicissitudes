@@ -44,13 +44,13 @@ jobs:
           psql \
           -h localhost \
           -U $POSTGRES_USER \
-          -d $TEST_DATABASE_URL \
+          -d $DATABASE_NAME \
           -f 'migrations/create_tables.sql'
       - run: |
           psql \
           -h localhost \
           -U $POSTGRES_USER \
-          -d $TEST_DATABASE_URL \
+          -d $DATABASE_NAME \
           -c "INSERT INTO public.user VALUES ('e8ms2cu1fese7h8k6fcog@test.no', \
               'e8ms2cu1fese7h8k6fcog@test.no', 'e8ms2cu1fese7h8k6fcog', \
               'bcrypt+sha512$807266fb5c8ec5cc034f6e4798c26dca$12$a35644b9caa3a92c217e35b22ea88b93b767f76b2fe793eb', \
