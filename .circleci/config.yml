@@ -80,11 +80,6 @@ jobs:
                 name: start gridsome
                 command: 'gridsome develop'
     cypress-test:
-        cypress/run:
-            record: true
-            executor: cypress/browsers-chrome69
-            browser: chrom
-            start: npm start
 
 
 
@@ -94,9 +89,13 @@ workflows:
     jobs:
       - build
       - gridsome-build
-      - cypress-test:
-          requires:
-              - build
-              - gridsome-build
+      - cypress/run:
+            record: true
+            executor: cypress/browsers-chrome69
+            browser: chrom
+            start: npm start
+            requires:
+                - build
+                - gridsome-build
 
 
