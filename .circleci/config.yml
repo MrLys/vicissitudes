@@ -57,6 +57,8 @@ jobs:
             - image: circleci/node:4.8.2
               # Now over to frontend
         steps:
+            - run: pwd
+            - run: ls
             - run: npm install
             - run:
                 name: update-npm
