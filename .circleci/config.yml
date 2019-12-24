@@ -5,13 +5,18 @@
 version: 2.1
 orbs:
   cypress: cypress-io/cypress@1.1.0
+  node: circleci/node@1.1
 jobs:
   build:
     working_directory: ~/project
-
+    executor:
+      name: node/default
+      tag: '10.4'
     docker:
       # specify the version you desire here
       - image: circleci/clojure:lein-2.7.1
+      - image: circleci/node:10.16.3
+      - image: vuejs/ci
 
       - image: circleci/postgres:9.6.5-alpine-ram
         environment:
@@ -48,47 +53,44 @@ jobs:
       # run tests!
       - run: cd groove-api && lein test
 
-    gridsome-build:
-        docker:
-            - image: circleci/node:10.16.3
-            - image: vuejs/ci
+      # Now over to frontend
+      - node/with-cache:
+          steps:
+            - run: npm install
+      - run:
+          name: update-npm
+          command: 'sudo npm install -g npm@latest'
+      - restore_cache:
+          key: dependency-cache-{{ checksum "package-lock.json" }}
+      - run:
+          name: install-npm-wee
+          command: npm install
+      - run:
+          name: install gridsome
+          command: 'sudo npm install -g gridsome'
 
-        steps:
-            - checkout
-            - run:
-                name: update-npm
-                command: 'sudo npm install -g npm@latest'
-            - restore_cache:
-                key: dependency-cache-{{ checksum "package-lock.json" }}
-            - run:
-                name: install-npm-wee
-                command: npm install
-            - run:
-                name: install gridsome
-                command: 'sudo npm install -g gridsome'
-            - save_cache: # special step to save the dependency cache
-                key: dependency-cache-{{ checksum "package-lock.json" }}
-                paths:
-                    - ./node_modules
-            - run: # run tests
-                name: test
-                command: npm test
-            - run: # run coverage report
-                name: code-coverage
-                command: './node_modules/.bin/nyc report --reporter=text-lcov'
-            - run:
-                name: start gridsome
-                command: 'gridsome develop'
-    cypress-test:
+      - save_cache: # special step to save the dependency cache
+            key: dependency-cache-{{ checksum "package-lock.json" }}
+            paths:
+                - ./node_modules
+
+      - run: # run tests
+            name: test
+            command: npm test
+      - run: # run coverage report
+            name: code-coverage
+            command: './node_modules/.bin/nyc report --reporter=text-lcov'
+      - run:
+            name: start gridsome
+            command: 'gridsome develop'
 
 
 
 workflows:
   version: 2
-  build_and_test:
+  build:
     jobs:
       - build
-      - gridsome-build
       - cypress/run:
             record: true
             executor: cypress/browsers-chrome69
@@ -96,6 +98,5 @@ workflows:
             start: npm start
             requires:
                 - build
-                - gridsome-build
 
 
