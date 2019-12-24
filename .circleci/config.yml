@@ -49,6 +49,7 @@ jobs:
             - run: cd groove-api && lein test
     build-gridsome:
 
+        working_directory: ~/project
         executor:
             name: node/default
             tag: '10.4'
