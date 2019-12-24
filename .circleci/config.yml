@@ -10,7 +10,6 @@ jobs:
     working_directory: ~/project
 
     docker:
-
       # specify the version you desire here
       - image: circleci/clojure:lein-2.7.1
 
@@ -19,12 +18,6 @@ jobs:
           TEST_DATABASE_URL: postgresql://root@localhost/groove_api
           POSTGRES_USER: root
           POSTGRES_DB: groove_api
-
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
 
     environment:
       LEIN_ROOT: "true"
@@ -55,6 +48,36 @@ jobs:
       # run tests!
       - run: cd groove-api && lein test
 
+    gridsome-build:
+        docker:
+            - image: vuejs/ci
+
+        steps:
+            - checkout
+            - restore_cache:
+                name: Restore Yarn Package Cache
+                keys:
+                    - yarn-packages-{{ checksum "yarn.lock" }}
+            - run:
+                name: Install Dependencies
+                command: yarn --network-timeout 600000
+            - save_cache:
+                name: Save Yarn Package Cache
+                key: yarn-packages-{{ checksum "yarn.lock" }}
+                paths:
+                    - ~/.cache/yarn
+
+            - persist_to_workspace:
+                root: ~/
+                paths:
+                    - project/vue
+    cypress-test:
+        cypress/run:
+            record: true
+            executor: cypress/browsers-chrome69
+            browser: chrom
+            start: npm start
+
 
 
 workflows:
@@ -62,8 +85,10 @@ workflows:
   build_and_test:
     jobs:
       - build
-      - cypress/run:
+      - gridsome-build
+      - cypress-test:
           requires:
               - build
+              - gridsome-build
 
 
