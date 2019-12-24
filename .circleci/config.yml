@@ -47,6 +47,7 @@ jobs:
 
       # run tests!
             - run: cd groove-api && lein test
+            - run: cd groove-api && lein run
     build-gridsome:
 
         working_directory: ~/project
@@ -57,6 +58,7 @@ jobs:
             - image: circleci/node:4.8.2
               # Now over to frontend
         steps:
+            - checkout
             - run: pwd
             - run: ls
             - run: npm install
