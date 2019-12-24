@@ -50,27 +50,35 @@ jobs:
 
     gridsome-build:
         docker:
+            - image: circleci/node:10.16.3
             - image: vuejs/ci
 
         steps:
             - checkout
-            - restore_cache:
-                name: Restore Yarn Package Cache
-                keys:
-                    - yarn-packages-{{ checksum "yarn.lock" }}
             - run:
-                name: Install Dependencies
-                command: yarn --network-timeout 600000
-            - save_cache:
-                name: Save Yarn Package Cache
-                key: yarn-packages-{{ checksum "yarn.lock" }}
+                name: update-npm
+                command: 'sudo npm install -g npm@latest'
+            - restore_cache:
+                key: dependency-cache-{{ checksum "package-lock.json" }}
+            - run:
+                name: install-npm-wee
+                command: npm install
+            - run:
+                name: install gridsome
+                command: 'sudo npm install -g gridsome'
+            - save_cache: # special step to save the dependency cache
+                key: dependency-cache-{{ checksum "package-lock.json" }}
                 paths:
-                    - ~/.cache/yarn
-
-            - persist_to_workspace:
-                root: ~/
-                paths:
-                    - project/vue
+                    - ./node_modules
+            - run: # run tests
+                name: test
+                command: npm test
+            - run: # run coverage report
+                name: code-coverage
+                command: './node_modules/.bin/nyc report --reporter=text-lcov'
+            - run:
+                name: start gridsome
+                command: 'gridsome develop'
     cypress-test:
         cypress/run:
             record: true
