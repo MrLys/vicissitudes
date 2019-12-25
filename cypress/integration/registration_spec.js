@@ -56,7 +56,7 @@ describe('Registration test', function () {
         cy.url().should('include', '/register')
 
         //successfull registration
-        cy.contains("Congratulations, you've successfully created an account! 🎉")
+        cy.contains("Congratulations, you've successfully created an account!")
         cy.contains("A link to activate your account has been emailed to " + email)
     })
 })
