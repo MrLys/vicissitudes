@@ -1,4 +1,5 @@
 (ns groove-api.core
+  (:gen-class)
   (:require [compojure.api.sweet :refer [api context routes]]
             [groove-api.routes.groove :refer [groove-routes]]
             [groove-api.routes.user :refer [user-routes]]

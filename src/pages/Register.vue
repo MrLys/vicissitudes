@@ -12,7 +12,7 @@
 
           <div class="block py-2">
             <label class="px-1 text-violet">Email:</label>
-            <input class="bg-white focus:outline-none focus:shadow-outline border
+            <input id="email" class="bg-white focus:outline-none focus:shadow-outline border
             border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none
             leading-normal" v-model="email" type="email" placeholder="jane@example.com">
           </div>
@@ -36,13 +36,13 @@
           </div>
           <div class="block py-2">
             <label class="px-1 text-violet">Password:</label>
-            <input class="bg-white focus:outline-none focus:shadow-outline border
+            <input id="password1" class="bg-white focus:outline-none focus:shadow-outline border
             border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none
             leading-normal" v-model="password" type="password" placeholder="************" v-on:keyup.enter="register()">
           </div>
           <div class="block py-2">
             <label class="px-1 text-violet">Repeat password:</label>
-            <input class="bg-white focus:outline-none focus:shadow-outline border
+            <input id="password2" class="bg-white focus:outline-none focus:shadow-outline border
             border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none
             leading-normal" v-model="password2" type="password" placeholder="************" v-on:keyup.enter="register()">
           </div>
