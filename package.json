@@ -19,5 +19,7 @@
     "http-proxy-middleware": "^0.20.0",
     "serialize-javascript": ">=2.1.1",
     "vue-svg-loader": "^0.15.0"
-  }
+  },
+  "scripts": {
+  "grdsm:run": "gridsome develop"}
 }
