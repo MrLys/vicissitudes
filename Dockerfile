@@ -7,10 +7,19 @@ ENV LEIN_JVM_OPTS=-Xmx400m
 ENV LEIN_VERSION 2.6.1
 # Verify the circleci user exists before proceeding
 RUN whoami
-
+#RUN useradd -r mrlys -shell /bin/bash --create-home
 # node installations command expect to run as root
 USER root
+# make Apt non-interactive
+RUN echo 'APT::Get::Assume-Yes "true";' > /etc/apt/apt.conf.d/90circleci \
+  && echo 'DPkg::Options "--force-confnew";' >> /etc/apt/apt.conf.d/90circleci
 ## Using node installation from https://raw.githubusercontent.com/nodejs/docker-node/4f49f67ebd8d577dd7c97dabf5df69e6d947406c/12/stretch/Dockerfile
+RUN apt-get update \
+  && mkdir -p /usr/share/man/man1 \
+  && apt-get install -y \
+    git mercurial xvfb \
+    locales sudo openssh-client ca-certificates tar gzip parallel \
+    net-tools netcat unzip zip bzip2 gnupg curl wget
 
 RUN groupadd --gid 1000 node \
   && useradd --uid 1000 --gid node --shell /bin/bash --create-home node
@@ -82,6 +91,11 @@ RUN set -ex \
   && ln -s /opt/yarn-v$YARN_VERSION/bin/yarn /usr/local/bin/yarn \
   && ln -s /opt/yarn-v$YARN_VERSION/bin/yarnpkg /usr/local/bin/yarnpkg \
   && rm yarn-v$YARN_VERSION.tar.gz.asc yarn-v$YARN_VERSION.tar.gz
+
+RUN groupadd --gid 3434 circleci \
+  && useradd --uid 3434 --gid circleci --shell /bin/bash --create-home circleci \
+  && echo 'circleci ALL=NOPASSWD: ALL' >> /etc/sudoers.d/50-circleci \
+  && echo 'Defaults    env_keep += "DEBIAN_FRONTEND"' >> /etc/sudoers.d/env_keep
 
 RUN node --version
 RUN npm -v
