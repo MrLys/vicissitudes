@@ -27,7 +27,12 @@ jobs:
             - run: sudo apt-get install postgresql-client-9.6
               # So each command is run separately.
             - run: cd groove-api && psql -h localhost -U root -d groove_api -f 'migrations/create_tables.sql'
-            - run: cd groove-api && psql -h localhost -U root -d groove_api -f "migrations/test_user.sql"
+              # Add a test user
+            - run: curl -X POST --header 'Content-Type: application/json' --header 'Accept: application/json' -d '{
+              "username": "e8ms2cu1fese7h8k6fcog@test.no",
+              "email": "e8ms2cu1fese7h8k6fcog@test.no",
+              "password": "e8ms2cu1fese7h8k6fcog"}' http://localhost:3000/api/register
+            - run: psql -h localhost -U root -d groove_api -c "update public.user set activated = 't' where username = 'e8ms2cu1fese7h8k6fcog@test.no';"
               # Download and cache dependencies
 
             - restore_cache:
