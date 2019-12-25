@@ -1,0 +1,1 @@
+INSERT INTO public.user VALUES (123321,'e8ms2cu1fese7h8k6fcog@test.no', 'e8ms2cu1fese7h8k6fcog@test.no', 'bcrypt+sha512$0be5e10220d26b403595bdd08081d439$12$2f05ea899e5cc8b1525031c9195c5ce16d4fabfdb1b6a543', 0,'2f604c4c-4f8f-49ec-88ef-d9e73b0b0815', 't');
