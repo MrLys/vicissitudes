@@ -1,111 +1,87 @@
-# Clojure CircleCI 2.0 configuration file
-#
-# Check https://circleci.com/docs/2.0/language-clojure/ for more details
-#
 version: 2.1
 orbs:
     cypress: cypress-io/cypress@1.1.0
-    node: circleci/node@1.1
 jobs:
-    build:
-        working_directory: ~/project
-        docker:
-            # specify the version you desire here
-            - image: circleci/clojure:lein-2.7.1
+  build:
+    working_directory: ~/project
+    machine: true
+    #image: ubuntu-1604:201903-01
 
-            - image: circleci/postgres:9.6.5-alpine-ram
-              environment:
-                  TEST_DATABASE_URL: postgresql://root@localhost/groove_api
-                  POSTGRES_USER: root
-                  POSTGRES_DB: groove_api
+    environment:
+        LEIN_ROOT: "true"
+        # Customize the JVM maximum heap limit
+        JVM_OPTS: -Xmx3200m
+        # Sorry, this is manual. Couldn't figure out how to use env variables
+    steps:
+        - run: |
+            if [[ ${CIRCLE_SHELL_ENV} =~ "localbuild" ]]; then
+            mkdir -p /tmp
+            fi
+        - checkout
+        - run: sudo apt-get update
+        - run: sudo apt-get install postgresql-client-9.6
+        - run: cd groove-api && psql -h localhost -U root -d groove_api -f 'migrations/create_tables.sql'
+        - run: psql -h localhost -U root -d groove_api -c "INSERT INTO public.user VALUES (1,'e8ms2cu1fese7h8k6fcog@test.no', 'e8ms2cu1fese7h8k6fcog@test.no', 'bcrypt+sha512$807266fb5c8ec5cc034f6e4798c26dca$12$a35644b9caa3a92c217e35b22ea88b93b767f76b2fe793eb', 0,'2f604c4c-4f8f-49ec-88ef-d9e73b0b0815', 't');"
+          # Download and cache dependencies
+        - restore_cache:
+            keys:
+                - v1-dependencies-{{ checksum "groove-api/project.clj" }}
+                    # fallback to using the latest cache if no exact match is found
+                - v1-dependencies-
 
-        environment:
-            LEIN_ROOT: "true"
-            # Customize the JVM maximum heap limit
-            JVM_OPTS: -Xmx3200m
-            # Sorry, this is manual. Couldn't figure out how to use env variables
-        steps:
-            - checkout
-            - run: sudo apt-get update
-            - run: sudo apt-get install postgresql-client-9.6
-              # So each command is run separately.
-            - run: cd groove-api && psql -h localhost -U root -d groove_api -f 'migrations/create_tables.sql'
-            - run: psql -h localhost -U root -d groove_api -c "INSERT INTO public.user VALUES (1,'e8ms2cu1fese7h8k6fcog@test.no', 'e8ms2cu1fese7h8k6fcog@test.no', 'bcrypt+sha512$807266fb5c8ec5cc034f6e4798c26dca$12$a35644b9caa3a92c217e35b22ea88b93b767f76b2fe793eb', 0,'2f604c4c-4f8f-49ec-88ef-d9e73b0b0815', 't');"
-              # Download and cache dependencies
-            - restore_cache:
-                keys:
-                    - v1-dependencies-{{ checksum "groove-api/project.clj" }}
-                      # fallback to using the latest cache if no exact match is found
-                    - v1-dependencies-
+        - run: cd groove-api && lein deps
 
-            - run: cd groove-api && lein deps
+        - save_cache:
+            paths:
+                - ~/.m2
+            key: v1-dependencies-{{ checksum "groove-api/project.clj" }}
 
-            - save_cache:
-                paths:
-                    - ~/.m2
-                key: v1-dependencies-{{ checksum "groove-api/project.clj" }}
+            # run tests!
+        - run: cd groove-api && lein test
+        - run: cd groove-api && lein run &
 
-      # run tests!
-            - run: cd groove-api && lein test
-            - run: cd groove-api && lein run
-    build-gridsome:
+          # backend should be up and running
+          # now lets start the frontend
+          # and the frontend tests
+        - run: sudo npm install
+        - run:
+            name: update-npm
+            command: 'sudo npm install -g npm@latest'
+        - restore_cache:
+            key: dependency-cache-{{ checksum "package-lock.json" }}
 
-        working_directory: ~/project
-        executor:
-            name: node/default
-            tag: '10.4'
-        docker:
-            - image: circleci/node:4.8.2
-              # Now over to frontend
-        steps:
-            - checkout
-            - run: pwd
-            - run: ls
-            - run: npm install
-            - run:
-                name: update-npm
-                command: 'sudo npm install -g npm@latest'
-            - restore_cache:
-                key: dependency-cache-{{ checksum "package-lock.json" }}
-            - run:
-                name: install-npm-wee
-                command: npm install
-            - run:
-                name: install gridsome
-                command: 'sudo npm install -g gridsome'
+        - run:
+            name: install-npm-wee
+            command: npm install
+        - run:
+            name: install gridsome
+            command: 'sudo npm install -g gridsome'
 
-            - save_cache: # special step to save the dependency cache
-                key: dependency-cache-{{ checksum "package-lock.json" }}
-                paths:
-                    - ./node_modules
+        - save_cache:
+            # special step to save the dependency cache
+            key: dependency-cache-{{ checksum "package-lock.json" }}
+            paths:
+            - ./node_modules
 
-            - run: # run tests
-                name: test
-                command: npm test
-            - run: # run coverage report
-                name: code-coverage
-                command: './node_modules/.bin/nyc report --reporter=text-lcov'
-            - run:
-                name: start gridsome
-                command: 'gridsome develop'
-
-
+        - run: # run tests
+            name: test
+            command: npm test
+        - run: # run coverage report
+            name: code-coverage
+            command: './node_modules/.bin/nyc report --reporter=text-lcov'
+        - run:
+            name: start gridsome
+            command: 'gridsome develop &'
 
 workflows:
     version: 2
     build_and_test:
         jobs:
             - build
-            - build-gridsome:
-                requires:
-                    - build
             - cypress/run:
                 record: true
                 executor: cypress/browsers-chrome69
                 browser: chrom
                 start: npm start
                 requires:
-                - build
-                - build-gridsome
-
-
+                    - build
