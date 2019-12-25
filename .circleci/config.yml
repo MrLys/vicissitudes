@@ -32,16 +32,16 @@ jobs:
 
             - restore_cache:
                 keys:
-                    - v1-dependencies-{{ checksum "groove-api/project.clj" }}
+                    - v2-dependencies-{{ checksum "groove-api/project.clj" }}
                       # fallback to using the latest cache if no exact match is found
-                    - v1-dependencies-
+                    - v2-dependencies-
 
             - run: cd groove-api && lein deps
 
             - save_cache:
                 paths:
                     - ~/.m2
-                key: v1-dependencies-{{ checksum "groove-api/project.clj" }}
+                key: v2-dependencies-{{ checksum "groove-api/project.clj" }}
 
       # run tests!
             - run: cd groove-api && lein test
@@ -52,7 +52,7 @@ jobs:
 
             - restore_cache:
                 keys:
-                    - cache-{{ checksum "package.json" }}
+                    - v2-cache-{{ checksum "package.json" }}
       # install npm dependencies and Cypress binary
       # if they were cached, this step is super quick
             - run:
@@ -61,7 +61,7 @@ jobs:
             - run: npm run cy:verify
       # save npm dependencies and Cypress binary for future runs
             - save_cache:
-                key: cache-{{ checksum "package.json" }}
+                key: v2-cache-{{ checksum "package.json" }}
                 paths:
                     - ~/.npm
                     - ~/.cache
