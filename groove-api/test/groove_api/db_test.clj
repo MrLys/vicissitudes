@@ -2,8 +2,7 @@
   (:require [clojure.test :refer :all]
             [groove-api.core :refer :all]
             [groove-api.db :as db]
-            [groove-api.db-test-utils :refer [clear]]
-            [groove-api.test-utils :refer [assertEqual]]))
+            [groove-api.db-test-utils :refer [clear]]))
 
 
 (deftest new-user-test
@@ -16,8 +15,8 @@
     (testing "Is the user created, and does the user have the correct values?"
       (and
         (is (:username dbUser) (:username inDb))
-        (is (assertEqual (:email dbUser) (:email inDb)))
-        (is (assertEqual (:id dbUser) (:id inDb)))))))
+        (is (:email dbUser) (:email inDb))
+        (is (:id dbUser) (:id inDb))))))
 
 (deftest new-existing-user-test
   "Create a new user that already exists"
@@ -67,4 +66,42 @@
         _ (clear :user)]
     (and (is updated?)
          (is (:activated dbUser)))))
+
+(deftest create-user-habit
+  (let [_ (setup-db)
+        user (db/new-user! {:password "password" :username "test@test.no" :email "test@test.no"})
+        exercise (db/create-habit "exercising")
+        userHabit (db/create-user-habit exercise (:id user))
+        _ (clear :user)
+        _ (clear :habit)]
+    (and
+      (is (= (:id exercise) (:habit_id userHabit)))
+      (is (= (:id user) (:owner_id userHabit))))))
+
+
+(deftest create-existing-user-habit
+  (let [_ (setup-db)
+        user (db/new-user! {:password "password" :username "test@test.no" :email "test@test.no"})
+        exercise (db/create-habit "exercising")
+        userHabit (db/create-user-habit  exercise (:id user))]
+    (is (thrown? org.postgresql.util.PSQLException (db/create-user-habit exercise (:id user)))))
+  (clear :user)
+  (clear :habit))
+
+(deftest get-habits-by-userid-test
+  (let [_ (setup-db)
+        user (db/new-user! {:password "password" :username "test@test.no" :email "test@test.no"})
+        habit1 (db/create-habit "exercising")
+        userHabit1 (db/create-user-habit habit1 (:id user))
+        habit2 (db/create-habit "piano")
+        userHabit2 (db/create-user-habit habit2 (:id user))
+        habits (db/get-all-habits-by-userId (:id user))
+        _ (clear :user)
+        _ (clear :habit)]
+    (and
+      (is (= (count habits) 2))
+      (is (or (= (:id (nth habits 0)) (:id habit1))
+              (= (:id (nth habits 0)) (:id habit2))))
+      (is (or (= (:id (nth habits 1)) (:id habit1))
+              (= (:id (nth habits 1)) (:id habit2)))))))
 
