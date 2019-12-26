@@ -7,7 +7,7 @@
   (created (str "/habits/" id) {:id id}))
 
 (defn- lower-habit-name [habit]
-  (assoc habit :name (.lowerCase (:name habit))))
+  (assoc habit :name (.toLowerCase (:name habit))))
 
 (defn create-habit-handler [habit request]
   (create-habit (lower-habit-name habit) request))

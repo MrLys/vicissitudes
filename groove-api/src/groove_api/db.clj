@@ -42,7 +42,6 @@
   (db/select Groove :owner_id user_id :user_habit_id userHabitId :date [:>= start] :date [:<= end]))
 
 (defn get-all-grooves-by-date-range [user_id start end]
-  (println (str user_id " " start " " end "\n\n"))
   (db/select Groove :owner_id user_id :date [:>= start] :date [:<= end]))
 
 (defn get-groove-by-user-habit-date [userId userHabitId date]
@@ -55,7 +54,6 @@
   (db/insert! Groove groove))
 
 (defn update-groove [grooveId updated field]
-  (println (str grooveId " " updated " " field "\n\n" (field updated) "\n\n"))
   (db/update! Groove grooveId field updated))
 
 (defn get-user-data [identifier]
