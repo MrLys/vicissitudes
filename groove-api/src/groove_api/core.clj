@@ -12,6 +12,7 @@
             [org.httpkit.server :refer :all]
             [ring.adapter.jetty :refer [run-jetty]]))
 
+
 (def db-spec
   {:dbtype (env :dbtype)
    :dbname (env :dbname)
@@ -23,6 +24,10 @@
    :spec "/swagger.json"
    :data {:info {:version "1.0.0", :title "RESTful groove API"
                  :securityDefinitions {:api_key {:type "apiKey" :name "Authorization" :in "header"}}}}})
+
+(defn setup-db []
+  (db/set-default-db-connection! db-spec)
+  (models/set-root-namespace! 'groove-api.models))
 (def app
   (api
     {:swagger swagger-config}
@@ -30,8 +35,7 @@
 
 (defn -main
   [& args]
-  (db/set-default-db-connection! db-spec)
-  (models/set-root-namespace! 'groove-api.models)
+  (setup-db)
   (run-server app {:port (parseLong (env :port))})) ;; http-kit complains that it cannot parse from string to Number?
 
 (defn -dev-main

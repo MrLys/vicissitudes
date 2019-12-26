@@ -18,21 +18,25 @@
 (defn id->created [id]
   (created (str "/users/" id) {:id id}))
 
-(defn new-user [user]
+
+(defn new-user! [user]
   (println (str "\n\n\n\n\n" user "\n\n\n\n"))
   (let [digest (hashers/derive (:password user))]
     (println digest)
     (println (assoc user :password digest))
-    (user->created (db/insert! User (rename-keys (assoc user :password digest) {:password :digest})))))
+    (db/insert! User (rename-keys (assoc user :password digest) {:password :digest}))))
+
+(defn new-user [user]
+  (user->created (new-user! user)))
 
 (defn update-refresh-token [user refresh-token]
   (db/update! User (:id user) :refresh_token refresh-token))
 
 (defn get-registered-user-by-email [field]
-  (db/select User :email field))
+  (db/select-one User :email field)) ;; username and email must be unique
 
 (defn get-registered-user-by-username [field]
-  (db/select User :username field))
+  (db/select-one User :username field));; username and email must be unique
 
 (defn get-all-users []
   (db/select User))

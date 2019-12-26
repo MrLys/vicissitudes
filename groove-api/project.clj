@@ -15,6 +15,7 @@
                  [com.sun.mail/smtp "1.6.3"]
                  [toucan "1.1.9"]
                  [clj-time "0.15.2"]
+                 [org.clojure/java.jdbc "0.7.11"]
                  [metosin/schema-tools "0.12.0"]
                  [org.postgresql/postgresql "42.2.4"]
                  [buddy/buddy-hashers "1.4.0"]
