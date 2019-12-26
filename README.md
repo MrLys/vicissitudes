@@ -1,3 +1,4 @@
+[![CircleCI](https://circleci.com/gh/MrLys/vicissitudes/tree/master.svg?style=svg)](https://circleci.com/gh/MrLys/vicissitudes/tree/master)
 # Groove - The habit tracker
 Groove is a very simple habit tracker. You can create your own habits and each day you can
 check the habit of as success (✅), failure (❌) or pass (⚪️).
