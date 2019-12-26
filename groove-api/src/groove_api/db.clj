@@ -38,23 +38,25 @@
 (defn get-all-users []
   (db/select User))
 
-(defn get-grooves-by-date-range [user_id habit start end]
-  (db/select Groove :owner_id user_id :habit_id habit :date [:> start] :date [:< end]))
+(defn get-grooves-by-date-range [user_id userHabitId start end]
+  (db/select Groove :owner_id user_id :user_habit_id userHabitId :date [:>= start] :date [:<= end]))
 
 (defn get-all-grooves-by-date-range [user_id start end]
+  (println (str user_id " " start " " end "\n\n"))
   (db/select Groove :owner_id user_id :date [:>= start] :date [:<= end]))
 
-(defn get-groove-by-user-habit-date [userId habitId date]
-  (db/select Groove  :owner_id userId :habit_id habitId :date date))
+(defn get-groove-by-user-habit-date [userId userHabitId date]
+  (db/select Groove  :owner_id userId :user_habit_id userHabitId :date date))
 
-(defn groove-id-by-user-habit-date [userId habitId date]
-  (db/select-one-id Groove  :owner_id userId :habit_id habitId :date date))
+(defn groove-id-by-user-habit-date [userId userHabitId date]
+  (db/select-one-id Groove  :owner_id userId :user_habit_id userHabitId :date date))
 
 (defn create-groove [groove]
   (db/insert! Groove groove))
 
-(defn update-groove [grooveId updated]
-  (db/update! Groove grooveId updated))
+(defn update-groove [grooveId updated field]
+  (println (str grooveId " " updated " " field "\n\n" (field updated) "\n\n"))
+  (db/update! Groove grooveId field updated))
 
 (defn get-user-data [identifier]
   (let [user (User :username identifier)]
@@ -77,7 +79,7 @@
   (db/select-one Habit :name name))
 
 (defn get-all-habits-by-userId [userId]
-  (db/query {:select [:habit.id :habit.name]
+  (db/query {:select [:user_habit.id :habit.name]
              :from [:habit]
              :where [:= :user_habit.owner_id userId]
              :join [:user_habit [:= :habit.id :user_habit.habit_id]]}))
@@ -88,8 +90,9 @@
 (defn create-user-habit [habit ownerId]
   (db/insert! User_habit :owner_id ownerId :habit_id (:id habit)))
 
-(defn get-user-habit [userId habitId]
-  (db/select-one User_habit :owner_id userId :habit_id habitId))
+(defn get-user-habit
+  ([userId habitId] (db/select-one User_habit :owner_id userId :habit_id habitId))
+  ([userHabitId] (db/select-one User_habit :id userHabitId)))
 
 (defn get-user-habits [userId]
   (db/select User_habit :owner_id userId))

@@ -10,7 +10,7 @@
 (s/defschema GrooveRequestSchema
   {:owner_id (s/constrained s/Int valid-user-id?)
    :state (s/constrained s/Str valid-groove?)
-   :habit_id (s/constrained s/Int valid-habit-id?)
+   :user_habit_id (s/constrained s/Int valid-habit-id?)
    :date (s/constrained java.time.LocalDate valid-date?)})
 
 (def groove-routes

@@ -110,8 +110,15 @@ export default {
         let endDate = dates.addDays(this.monday, 6).format("YYYY-MM-DD");
         let url = '/api/grooves/' + id +
           '?start_date=' + startDate + '&end_date=' + endDate;
-        this.$http.get(url).then(response => (this.mapper(response))).catch((error) => {console.log(error)});
-      }).catch((error) => {console.log(error)});
+        this.$http.get(url).then(response =>
+          (this.mapper(response))).catch((error) => {
+            this.feedback = handler.handleError(error, "");
+            console.log(error.response);
+          });
+      }).catch((error) => {
+        this.feedback = handler.handleError(error, "");
+        console.log(error.response);
+      });
   },
   methods: {
     newHabit: function() {
@@ -132,17 +139,17 @@ export default {
             "");
         });
     },
-    generateWeek: function (habit_id) {
+    generateWeek: function (user_habit_id) {
       let monday = this.monday;
       return [{day:'Monday', date: monday, clicked:false, groove: 'none',
-        habit: habit_id}, 
+        habit: user_habit_id}, 
       {day:'Tuesday', date: dates.addDays(monday, 1), clicked:false, groove:
-        'none', habit: habit_id}, 
-      {day:'Wednesday', date: dates.addDays(monday, 2), clicked:false, groove: 'none', habit: habit_id},
-      {day:'Thursday', date: dates.addDays(monday, 3), clicked:false, groove: 'none', habit: habit_id}, 
-      {day:'Friday', date: dates.addDays(monday, 4), clicked:false, groove: 'none', habit: habit_id}, 
-      {day:'Saturday',date: dates.addDays(monday, 5), clicked:false, groove: 'none', habit: habit_id},
-      {day:'Sunday',date: dates.addDays(monday, 6), clicked:false, groove: 'none', habit: habit_id}];
+        'none', habit: user_habit_id}, 
+      {day:'Wednesday', date: dates.addDays(monday, 2), clicked:false, groove: 'none', habit: user_habit_id},
+      {day:'Thursday', date: dates.addDays(monday, 3), clicked:false, groove: 'none', habit: user_habit_id}, 
+      {day:'Friday', date: dates.addDays(monday, 4), clicked:false, groove: 'none', habit: user_habit_id}, 
+      {day:'Saturday',date: dates.addDays(monday, 5), clicked:false, groove: 'none', habit: user_habit_id},
+      {day:'Sunday',date: dates.addDays(monday, 6), clicked:false, groove: 'none', habit: user_habit_id}];
     },
     mapHabits: function (habits) {
       let items = [];
@@ -160,12 +167,13 @@ export default {
       this.mapHabits(habits);
     },
     mapper: function (data) {
-      var items = data.data;
-      for(var i = 0; i < items.length; i++){
+      let items = data.data;
+      for(let i = 0; i < items.length; i++){
         let current_date = this.$moment(items[i].date);
-        let n = items[i].habit_id;
-        let k = this.iMap[items[i].habit_id];
-        for(var j = 0; j < this.items[k].length; j++) {
+        console.log(current_date);
+        let n = items[i].user_habit_id;
+        let k = this.iMap[items[i].user_habit_id];
+        for(let j = 0; j < this.items[k].length; j++) {
           if(dates.sameDate(this.items[k][j].date, current_date)){
             this.items[k][j].groove = items[i].state;
             break;
@@ -178,7 +186,7 @@ export default {
       console.log(item.date);
     },
     computedClass: function(item) {
-      var ret = this.grooves['default'];
+      let ret = this.grooves['default'];
       ret += this.grooves[item.groove];
       if(item.clicked) {
         ret += this.grooves['selected'];
@@ -189,7 +197,7 @@ export default {
       this.$http.patch('/api/groove', 
           {owner_id: parseInt(localStorage.getItem('user_id')), 
             state: groove.groove, 
-            habit_id: parseInt(groove.habit),
+            user_habit_id: parseInt(groove.habit),
             date: groove.date.format("YYYY-MM-DD")}).then((response) => {
               console.log(response)
             }).catch((error) => {console.log(error.response)});
@@ -197,7 +205,7 @@ export default {
     action: function (groove) {
       console.log(this.items[0][0] + " " + groove);
       for(let i = 0; i < this.items.length; i++) {
-        for(var j = 0; j < this.items[i].length; j++) {
+        for(let j = 0; j < this.items[i].length; j++) {
           if (this.items[i][j].clicked) {
             this.items[i][j].groove = groove;
             this.items[i][j].clicked = false;

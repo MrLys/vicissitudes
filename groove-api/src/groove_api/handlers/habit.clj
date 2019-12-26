@@ -6,9 +6,11 @@
 (defn id->created [id]
   (created (str "/habits/" id) {:id id}))
 
+(defn- lower-habit-name [habit]
+  (assoc habit :name (.lowerCase (:name habit))))
 
 (defn create-habit-handler [habit request]
-  (create-habit habit request))
+  (create-habit (lower-habit-name habit) request))
 
 (defn habit->response [habit]
   (if habit

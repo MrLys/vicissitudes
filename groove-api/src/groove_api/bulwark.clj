@@ -34,16 +34,17 @@
     (unauthorized {:error "Not authorized"})))
 
 (defn update-groove [groove request]
+  (println groove)
   (let [loggedInUser (parseLong (:id (:identity request)))
-        habitId (parseLong (:habit_id groove))
+        userHabitId (parseLong (:user_habit_id groove))
         ownerId (parseLong (:owner_id groove))
         validUser (validate-permission loggedInUser ownerId)
-        habit (db/get-user-habit loggedInUser habitId)
-        grooveId (db/groove-id-by-user-habit-date loggedInUser habitId (:date groove))]
+        habit (db/get-user-habit userHabitId)
+        grooveId (db/groove-id-by-user-habit-date loggedInUser userHabitId (:date groove))]
    (if (and validUser (not (empty? habit)))
      (if (nil? grooveId)
          (created (str "/groove/" ) (db/create-groove (format-groove groove))) ; this should probably use the id as param after groove/
-         (do (db/update-groove grooveId {:state (:state groove)})
+         (do (db/update-groove grooveId (:state groove) :state )
            (ok groove)))
      (unauthorized {:error "Not authorized"}))))
 
