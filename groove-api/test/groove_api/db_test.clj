@@ -57,3 +57,14 @@
         dbHabit (db/create-habit "exercising")]
     (is (thrown? org.postgresql.util.PSQLException (db/create-habit "exercising"))))
   (clear :habit))
+
+(deftest activate-user-test
+  "Create a user and activate it in the db"
+  (let [_ (setup-db)
+        user (db/new-user! {:password "password" :username "test@test.no" :email "test@test.no"})
+        updated? (db/activate-user (:id user))
+        dbUser (db/get-user (:id user))
+        _ (clear :user)]
+    (and (is updated?)
+         (is (:activated dbUser)))))
+
