@@ -3,17 +3,22 @@
     <div>
       <p class="h1 text-center" v-if="!hasHabits"> You don't track any habits yet! Click the
       button below to create your very first habit 🎉 </p>
-      <button class="bg-max_blue-light hover:bg-max_blue-dark text-white font-bold py-2
+      <button id="add-habit" class="bg-max_blue-light hover:bg-max_blue-dark text-white font-bold py-2
       px-4 rounded my-2 mx-2 mx-auto" v-on:click="newHabit()">
         <icon_plus class="w-5"/>
       </button>
         <div class="block py-2" v-if="creating">
-          <label class="px-1">Habit name </label>
-          <input class="bg-white focus:outline-none focus:shadow-outline border
+          <div class="flex">
+          <input id="habit-field" class="bg-white focus:outline-none focus:shadow-outline border
           border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none
           leading-normal" v-model="habitName" type="text" minlength="2" maxlength="255" placeholder="Name your new habit! E.g exercising" v-on:keyup.enter="createHabit()">
+        <button id="save-habit" class="rounded border-2 
+          bg-ocean_green-light hover:bg-ocean_green-dark p-2 mx-2" v-on:click="createHabit()">
+          Save
+        </button>
         </div>
-        <p class="text-red-500"> {{ feedback }}</p>
+        <p class="text-red-500 m-2"> {{ feedback }}</p>
+        </div>
     </div>
     <div class="flex container" v-if="hasHabits">
         <div class="py-2 w-1/6 block border-r last:border-r-0 text-center bg-gray-100" v-for="day in week">
@@ -25,24 +30,25 @@
     v-if="hasHabits">  
     <p class="py-2"> {{ habit.name }}</p>
     <div class="flex container">
-      <div class="w-1/6 block border-r last:border-r-0" v-for="item in items[habit_index]">
-        <div v-on:click="select(item)" :class="computedClass(item)">
+      <div v-bind:id="habit.name+'-'+week[index].day" class="w-1/6 block border-r last:border-r-0"
+        v-for="(item, index) in items[habit_index]">
+        <div v-bind:id="habit.name+'-'+week[index].day+'-groove'" v-on:click="select(item)" :class="computedClass(item)">
         </div>
       </div>
     </div>
     </div>
 
     <div class="flex container" v-if="hasHabits">
-      <button class="bg-ocean_green-light hover:bg-ocean_green-dark  text-white font-bold py-2
+      <button id="success-button" class="bg-ocean_green-light hover:bg-ocean_green-dark  text-white font-bold py-2
       px-4 rounded my-2 mx-2 mx-auto" v-on:click="action('success')">
         <icon_success class="w-6"/>
       </button>
 
-      <button class="bg-tango_pink-light hover:bg-tango_pink-dark text-white font-bold py-2 px-4 rounded my-2 mx-2 mx-auto" 
+      <button id="fail-button" class="bg-tango_pink-light hover:bg-tango_pink-dark text-white font-bold py-2 px-4 rounded my-2 mx-2 mx-auto" 
               v-on:click="action('fail')">
         <icon_fail class="w-6"/>
       </button>
-      <button class="bg-gray-300 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded my-2 mx-2 mx-auto"
+      <button id="pass-button" class="bg-gray-300 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded my-2 mx-2 mx-auto"
               v-on:click="action('pass')">
         <icon_pass class="w-6"/>
       </button>
@@ -55,6 +61,7 @@ import icon_success from '~/assets/svgs/success.svg'
 import icon_fail from '~/assets/svgs/error.svg'
 import icon_pass from '~/assets/svgs/minus.svg'
 import icon_plus from '~/assets/svgs/plus.svg'
+import handler from '../lib/responseHandler.js';
 export default {
   metaInfo: {
     title: 'Hello, world!'
@@ -119,6 +126,10 @@ export default {
       this.$http.post('/api/habit',{owner_id: parseInt(id), name:
         this.habitName}).then(response => {
           location.reload();
+        }).catch(err => {
+          this.positive_feedback = false;
+          this.feedback = handler.handleError(err, 
+            "");
         });
     },
     generateWeek: function (habit_id) {
@@ -164,6 +175,7 @@ export default {
     },
     select: function (item) {
       item.clicked = !item.clicked;
+      console.log(item.date);
     },
     computedClass: function(item) {
       var ret = this.grooves['default'];

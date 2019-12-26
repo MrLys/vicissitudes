@@ -14,9 +14,14 @@
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
+    "cypress": "^3.8.0",
     "gridsome-plugin-tailwindcss": "^2.2.27",
     "http-proxy-middleware": "^0.20.0",
     "serialize-javascript": ">=2.1.1",
     "vue-svg-loader": "^0.15.0"
-  }
+  },
+  "scripts": {
+  "grdsm:run": "gridsome develop",
+   "cy:verify": "cypress verify",
+  "e2e:record": "cypress run --record"}
 }

@@ -1,4 +1,5 @@
 (ns groove-api.core
+  (:gen-class)
   (:require [compojure.api.sweet :refer [api context routes]]
             [groove-api.routes.groove :refer [groove-routes]]
             [groove-api.routes.user :refer [user-routes]]
@@ -8,12 +9,13 @@
             [groove-api.util.utils :refer [parseLong]]
             [ring.middleware.reload :refer [wrap-reload]]
             [environ.core :refer [env]]
-            [org.httpkit.server :refer :all]))
+            [org.httpkit.server :refer :all]
+            [ring.adapter.jetty :refer [run-jetty]]))
 
 (def db-spec
   {:dbtype (env :dbtype)
    :dbname (env :dbname)
-   :user (env :user) 
+   :user (env :user)
    :password (env :password)})
 
 (def swagger-config
@@ -21,7 +23,7 @@
    :spec "/swagger.json"
    :data {:info {:version "1.0.0", :title "RESTful groove API"
                  :securityDefinitions {:api_key {:type "apiKey" :name "Authorization" :in "header"}}}}})
-(def app 
+(def app
   (api
     {:swagger swagger-config}
    (context "/api" [] groove-routes user-routes habit-routes)))
@@ -36,4 +38,4 @@
   [& args]
   (db/set-default-db-connection! db-spec)
   (models/set-root-namespace! 'groove-api.models)
-  (run-server (wrap-reload #'app) {:port (parseLong (env :port))}))
+  (run-jetty (wrap-reload #'app) {:port (parseLong (env :port))}))

@@ -1,0 +1,76 @@
+# Clojure CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-clojure/ for more details
+#
+version: 2
+jobs:
+    build:
+        working_directory: ~/project
+        docker:
+            # specify the version you desire here
+            - image: mrlys/rutta-lein-and-node:0.0.6
+
+            - image: circleci/postgres:9.6.5-alpine-ram
+              environment:
+                  TEST_DATABASE_URL: postgresql://root@localhost/groove_api
+                  POSTGRES_USER: root
+                  POSTGRES_DB: groove_api
+
+        environment:
+            LEIN_ROOT: "true"
+            # Customize the JVM maximum heap limit
+            JVM_OPTS: -Xmx3200m
+            # Sorry, this is manual. Couldn't figure out how to use env variables
+        steps:
+            - checkout
+            - run: sudo apt-get update
+            - run: sudo apt-get install postgresql-client-9.6
+              # So each command is run separately.
+            - run: cd groove-api && psql -h localhost -U root -d groove_api -f 'migrations/create_tables.sql'
+              # Add a test user
+              # Download and cache dependencies
+
+            - restore_cache:
+                keys:
+                    - v2-dependencies-{{ checksum "groove-api/project.clj" }}
+                      # fallback to using the latest cache if no exact match is found
+                    - v2-dependencies-
+
+            - run: cd groove-api && lein deps
+
+            - save_cache:
+                paths:
+                    - ~/.m2
+                key: v2-dependencies-{{ checksum "groove-api/project.clj" }}
+
+      # run tests!
+            - run: cd groove-api && lein test
+            - run:
+                name: Start backend
+                command: cd groove-api && lein run
+                background: true
+
+            - restore_cache:
+                keys:
+                    - v2-cache-{{ checksum "package.json" }}
+      # install npm dependencies and Cypress binary
+      # if they were cached, this step is super quick
+            - run:
+                name: Install dependencies
+                command: npm ci
+            - run: npm run cy:verify
+      # save npm dependencies and Cypress binary for future runs
+            - save_cache:
+                key: v2-cache-{{ checksum "package.json" }}
+                paths:
+                    - ~/.npm
+                    - ~/.cache
+      # start server before starting tests
+            - run:
+                command: npm run grdsm:run
+                background: true
+
+            - run: /bin/bash create_test_user.sh
+
+            - run: npm run e2e:record
+

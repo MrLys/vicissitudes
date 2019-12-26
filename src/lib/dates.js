@@ -8,13 +8,13 @@ var dates = {
   },
 
   getMonday: function (d) {
-    d = moment(d).utc();
-    return d.isoWeekday(1); // First day of week is sunday -.-
+    d = moment(d);
+    return d.isoWeekday(1); // First day of week (1) is monday
   },
   addDays: function (monday, days) {
-    var date = moment(monday).utc();
+    var date = moment(monday);
     date.add(days, 'day');
-    return date.utc();
+    return date;
   }
 };
 
