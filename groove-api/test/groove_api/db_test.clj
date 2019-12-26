@@ -14,10 +14,10 @@
         inDb (db/get-registered-user-by-username "test@test.no")
         _ (clear :user)] ;; clear database
     (testing "Is the user created, and does the user have the correct values?"
-      (is
-        (and (assertEqual (:username dbUser) (:username inDb))
-             (assertEqual (:email dbUser) (:email inDb))
-             (assertEqual (:id dbUser) (:id inDb)))))))
+      (and
+        (is (:username dbUser) (:username inDb))
+        (is (assertEqual (:email dbUser) (:email inDb)))
+        (is (assertEqual (:id dbUser) (:id inDb)))))))
 
 (deftest new-existing-user-test
   "Create a new user that already exists"
@@ -26,3 +26,34 @@
         dbUser (db/new-user! user)]
       (is (thrown? org.postgresql.util.PSQLException (db/new-user! user))))
   (clear :user))
+
+(deftest get-all-users-empty
+  "Get all users in empty db and assert the number is correct"
+  (setup-db)
+  (is (= 0 (count (db/get-all-users)))))
+
+(deftest get-all-users
+  "Get all users in empty db and assert the number is correct"
+  (let [_ (setup-db)
+        _ (db/new-user! {:password "password" :username "test@test.no" :email "test@test.no"})
+        _ (db/new-user! {:password "password" :username "test2@test.no" :email "test2@test.no"})
+        _ (db/new-user! {:password "password" :username "test3@test.no" :email "test3@test.no"})]
+  (is (= 3 (count (db/get-all-users)))))
+  (clear :user))
+
+(deftest create-habit-test
+  "Create a habit, verify it in db"
+  (let [_ (setup-db)
+        dbHabit (db/create-habit "exercising")
+        inDb (db/get-habit-by-name "exercising")
+        _ (clear :habit)]
+  (and
+    (is (= (:name dbHabit) (:name inDb)))
+       (is (= (:id dbHabit) (:id inDb))))))
+
+(deftest create-existing-habit-test
+  "Create a habit, verify it in db"
+  (let [_ (setup-db)
+        dbHabit (db/create-habit "exercising")]
+    (is (thrown? org.postgresql.util.PSQLException (db/create-habit "exercising"))))
+  (clear :habit))
