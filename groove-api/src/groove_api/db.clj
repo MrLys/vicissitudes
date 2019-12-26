@@ -20,10 +20,7 @@
 
 
 (defn new-user! [user]
-  (println (str "\n\n\n\n\n" user "\n\n\n\n"))
   (let [digest (hashers/derive (:password user))]
-    (println digest)
-    (println (assoc user :password digest))
     (db/insert! User (rename-keys (assoc user :password digest) {:password :digest}))))
 
 (defn new-user [user]
