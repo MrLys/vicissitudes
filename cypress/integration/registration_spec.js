@@ -1,5 +1,5 @@
 describe('Registration test', function () {
-    it('Visit Rutta.no', function () {
+    it('Test registration', function () {
         cy.visit('http://localhost:8080')
         cy.contains('Log in')
         cy.contains('About')

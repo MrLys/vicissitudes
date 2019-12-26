@@ -1,5 +1,5 @@
 describe('My First Test', function () {
-    it('Visit Rutta.no', function () {
+    it('Log into Rutta.no and create some habits to track', function () {
         cy.visit('http://localhost:8080')
         cy.contains('Log in')
         cy.contains('About')
@@ -47,7 +47,7 @@ describe('My First Test', function () {
         // Not cleared when already exists.
         cy.get('#habit-field').type('hi').clear()
 
-        cy.get('#habit-field').type('Exercising{enter}').clear();
+        cy.get('#habit-field').type('Exercising{enter}')
         // wait for the page to refresh
         cy.wait('@new-habit').should('have.property', 'status', 200)
 
