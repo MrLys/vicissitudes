@@ -163,6 +163,9 @@ export default {
     },
     mapHabitsResp: function (resp) {
       let habits = resp.data;
+      for(let i = 0; i < habits.length; i++) {
+        habits[i].name = this.capitalizeFirstLetter(habits[i].name);
+      }
       this.habits = habits;
       this.mapHabits(habits);
     },
@@ -201,6 +204,9 @@ export default {
             date: groove.date.format("YYYY-MM-DD")}).then((response) => {
               console.log(response)
             }).catch((error) => {console.log(error.response)});
+    },
+    capitalizeFirstLetter: function (string) {
+      return string.charAt(0).toUpperCase() + string.slice(1);
     },
     action: function (groove) {
       console.log(this.items[0][0] + " " + groove);

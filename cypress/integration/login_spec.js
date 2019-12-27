@@ -1,3 +1,6 @@
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
 describe('My First Test', function () {
     it('Log into Rutta.no and create some habits to track', function () {
         cy.visit('http://localhost:8080')
@@ -25,7 +28,7 @@ describe('My First Test', function () {
         // Officially logged in. Create a habit
         // Create a new habit with random values
         cy.get('#add-habit').click()
-        var rand = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        var rand = capitalizeFirstLetter(Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15));
         cy.get('#habit-field')
             .type(rand+'{enter}')
         cy.wait('@new-habit').should('have.property', 'status', 200)
