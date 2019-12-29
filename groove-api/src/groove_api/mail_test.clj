@@ -9,24 +9,24 @@
       (.setProperty "mail.smtp.host" "mail.smtpbucket.com")
       (.setProperty "mail.smtp.port" "8025"))
 
-      (if (= (:ssl mail) true)
-        (doto props
-          (.setProperty "mail.smtp.socketFactory.class" 
-                        "javax.net.ssl.SSLSocketFactory")
-          (.setProperty "mail.smtp.socketFactory.fallback" "false")
-          (.setProperty "mail.smtp.socketFactory.port" (str (:port mail)))
-          (.put "mail.smtp.starttls.enable" "true")))
+    (if (= (:ssl mail) true)
+      (doto props
+        (.setProperty "mail.smtp.socketFactory.class"
+                      "javax.net.ssl.SSLSocketFactory")
+        (.setProperty "mail.smtp.socketFactory.fallback" "false")
+        (.setProperty "mail.smtp.socketFactory.port" (str (:port mail)))
+        (.put "mail.smtp.starttls.enable" "true")))
 
-      (let  [session (javax.mail.Session/getDefaultInstance props)
-             msg     (javax.mail.internet.MimeMessage. session)
-             recipients (reduce #(str % "," %2) (:to mail))]
+    (let  [session (javax.mail.Session/getDefaultInstance props)
+           msg     (javax.mail.internet.MimeMessage. session)
+           recipients (reduce #(str % "," %2) (:to mail))]
 
-        (.setFrom msg (javax.mail.internet.InternetAddress. "noreply@rutta.no"))
+      (.setFrom msg (javax.mail.internet.InternetAddress. "noreply@rutta.no"))
 
-        (.addRecipient msg 
-                        (javax.mail.Message$RecipientType/TO)
-                        (javax.mail.internet.InternetAddress. (str (:to mail))))
+      (.addRecipient msg
+                     (javax.mail.Message$RecipientType/TO)
+                     (javax.mail.internet.InternetAddress. (str (:to mail))))
 
-        (.setSubject msg (:subject mail))
-        (.setContent msg (:text mail) "text/html")
-        (javax.mail.Transport/send msg))))
+      (.setSubject msg (:subject mail))
+      (.setContent msg (:text mail) "text/html")
+      (javax.mail.Transport/send msg))))

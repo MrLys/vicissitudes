@@ -31,7 +31,7 @@
 (def app
   (api
     {:swagger swagger-config}
-   (context "/api" [] groove-routes user-routes habit-routes)))
+    (context "/api" [] groove-routes user-routes habit-routes)))
 
 (defn -main
   [& args]

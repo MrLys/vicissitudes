@@ -12,7 +12,8 @@
 (def ^:private email-regex
   #"(?i)[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
 
-(defn- filter-dgst [suffix dgsts] (filter (fn [dgst] (= suffix (.toLowerCase (:hash dgst)))) dgsts))
+(defn- filter-dgst [suffix dgsts]
+  (filter (fn [dgst] (= suffix (.toLowerCase (:hash dgst)))) dgsts))
 
 (defn- match [suffix dgsts] (:freq (first (filter-dgst suffix dgsts))))
 

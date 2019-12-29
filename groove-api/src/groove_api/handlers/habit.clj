@@ -17,8 +17,8 @@
     (ok habit)
     (not-found)))
 
-(defn get-habit-handler [habitId request]
-  (get-habits habitId request))
+(defn get-habit-handler [habit-id request]
+  (get-habits habit-id request))
 
 (defn get-habits-handler [request]
   (get-habits request))
