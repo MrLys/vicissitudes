@@ -72,8 +72,8 @@
     (no-content)
     (not-modified)))
 
-(defn new-activation-token [id date]
-  (db/new-activation-token id date))
+(defn new-activation-token [token id date]
+  (db/new-activation-token token id date))
 
 (defn activate-user [token request]
   (let [token (db/get-token-by-token token)]
