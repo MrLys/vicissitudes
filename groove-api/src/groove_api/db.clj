@@ -38,17 +38,17 @@
 (defn get-all-users []
   (db/select User))
 
-(defn get-grooves-by-date-range [user_id userHabitId start end]
-  (db/select Groove :owner_id user_id :user_habit_id userHabitId :date [:>= start] :date [:<= end]))
+(defn get-grooves-by-date-range [user_id user-habit-id start end]
+  (db/select Groove :owner_id user_id :user_habit_id user-habit-id :date [:>= start] :date [:<= end] {:order-by [:date]}))
 
 (defn get-all-grooves-by-date-range [user_id start end]
-  (db/select Groove :owner_id user_id :date [:>= start] :date [:<= end]))
+  (db/select Groove :owner_id user_id :date [:>= start] :date [:<= end] {:order-by [:date]}))
 
-(defn get-groove-by-user-habit-date [userId userHabitId date]
-  (db/select Groove  :owner_id userId :user_habit_id userHabitId :date date))
+(defn get-groove-by-user-habit-date [user-id user-habit-id date]
+  (db/select Groove  :owner_id user-id :user_habit_id user-habit-id :date date))
 
-(defn groove-id-by-user-habit-date [userId userHabitId date]
-  (db/select-one-id Groove  :owner_id userId :user_habit_id userHabitId :date date))
+(defn groove-id-by-user-habit-date [user-id user-habit-id date]
+  (db/select-one-id Groove  :owner_id user-id :user_habit_id user-habit-id :date date))
 
 (defn create-groove [groove]
   (db/insert! Groove groove))
@@ -67,8 +67,8 @@
 (defn get-user-id-by-email [email]
   (db/select-one-id User :email email))
 
-(defn get-user [userId]
-  (db/select-one User :id userId))
+(defn get-user [user-id]
+  (db/select-one User :id user-id))
 
 (defn create-habit [habit]
   (db/insert! Habit :name habit))
@@ -76,31 +76,35 @@
 (defn get-habit-by-name [name]
   (db/select-one Habit :name name))
 
-(defn get-all-habits-by-userId [userId]
+(defn get-all-habits-by-user-id [user-id]
   (db/query {:select [:user_habit.id :habit.name]
              :from [:habit]
-             :where [:= :user_habit.owner_id userId]
+             :where [:= :user_habit.owner_id user-id]
              :join [:user_habit [:= :habit.id :user_habit.habit_id]]}))
 
-(defn get-habit-by-id [habitId]
-  (db/select-one Habit habitId))
+(defn get-habit-by-id [habit-id]
+  (db/select-one Habit habit-id))
 
 (defn create-user-habit [habit ownerId]
   (db/insert! User_habit :owner_id ownerId :habit_id (:id habit)))
 
 (defn get-user-habit
-  ([userId habitId] (db/select-one User_habit :owner_id userId :habit_id habitId))
-  ([userHabitId] (db/select-one User_habit :id userHabitId)))
+  ([user-id habit-id] (db/select-one User_habit :owner_id user-id :habit_id habit-id))
+  ([user-habit-id] (db/select-one User_habit :id user-habit-id)))
 
-(defn get-user-habits [userId]
-  (db/select User_habit :owner_id userId))
+(defn get-user-habits [user-id]
+  (db/select User_habit :owner_id user-id))
 
 
-(defn new-activation-token [token userId date]
-  (db/insert! Activation_token :user_id userId :token token :expiration date))
+(defn new-activation-token [token user-id date]
+  (db/insert! Activation_token :user_id user-id :token token :expiration date))
 
 (defn get-token-by-token [token]
   (db/select-one Activation_token :token token))
 
-(defn activate-user [userId]
-  (db/update! User userId :activated true))
+(defn get-token-by-user-id [id]
+  (db/select-one Activation_token :user_id id))
+
+
+(defn activate-user [user-id]
+  (db/update! User user-id :activated true))
