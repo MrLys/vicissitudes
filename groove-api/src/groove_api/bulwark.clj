@@ -73,6 +73,7 @@
     (not-modified)))
 
 (defn new-activation-token [token id date]
+  (println id)
   (db/new-activation-token token id date))
 
 (defn activate-user [token request]
@@ -82,4 +83,4 @@
       (unauthorized {:error "unauthorized"}))))
 
 (defn new-user [user]
-  (db/new-user user))
+  (db/new-user! user))
