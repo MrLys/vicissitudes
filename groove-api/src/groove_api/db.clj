@@ -40,10 +40,11 @@
 
 (defn get-all-grooves-and-habits-by-date-range [user-id start end]
   (db/query {:select [:user_habit.owner_id :user_habit.id :habit.name :groove.date :groove.state]
-	     :from [:habit]
+	     :from [:user_habit]
 	     :where [:= :user_habit.owner_id user-id]
-	     :join [:user_habit [:= :habit.id :user_habit.habit_id]]
-	     :left-join [:groove [:= :groove.owner_id :user_habit.owner_id]]}))
+	     :join [:habit [:= :user_habit.habit_id :habit.id]]
+	     :left-join [:groove [:= :user_habit.id :groove.user_habit_id]]}))
+	     ;:join [:groove [:= :groove.owner_id :user_habit.owner_id]]}))
 
 (defn get-grooves-by-date-range [user_id user-habit-id start end]
   (db/select Groove :owner_id user_id :user_habit_id user-habit-id :date [:>= start] :date [:<= end] {:order-by [:date]}))

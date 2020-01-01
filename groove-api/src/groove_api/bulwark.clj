@@ -58,8 +58,10 @@
 
 (defn- activation-helper [id]
   (if (db/activate-user id)
-    "Activated"
-    {:error "Cannot activate user"}))
+    (do (println (db/get-user id))
+    "Activated")
+    (do (println "Cannot activate?")
+        {:error "Cannot activate user"})))
 
 (defn new-activation-token [token id date]
   (println id)
@@ -67,6 +69,7 @@
 
 (defn activate-user [token request]
   (let [token (db/get-token-by-token token)]
+    (println token)
     (if (valid-token? token) ;; user can be activated
       (activation-helper (:user_id token))
       {:error "Not authorized"})))

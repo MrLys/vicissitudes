@@ -18,5 +18,5 @@
   (response-handler :GET get-habits request))
 
 (defn get-all-grooves-by-habit [req start end]
-  (response-handler :GET get-all-grooves-and-habits-by-date-range start end))
+  (response-handler :GET get-all-grooves-and-habits-by-date-range req start end))
 

@@ -3,14 +3,16 @@
             [compojure.api.sweet :refer [GET POST PATCH PUT]]))
 
 (defn- valid-response? [value]
-  (or (empty? value) (nil? value)))
+  (or (not (empty? value)) (not (nil? value)) (nil? (:error value))))
 
-(def ^:private handler-map {:GET (fn [v] (if (valid-response? v) (not-found "Not found") (ok v)))
-                  :POST (fn [v] (if (valid-response? v) (unauthorized "Not authorized!") (created v)))
-                  :PATCH (fn [v] (if (valid-response? v) (unauthorized "Not authorized!") (ok v)))
-                  :PUT (fn [v] (if (valid-response? v) (unauthorized "Not authorized!")  (ok v)))})
+(def ^:private handler-map {:GET (fn [v] (if (valid-response? v) (ok v) (not-found "Not found")))
+                  :POST (fn [v] (if (valid-response? v) (created v) (unauthorized "Not authorized!")))
+                  :PATCH (fn [v] (if (valid-response? v) (ok v) (unauthorized "Not authorized!")))
+                  :PUT (fn [v] (if (valid-response? v) (ok v) (unauthorized "Not authorized!")))})
 ; Get the function or deciding the response
 ; call the getter/handler function with the args and pass the result to
 ; handler function from the map
 (defn response-handler [req-type f & args]
+  (println (req-type handler-map))
+  (println args)
   ((req-type handler-map) (apply f args)))

@@ -17,20 +17,19 @@
          :body [create-habit-req HabitRequestSchema]
          (create-habit-handler create-habit-req request))
 
-   (GET "/habit/:user_id" [:as request]
+   (GET "/habits" [:as request]
         :header-params [authorization :- String]
         :tags ["habits"]
         :middleware [wrap-token-auth]
-        :path-params [user_id :- Long]
         :query-params [start_date :- java.time.LocalDate, end_date :- java.time.LocalDate]
-        (get-all-grooves-by-habit request start_date end_date))
+        (get-all-grooves-by-habit request start_date end_date))])
    ;     :tags ["Habits"]
    ;     :header-params [authorization :- String]
    ;     :middleware [wrap-token-auth]
    ;     :path-params [id :- s/Int]
    ;     (get-habit-handler id request))
-   (GET "/habits" [:as request]
-         :tags ["Habits"]
-         :header-params [authorization :- String]
-         :middleware [wrap-token-auth]
-        (get-habits-handler request))])
+   ;(GET "/habits" [:as request]
+   ;      :tags ["Habits"]
+   ;      :header-params [authorization :- String]
+   ;      :middleware [wrap-token-auth]
+   ;     (get-habits-handler request))])
