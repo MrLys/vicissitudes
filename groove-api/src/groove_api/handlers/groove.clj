@@ -9,11 +9,11 @@
 (defn update-groove-handler [groove request]
   (update-groove groove request))
 
-(defn get-grooves-handler [request user habit start end]
-  (get-by-dates request user habit start end))
+(defn get-grooves-handler [request habit start end]
+  (get-by-dates request habit start end))
 
 (defn get-all-grooves-handler [request user start end]
-  (get-all-by-dates request user start end))
+  (get-all-by-dates request start end))
 
 (defn groove->response [day]
   (if day
