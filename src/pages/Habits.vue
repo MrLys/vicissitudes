@@ -79,6 +79,7 @@ export default {
       creating: false,
       habitName: "",
       hasHabits: false,
+      isWeekView: true,
       week: [
         {day:'Monday'},
         {day:'Tuesday'}, 
@@ -89,7 +90,6 @@ export default {
         {day:'Sunday'}],
 
       habits: [],
-      iMap: {},
       grooves: {
         'default': 'py-4 border-2 ',
         'none': 'bg-gray-200 border-gray-200 ',
@@ -100,21 +100,13 @@ export default {
     }
   },
   mounted () {
-    const id = this.$store.getters.id;
-    this.$http
-      .get('/api/habits')
+    let startDate = this.monday.format("YYYY-MM-DD");
+    let endDate = dates.addDays(this.monday, 6).format("YYYY-MM-DD");
+    let url = '/api/habits?start_date=' + startDate + '&end_date=' + endDate;
+    console.log('Getting habits from ' + url);
+    this.$http.get(url)
       .then(response => {
-        this.hasHabits = true;
-        this.mapHabitsResp(response);
-        let startDate = this.monday.format("YYYY-MM-DD");
-        let endDate = dates.addDays(this.monday, 6).format("YYYY-MM-DD");
-        let url = '/api/grooves/' + id +
-          '?start_date=' + startDate + '&end_date=' + endDate;
-        this.$http.get(url).then(response =>
-          (this.mapper(response))).catch((error) => {
-            this.feedback = handler.handleError(error, "");
-            console.log(error.response);
-          });
+        this.mapper(response);
       }).catch((error) => {
         this.feedback = handler.handleError(error, "");
         console.log(error.response);
@@ -153,11 +145,9 @@ export default {
     },
     mapHabits: function (habits) {
       let items = [];
-      console.log(habits);
       for (let i= 0; i < habits.length; i++) {
-        items.push(this.generateWeek(habits[i].id));
-        console.log("Creating entry ("+i+", " + habits[i].id+ ")");
-        this.iMap[habits[i].id] = i;
+        items.push(this.generateWeek(habits[i].user_habit_id));
+        this.iMap[habits[i].user_habit_id] = i;
       }
       this.items = items;
     },
@@ -171,15 +161,19 @@ export default {
     },
     mapper: function (data) {
       let items = data.data;
-      for(let i = 0; i < items.length; i++){
-        let current_date = this.$moment(items[i].date);
-        console.log(current_date);
-        let n = items[i].user_habit_id;
-        let k = this.iMap[items[i].user_habit_id];
-        for(let j = 0; j < this.items[k].length; j++) {
-          if(dates.sameDate(this.items[k][j].date, current_date)){
-            this.items[k][j].groove = items[i].state;
-            break;
+      if (this.isWeekView) {
+        console.log(items);
+        for(let i = 0; i < items.length; i++){
+          this.mapHabits(items);
+          let current_date = this.$moment(items[i].date);
+          console.log(current_date);
+          let n = items[i].user_habit_id;
+          let k = this.iMap[items[i].user_habit_id];
+          for(let j = 0; j < this.items[k].length; j++) {
+            if(dates.sameDate(this.items[k][j].date, current_date)){
+              this.items[k][j].groove = items[i].state;
+              break;
+            }
           }
         }
       }

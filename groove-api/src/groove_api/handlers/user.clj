@@ -2,6 +2,7 @@
   (:require [clojure.string :as str]
             [ring.util.http-response :refer [ok not-found forbidden created]]
             [groove-api.db :as db]
+            [groove-api.handlers.response :refer [response-handler]]
             [groove-api.bulwark :refer [activate-user new-user new-activation-token]]
             [groove-api.models.user :refer [User]]
             [groove-api.mail-test :refer [mail]]
@@ -43,4 +44,4 @@
      :else (create-new-user user))))
 
 (defn activate-user-handler [token request]
-  (activate-user token request))
+  (response-handler :POST activate-user token request))

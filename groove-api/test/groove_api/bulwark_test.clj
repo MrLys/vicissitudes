@@ -32,11 +32,11 @@
     (and
       (is (not (nil? db-habit)))
       (is (not (nil? (db/get-user-habit (:id user) (:id db-habit)))))
-      (is (= (str (:status response)) "200")) ;; http status ok
-      (is (= (str (:habit_id (:body response))) (str (:id db-habit)))) ; correct habit id
-      (is (= (str (:owner_id (:body response))) (str (:id user))))  ; correct user id
-      (is (= (str (:habit_id (:body response))) (str (:habit_id (db/get-user-habit (:id user) (:id db-habit))))))
-      (is (= (str (:owner_id (:body response))) (str (:owner_id (db/get-user-habit (:id user) (:id db-habit)))))))))
+      ;(is (= (str (:status response)) "200")) ;; http status ok
+      (is (= (str (:habit_id response)) (str (:id db-habit)))) ; correct habit id
+      (is (= (str (:owner_id response)) (str (:id user))))  ; correct user id
+      (is (= (str (:habit_id response)) (str (:habit_id (db/get-user-habit (:id user) (:id db-habit))))))
+      (is (= (str (:owner_id response)) (str (:owner_id (db/get-user-habit (:id user) (:id db-habit)))))))))
 
 (deftest get-habit-test
   "Test creation of a habit"
@@ -53,8 +53,8 @@
       ; User2 should not have access to habit1
       (is (nil? (db/get-user-habit (:id user2) (:id (db/get-habit-by-name (:name habit1))))))
       (is (nil? (db/get-user-habit (:id user1) (:id (db/get-habit-by-name (:name habit2))))))
-      (is (= (count (:body (blwrk/get-habits req1))) 1))
-      (is (= (count (:body (blwrk/get-habits req2))) 1)))))
+      (is (= (count (blwrk/get-habits req1)) 1))
+      (is (= (count (blwrk/get-habits req2)) 1)))))
 
 (deftest create-duplicate-habits
   "Create a duplicate habit"
@@ -67,17 +67,16 @@
         habits (blwrk/get-habits req)
         habit3 (blwrk/create-habit habit1 req)]
     (and
-      (is (= (str (:status habits)) (str 200)))
-      (is (= (count (:body habits)) 2))
-      (is (= (:status (:body habit3) 409))))))
-
+      (is (nil? (:error habits)))
+      (is (= (count habits) 2))
+      (is (not (nil? (:error habit3)))))))
 
 (defn- create-groove [req resp today offset state]
   "Create a groove based on request a user habit and date today"
   {
    :owner_id (parseLong (:id (:identity req)))
    :state state
-   :user_habit_id (parseLong (:id (:body resp)))
+   :user_habit_id (parseLong (:id resp))
    :date (.plusDays today offset)
    })
 
@@ -109,26 +108,27 @@
         _ (blwrk/update-groove g5 req1)
         g6 (create-groove req1 resp2 today -3 "fail")
         _ (blwrk/update-groove g6 req1)
-        user1-grooves-habit1 (blwrk/get-by-dates req1 (parseLong (:id user1)) (parseLong (:id (:body resp1))) (.plusDays today -6) today)
-        user1-grooves-habit2 (blwrk/get-by-dates req1 (parseLong (:id user1)) (parseLong (:id (:body resp2))) (.plusDays today -6) today)
-        user2-grooves-habit1 (blwrk/get-by-dates req2 (parseLong (:id user2)) (parseLong (:id (:body resp1))) (.plusDays today -6) today)]
+        user1-grooves-habit1 (blwrk/get-by-dates req1 (parseLong (:id resp1)) (.plusDays today -6) today)
+        user1-grooves-habit2 (blwrk/get-by-dates req1 (parseLong (:id resp2)) (.plusDays today -6) today)
+        user2-grooves-habit1 (blwrk/get-by-dates req2 (parseLong (:id resp1)) (.plusDays today -6) today)]
+    (println user1-grooves-habit1)
     (and
-      (is (= (count (:body user1-grooves-habit1)) 3))
-      (is (= (count (:body user1-grooves-habit2)) 3))
-      (is (= (count (:body user2-grooves-habit1)) 0))
-      (is (= (:state (nth (:body user1-grooves-habit1) 2)) (:state g1)))
-      (is (= (:state (nth (:body user1-grooves-habit1) 1)) (:state g2)))
-      (is (= (:state (nth (:body user1-grooves-habit1) 0)) (:state g3)))
-      (is (= (:state (nth (:body user1-grooves-habit2) 2)) (:state g4)))
-      (is (= (:state (nth (:body user1-grooves-habit2) 1)) (:state g5)))
-      (is (= (:state (nth (:body user1-grooves-habit2) 0)) (:state g6)))
+      (is (= (count user1-grooves-habit1) 3))
+      (is (= (count user1-grooves-habit2) 3))
+      (is (= (count user2-grooves-habit1) 0))
+      (is (= (:state (nth user1-grooves-habit1 2) (:state g1))))
+      (is (= (:state (nth user1-grooves-habit1 1) (:state g2))))
+      (is (= (:state (nth user1-grooves-habit1 0) (:state g3))))
+      (is (= (:state (nth user1-grooves-habit2 2) (:state g4))))
+      (is (= (:state (nth user1-grooves-habit2 1) (:state g5))))
+      (is (= (:state (nth user1-grooves-habit2 0) (:state g6))))
       (do
         (blwrk/update-groove (create-groove req1 resp1 today -1 "fail") req1)
-        (let [updated (blwrk/get-by-dates req1 (parseLong (:id user1)) (parseLong (:id (:body resp1))) (.plusDays today -6) today)]
-          (is (= (count (:body updated)) 3))
-          (is (= (:state (nth (:body updated) 2)) "fail"))
-          (is (= (:state (nth (:body updated) 1)) (:state g2)))
-          (is (= (:state (nth (:body updated) 0)) (:state g3))))))))
+        (let [updated (blwrk/get-by-dates req1 (parseLong (:id resp1)) (.plusDays today -6) today)]
+          (is (= (count updated) 3))
+          (is (= (:state (nth updated 2)) "fail"))
+          (is (= (:state (nth updated 1)) (:state g2)))
+          (is (= (:state (nth updated 0)) (:state g3))))))))
 
 (deftest get-by-dates-test
   "Test getting grooves by date")

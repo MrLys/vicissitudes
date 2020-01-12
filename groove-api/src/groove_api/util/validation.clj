@@ -92,5 +92,5 @@
     (let [calendarNow (java.util.Calendar/getInstance)
           calendarToken (java.util.Calendar/getInstance)]
       (.setTime calendarToken (:expiration token))
-      (.after calendarNow calendarToken))))
+      (.after calendarToken calendarNow))))
 

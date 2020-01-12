@@ -31,7 +31,7 @@ describe('My First Test', function () {
         var rand = capitalizeFirstLetter(Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15));
         cy.get('#habit-field')
             .type(rand+'{enter}')
-        cy.wait('@new-habit').should('have.property', 'status', 200)
+        cy.wait('@new-habit').should('have.property', 'status', 201)
         cy.contains(rand)
 
         // wait for the page to refresh
@@ -52,7 +52,7 @@ describe('My First Test', function () {
 
         cy.get('#habit-field').type('Exercising{enter}')
         // wait for the page to refresh
-        cy.wait('@new-habit').should('have.property', 'status', 200)
+        cy.wait('@new-habit').should('have.property', 'status', 201)
 
         cy.contains('Exercising')
 
