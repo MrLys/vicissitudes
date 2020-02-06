@@ -88,7 +88,7 @@ export default {
         {day:'Friday'}, 
         {day:'Saturday'},
         {day:'Sunday'}],
-
+      iMap: {},
       habits: [],
       grooves: {
         'default': 'py-4 border-2 ',
@@ -108,7 +108,10 @@ export default {
       .then(response => {
         this.mapper(response);
       }).catch((error) => {
+        console.log("An error has occured!");
+        console.log(error);
         this.feedback = handler.handleError(error, "");
+        this.positive_feedback = false;
         console.log(error.response);
       });
   },
@@ -146,29 +149,29 @@ export default {
     mapHabits: function (habits) {
       let items = [];
       for (let i= 0; i < habits.length; i++) {
-        items.push(this.generateWeek(habits[i].user_habit_id));
-        this.iMap[habits[i].user_habit_id] = i;
+        items.push(this.generateWeek(habits[i].id));
+        this.iMap[habits[i].id] = i;
       }
       this.items = items;
     },
     mapHabitsResp: function (resp) {
-      let habits = resp.data;
+      let habits = resp;
       for(let i = 0; i < habits.length; i++) {
         habits[i].name = this.capitalizeFirstLetter(habits[i].name);
       }
       this.habits = habits;
+      this.hasHabits = habits.length > 0;
       this.mapHabits(habits);
     },
     mapper: function (data) {
       let items = data.data;
       if (this.isWeekView) {
-        console.log(items);
+        this.mapHabitsResp(items);
         for(let i = 0; i < items.length; i++){
-          this.mapHabits(items);
           let current_date = this.$moment(items[i].date);
-          console.log(current_date);
-          let n = items[i].user_habit_id;
-          let k = this.iMap[items[i].user_habit_id];
+          console.log(items[i]);
+          let n = items[i].id;
+          let k = this.iMap[items[i].id];
           for(let j = 0; j < this.items[k].length; j++) {
             if(dates.sameDate(this.items[k][j].date, current_date)){
               this.items[k][j].groove = items[i].state;
@@ -183,6 +186,7 @@ export default {
       console.log(item.date);
     },
     computedClass: function(item) {
+
       let ret = this.grooves['default'];
       ret += this.grooves[item.groove];
       if(item.clicked) {

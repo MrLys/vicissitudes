@@ -2,6 +2,7 @@
   (:require [clojure.test :refer :all]
             [groove-api.core :refer :all]
             [toucan.db :as db]
+            [groove-api.util.utils :refer [parseLong]]
             [groove-api.core :refer :all]
             [clojure.java.jdbc :as j]
             [environ.core :refer [env]]))
@@ -13,6 +14,9 @@
             :user  (env :user)
             :password (env :password)
             :ssl false})
+
+(defn test-long[l1 l2] 
+  (= (parseLong l1) (parseLong l2)))
 
 (defn clear [table]
   (j/execute! pg-db [(format "TRUNCATE public.%s CASCADE" (name table))]))

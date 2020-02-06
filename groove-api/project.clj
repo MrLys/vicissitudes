@@ -22,7 +22,8 @@
                  [buddy/buddy-auth "2.2.0"]
                  [http-kit "2.3.0"]
                  [environ "1.1.0"]]
-  :plugins [[lein-environ "1.1.0"]]
+  :plugins [[lein-environ "1.1.0"]
+            [lein-cloverage "1.1.2"]]
   :main ^:skip-aot groove-api.core
   :target-path "target/%s"
   :profiles { :dev [:project/dev :profiles/dev]

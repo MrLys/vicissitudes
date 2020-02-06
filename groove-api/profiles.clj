@@ -2,7 +2,7 @@
   {:env
    {:dbtype "postgres"
     :dbname "groove_api"
-    :user   "root"
+    :user   "lyseggen"
     :password "password"
     :secret "password"
     :port 3000}}
@@ -10,7 +10,7 @@
   {:env
    {:dbtype "postgres"
     :dbname "groove_api"
-    :user   "root"
+    :user   "lyseggen"
     :password "password"
     :secret "password"
     :port 3001}}}

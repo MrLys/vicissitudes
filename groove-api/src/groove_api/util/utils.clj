@@ -7,6 +7,8 @@
 
 
 
+(defn create-activation-token []
+  (str (java.util.UUID/randomUUID)))
 
 (defn format-groove [groove]
   (assoc groove :state (.toLowerCase (:state groove))))

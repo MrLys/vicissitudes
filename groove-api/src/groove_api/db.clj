@@ -43,7 +43,8 @@
 	     :from [:user_habit]
 	     :where [:= :user_habit.owner_id user-id]
 	     :join [:habit [:= :user_habit.habit_id :habit.id]]
-	     :left-join [:groove [:= :user_habit.id :groove.user_habit_id]]}))
+	     :left-join [:groove [:= :user_habit.id :groove.user_habit_id]]
+             :order-by [:date]}))
 	     ;:join [:groove [:= :groove.owner_id :user_habit.owner_id]]}))
 
 (defn get-grooves-by-date-range [user_id user-habit-id start end]

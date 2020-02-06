@@ -6,48 +6,27 @@
         props (java.util.Properties.)]
 
     (doto props
-      (.put "mail.smtp.host" (:host mail))
-      (.put "mail.smtp.port" (:port mail))
-      (.put "mail.smtp.user" (:user mail))
-      (.put "mail.smtp.socketFactory.port"  (:port mail))
-      (when-not (empty? (:password mail)) (.put "mail.smtp.auth" "true")))
+      (.setProperty "mail.smtp.host" "mail.smtpbucket.com")
+      (.setProperty "mail.smtp.port" "8025"))
 
     (if (= (:ssl mail) true)
       (doto props
-        (.setProperty "mail.smtp.socketFactory.class" 
-              "javax.net.ssl.SSLSocketFactory")
+        (.setProperty "mail.smtp.socketFactory.class"
+                      "javax.net.ssl.SSLSocketFactory")
         (.setProperty "mail.smtp.socketFactory.fallback" "false")
         (.setProperty "mail.smtp.socketFactory.port" (str (:port mail)))
         (.put "mail.smtp.starttls.enable" "true")))
-    (if (empty? (:password mail))
-          (let [recipients (reduce #(str % "," %2) (:to mail))
-                session (javax.mail.Session/getDefaultInstance props)
-                msg     (javax.mail.internet.MimeMessage. session)]
-            
-      (.setFrom msg (javax.mail.internet.InternetAddress. (:user mail)))
 
-      (.setRecipients msg 
-                      (javax.mail.Message$RecipientType/TO)
-                      (javax.mail.internet.InternetAddress/parse recipients))
+    (let  [session (javax.mail.Session/getDefaultInstance props)
+           msg     (javax.mail.internet.MimeMessage. session)
+           recipients (reduce #(str % "," %2) (:to mail))]
 
-      (.setSubject msg (:subject mail))
-      (.setText msg (:text mail))
-      (javax.mail.Transport/send msg))
-    (let [authenticator (proxy [javax.mail.Authenticator] [] 
-                          (getPasswordAuthentication 
-                            []
-                            (javax.mail.PasswordAuthentication. 
-                              (:user mail) (:password mail))))
-          recipients (reduce #(str % "," %2) (:to mail))
-          session (javax.mail.Session/getInstance props authenticator)
-          msg     (javax.mail.internet.MimeMessage. session)]
+      (.setFrom msg (javax.mail.internet.InternetAddress. "noreply@rutta.no"))
 
-      (.setFrom msg (javax.mail.internet.InternetAddress. (:user mail)))
-
-      (.setRecipients msg 
-                      (javax.mail.Message$RecipientType/TO)
-                      (javax.mail.internet.InternetAddress/parse recipients))
+      (.addRecipient msg
+                     (javax.mail.Message$RecipientType/TO)
+                     (javax.mail.internet.InternetAddress. (str (:to mail))))
 
       (.setSubject msg (:subject mail))
-      (.setText msg (:text mail))
-      (javax.mail.Transport/send msg)))))
+      (.setContent msg (:text mail) "text/html")
+      (javax.mail.Transport/send msg))))

@@ -43,7 +43,7 @@ describe('My First Test', function () {
         cy.get('#save-habit').click()
 
         // wait for the page to refresh
-        cy.wait('@new-habit').should('have.property', 'status', 409)
+        cy.wait('@new-habit').should('have.property', 'status', 401)
 
         // add Exercising
         cy.get('#add-habit').click()

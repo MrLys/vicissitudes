@@ -3,7 +3,10 @@
             [compojure.api.sweet :refer [GET POST PATCH PUT]]))
 
 (defn- valid-response? [value]
-  (or (not (empty? value)) (not (nil? value)) (nil? (:error value))))
+  (and
+    (not (empty? value)) 
+    (not (nil? value))
+    (nil? (:error value))))
 
 (def ^:private handler-map {:GET (fn [v] (if (valid-response? v) (ok v) (not-found "Not found")))
                   :POST (fn [v] (if (valid-response? v) (created v) (unauthorized "Not authorized!")))

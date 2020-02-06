@@ -57,19 +57,13 @@
   (db/get-user-habit (get-user-id request) habit-id))
 
 (defn- activation-helper [id]
-  (if (db/activate-user id)
-    (do (println (db/get-user id))
-    "Activated")
-    (do (println "Cannot activate?")
-        {:error "Cannot activate user"})))
+  (db/activate-user id))
 
 (defn new-activation-token [token id date]
-  (println id)
   (db/new-activation-token token id date))
 
 (defn activate-user [token request]
   (let [token (db/get-token-by-token token)]
-    (println token)
     (if (valid-token? token) ;; user can be activated
       (activation-helper (:user_id token))
       {:error "Not authorized"})))
