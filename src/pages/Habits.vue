@@ -148,36 +148,46 @@ export default {
     },
     mapHabits: function (habits) {
       let items = [];
-      for (let i= 0; i < habits.length; i++) {
-        items.push(this.generateWeek(habits[i].id));
-        this.iMap[habits[i].id] = i;
+      let i = 0;
+      let keys = Object.keys(habits);
+      for (let i = 0; i < keys.length; i++) {
+        items.push(this.generateWeek(habits[keys[i]].id));
+        this.iMap[habits[keys[i]].id] = i;
       }
       this.items = items;
     },
     mapHabitsResp: function (resp) {
       let habits = resp;
-      for(let i = 0; i < habits.length; i++) {
-        habits[i].name = this.capitalizeFirstLetter(habits[i].name);
+      let keys = Object.keys(habits);
+      let habit_array = []
+      for(let i = 0; i < keys.length; i++) {
+        habits[keys[i]].name = this.capitalizeFirstLetter(habits[keys[i]].name);
+        habit_array[i] = habits[keys[i]];
       }
-      this.habits = habits;
-      this.hasHabits = habits.length > 0;
+      this.habits = habit_array;
+      this.hasHabits = Object.keys(habits).length > 0;
+      console.log(this.hasHabits);
       this.mapHabits(habits);
     },
     mapper: function (data) {
       let items = data.data;
+      console.log(items);
       if (this.isWeekView) {
         this.mapHabitsResp(items);
-        for(let i = 0; i < items.length; i++){
-          let current_date = this.$moment(items[i].date);
-          console.log(items[i]);
-          let n = items[i].id;
-          let k = this.iMap[items[i].id];
-          for(let j = 0; j < this.items[k].length; j++) {
-            if(dates.sameDate(this.items[k][j].date, current_date)){
-              this.items[k][j].groove = items[i].state;
-              break;
+        let keys = Object.keys(items); 
+        for(let i = 0; i < keys.length; i++){
+            for(let m = 0; m < items[keys[i]].grooves.length; m++) {
+                let current_date = this.$moment(items[keys[i]].grooves[m].date);
+                let n = items[keys[i]].id;
+                let k = this.iMap[n];
+                for(let j = 0; j < this.items[k].length; j++) {
+                    if(dates.sameDate(this.items[k][j].date, current_date)){
+                        this.items[k][j].groove = items[keys[i]].grooves[m].state;
+                        console.log(items[keys[i]]);
+                        break;
+                    }
+                }
             }
-          }
         }
       }
     },
