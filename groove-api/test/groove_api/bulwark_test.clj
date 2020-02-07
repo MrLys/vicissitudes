@@ -10,7 +10,7 @@
 (defn- get-mock-request [user]
   {:identity (db/new-user! user)})
 
-(defn- each-fixture-wrapper []) 
+(defn- each-fixture-wrapper [])
 
 
 (defn- generate-grooves [user habit start-date end-date]
@@ -156,11 +156,11 @@
     (println (nth grooves 0))
     (println (str "user_habit_id of grooves[0] " (:user_habit_id (nth grooves 0))))
     (println resp1)
-    (and 
+    (and
       (is (= (count grooves) 6))
-      (is (test-long (:owner_id (nth grooves 0) (:id user1))))
+      (is (test-long (:owner_id (nth grooves 0)) (:id user1)))
       (is (reduce #(and %1 (test-long (:owner_id %2) (:id user1))) grooves)) ; all grooves belong to user1
-      (is (reduce #(and %1 (or (test-long (:user_habit_id %2) (:id resp1)) (test-long (:user_habit_id %2) (:id resp2)))) grooves))))) ; all should be of user_habit1 or 2 
+      (is (reduce #(and %1 (or (test-long (:user_habit_id %2) (:id resp1)) (test-long (:user_habit_id %2) (:id resp2)))) grooves))))) ; all should be of user_habit1 or 2
 
 (deftest get-all-grooves-and-habits-by-date-range-test
   (let [req1 (create-user)
@@ -190,14 +190,14 @@
         _ (blwrk/update-groove g7 req2)
         all (blwrk/get-all-grooves-and-habits-by-date-range req1 (.plusDays today -6) (.plusDays today 1))]
     (println all)
-    (and 
+    (and
       (is (= (count all) 6))
       (is (reduce #(and %1 (test-long (:owner_id %2) (:id user1))) all)) ; all grooves belong to user1
-      (is (reduce #(and %1 (or (test-long (:id %2) (:id resp1)) (test-long (:id %2) (:id resp2)))) all)) ; all should be of user_habit1 or 2 
-      (is (reduce #(and %1 (or (= (str (:name %2)) (str (:name habit1))) (= (str (:name %2)) (str (:name habit2))))) all))))) ; all should be of user_habit1 or 2 
+      (is (reduce #(and %1 (or (test-long (:id %2) (:id resp1)) (test-long (:id %2) (:id resp2)))) all)) ; all should be of user_habit1 or 2
+      (is (reduce #(and %1 (or (= (str (:name %2)) (str (:name habit1))) (= (str (:name %2)) (str (:name habit2))))) all))))) ; all should be of user_habit1 or 2
 
 
-(deftest activation-token-test 
+(deftest activation-token-test
   "Try creating an activation token
   and check its validity"
   (let [token1 (create-activation-token)
@@ -209,7 +209,7 @@
      (is (nil? (:error resp)))
      (is resp)
      (is (not (nil? (:error (blwrk/activate-user token2 req))))))))
-  
+
 
 (use-fixtures :once once-fixture)
 (use-fixtures :each each-fixture)
