@@ -79,6 +79,7 @@ export default {
       creating: false,
       habitName: "",
       hasHabits: false,
+      isWeekView: true,
       week: [
         {day:'Monday'},
         {day:'Tuesday'}, 
@@ -87,9 +88,8 @@ export default {
         {day:'Friday'}, 
         {day:'Saturday'},
         {day:'Sunday'}],
-
-      habits: [],
       iMap: {},
+      habits: [],
       grooves: {
         'default': 'py-4 border-2 ',
         'none': 'bg-gray-200 border-gray-200 ',
@@ -100,18 +100,20 @@ export default {
     }
   },
   mounted () {
-    const id = this.$store.getters.id;
-    this.$http
-      .get('/api/habits')
+    let startDate = this.monday.format("YYYY-MM-DD");
+    let endDate = dates.addDays(this.monday, 6).format("YYYY-MM-DD");
+    let url = '/api/habits?start_date=' + startDate + '&end_date=' + endDate;
+    console.log('Getting habits from ' + url);
+    this.$http.get(url)
       .then(response => {
-        this.hasHabits = true;
-        this.mapHabitsResp(response);
-        let startDate = this.monday.format("YYYY-MM-DD");
-        let endDate = dates.addDays(this.monday, 6).format("YYYY-MM-DD");
-        let url = '/api/grooves/' + id +
-          '?start_date=' + startDate + '&end_date=' + endDate;
-        this.$http.get(url).then(response => (this.mapper(response))).catch((error) => {console.log(error)});
-      }).catch((error) => {console.log(error)});
+        this.mapper(response);
+      }).catch((error) => {
+        console.log("An error has occured!");
+        console.log(error);
+        this.feedback = handler.handleError(error, "");
+        this.positive_feedback = false;
+        console.log(error.response);
+      });
   },
   methods: {
     newHabit: function() {
@@ -132,44 +134,60 @@ export default {
             "");
         });
     },
-    generateWeek: function (habit_id) {
+    generateWeek: function (user_habit_id) {
       let monday = this.monday;
       return [{day:'Monday', date: monday, clicked:false, groove: 'none',
-        habit: habit_id}, 
+        habit: user_habit_id}, 
       {day:'Tuesday', date: dates.addDays(monday, 1), clicked:false, groove:
-        'none', habit: habit_id}, 
-      {day:'Wednesday', date: dates.addDays(monday, 2), clicked:false, groove: 'none', habit: habit_id},
-      {day:'Thursday', date: dates.addDays(monday, 3), clicked:false, groove: 'none', habit: habit_id}, 
-      {day:'Friday', date: dates.addDays(monday, 4), clicked:false, groove: 'none', habit: habit_id}, 
-      {day:'Saturday',date: dates.addDays(monday, 5), clicked:false, groove: 'none', habit: habit_id},
-      {day:'Sunday',date: dates.addDays(monday, 6), clicked:false, groove: 'none', habit: habit_id}];
+        'none', habit: user_habit_id}, 
+      {day:'Wednesday', date: dates.addDays(monday, 2), clicked:false, groove: 'none', habit: user_habit_id},
+      {day:'Thursday', date: dates.addDays(monday, 3), clicked:false, groove: 'none', habit: user_habit_id}, 
+      {day:'Friday', date: dates.addDays(monday, 4), clicked:false, groove: 'none', habit: user_habit_id}, 
+      {day:'Saturday',date: dates.addDays(monday, 5), clicked:false, groove: 'none', habit: user_habit_id},
+      {day:'Sunday',date: dates.addDays(monday, 6), clicked:false, groove: 'none', habit: user_habit_id}];
     },
     mapHabits: function (habits) {
       let items = [];
-      console.log(habits);
-      for (let i= 0; i < habits.length; i++) {
-        items.push(this.generateWeek(habits[i].id));
-        console.log("Creating entry ("+i+", " + habits[i].id+ ")");
-        this.iMap[habits[i].id] = i;
+      let i = 0;
+      let keys = Object.keys(habits);
+      for (let i = 0; i < keys.length; i++) {
+        items.push(this.generateWeek(habits[keys[i]].id));
+        this.iMap[habits[keys[i]].id] = i;
       }
       this.items = items;
     },
     mapHabitsResp: function (resp) {
-      let habits = resp.data;
-      this.habits = habits;
+      let habits = resp;
+      let keys = Object.keys(habits);
+      let habit_array = []
+      for(let i = 0; i < keys.length; i++) {
+        habits[keys[i]].name = this.capitalizeFirstLetter(habits[keys[i]].name);
+        habit_array[i] = habits[keys[i]];
+      }
+      this.habits = habit_array;
+      this.hasHabits = Object.keys(habits).length > 0;
+      console.log(this.hasHabits);
       this.mapHabits(habits);
     },
     mapper: function (data) {
-      var items = data.data;
-      for(var i = 0; i < items.length; i++){
-        let current_date = this.$moment(items[i].date);
-        let n = items[i].habit_id;
-        let k = this.iMap[items[i].habit_id];
-        for(var j = 0; j < this.items[k].length; j++) {
-          if(dates.sameDate(this.items[k][j].date, current_date)){
-            this.items[k][j].groove = items[i].state;
-            break;
-          }
+      let items = data.data;
+      console.log(items);
+      if (this.isWeekView) {
+        this.mapHabitsResp(items);
+        let keys = Object.keys(items); 
+        for(let i = 0; i < keys.length; i++){
+            for(let m = 0; m < items[keys[i]].grooves.length; m++) {
+                let current_date = this.$moment(items[keys[i]].grooves[m].date);
+                let n = items[keys[i]].id;
+                let k = this.iMap[n];
+                for(let j = 0; j < this.items[k].length; j++) {
+                    if(dates.sameDate(this.items[k][j].date, current_date)){
+                        this.items[k][j].groove = items[keys[i]].grooves[m].state;
+                        console.log(items[keys[i]]);
+                        break;
+                    }
+                }
+            }
         }
       }
     },
@@ -178,7 +196,8 @@ export default {
       console.log(item.date);
     },
     computedClass: function(item) {
-      var ret = this.grooves['default'];
+
+      let ret = this.grooves['default'];
       ret += this.grooves[item.groove];
       if(item.clicked) {
         ret += this.grooves['selected'];
@@ -189,15 +208,18 @@ export default {
       this.$http.patch('/api/groove', 
           {owner_id: parseInt(localStorage.getItem('user_id')), 
             state: groove.groove, 
-            habit_id: parseInt(groove.habit),
+            user_habit_id: parseInt(groove.habit),
             date: groove.date.format("YYYY-MM-DD")}).then((response) => {
               console.log(response)
             }).catch((error) => {console.log(error.response)});
     },
+    capitalizeFirstLetter: function (string) {
+      return string.charAt(0).toUpperCase() + string.slice(1);
+    },
     action: function (groove) {
       console.log(this.items[0][0] + " " + groove);
       for(let i = 0; i < this.items.length; i++) {
-        for(var j = 0; j < this.items[i].length; j++) {
+        for(let j = 0; j < this.items[i].length; j++) {
           if (this.items[i][j].clicked) {
             this.items[i][j].groove = groove;
             this.items[i][j].clicked = false;

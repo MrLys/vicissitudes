@@ -12,7 +12,8 @@
 (def ^:private email-regex
   #"(?i)[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?")
 
-(defn- filter-dgst [suffix dgsts] (filter (fn [dgst] (= suffix (.toLowerCase (:hash dgst)))) dgsts))
+(defn- filter-dgst [suffix dgsts]
+  (filter (fn [dgst] (= suffix (.toLowerCase (:hash dgst)))) dgsts))
 
 (defn- match [suffix dgsts] (:freq (first (filter-dgst suffix dgsts))))
 
@@ -21,7 +22,7 @@
     (if (empty? match)
       false
       (> (Integer/parseInt match) breach_limit))))
-  
+
 (defn- get-prefix [^String dgst]
   (subs dgst 0 5))
 
@@ -33,11 +34,11 @@
 
 (defn build-map [body]
   (let [body-map (structure body)]
-    (if body-map 
+    (if body-map
       (map (fn [x] {:hash (nth x 1) :freq (nth x 2)}) body-map)
       {})))
 
-(defn- fetch-db [prefix] 
+(defn- fetch-db [prefix]
   (client/get (str "https://api.pwnedpasswords.com/range/" prefix)))
 
 (defn- digest [^String pwd]
@@ -51,8 +52,8 @@
   (valid-name? name))
 
 (defn valid-email? [^String email]
-  (boolean (and 
-             (string? email) 
+  (boolean (and
+             (string? email)
              (re-matches email-regex email))))
 
 (defn valid-groove? [state]
@@ -65,18 +66,19 @@
 
 (defn valid-user-id? [id]
   (> id 0))
+
 (defn valid-habit-id? [id]
   (> id 0))
 
 (defn- found-in-breach? [^String pwd]
   (let [dgst (digest pwd)]
-  (digest-in-digests? 
-    (get-suffix dgst) 
-    (build-map 
+  (digest-in-digests?
+    (get-suffix dgst)
+    (build-map
       (:body (fetch-db (get-prefix dgst)))))))
-                            
+
 (defn valid-password? [^String pwd]
-  (and 
+  (and
     (> (.length pwd) lower_limit)
     (< (.length pwd) upper_limit)
     (not (found-in-breach? pwd))))
@@ -87,8 +89,8 @@
 (defn valid-token? [token]
   (if (nil? token)
     false
-    (let [calendarNow (java.util.Calendar/getInstance) 
+    (let [calendarNow (java.util.Calendar/getInstance)
           calendarToken (java.util.Calendar/getInstance)]
       (.setTime calendarToken (:expiration token))
-      (.after calendarNow calendarToken)))) 
+      (.after calendarToken calendarNow))))
 

@@ -2,21 +2,22 @@
   (:require [clojure.string :as str]
             [ring.util.http-response :refer [ok not-found forbidden created]]
             [groove-api.db :as db]
-            [groove-api.bulwark :refer [activate-user]]
+            [groove-api.handlers.response :refer [response-handler]]
+            [groove-api.bulwark :refer [activate-user new-user new-activation-token]]
             [groove-api.models.user :refer [User]]
-            [groove-api.mail-test :refer [mail]]
+            [groove-api.mail :refer [mail]]
+            [groove-api.util.utils :refer [create-activation-token]]
             [groove-api.util.validation :refer :all]))
 
 
 (defn create-new-user [user]
-  (let [user (assoc user :email (.toLowerCase (:email user)))
-        activation_token (java.util.UUID/randomUUID)
+  (let [user (assoc user :email (.toLowerCase (:email user)) :username (.toLowerCase (:username user)))
+        activation-token (create-activation-token)
         date (.plusDays (java.time.LocalDate/now) 1)
-        dbUser (db/new-user user)
-        userId (db/get-user-id-by-email (.toLowerCase (:email user)))]
-    (db/new-activation-token activation_token userId date)
-    (mail :to (:email user) :subject "Welcome to rutta!" :text (str "<h1>Welcome to rutta!</h1>\n" "Please follow this link for activation\n" "<a href=\"http://localhost:8080/activation?token=" activation_token"\">Click here</a>"))
-    (ok dbUser)))
+        db-user (new-user user)]
+    (new-activation-token activation-token (:id db-user) date)
+    ;(mail :to (:email user) :subject "Welcome to rutta!" :text (str "<h1>Welcome to rutta!</h1>\n" "Please follow this link for activation\n" "<a href=\"http://localhost:8080/activation?token=" activation-token"\">Click here</a>"))
+    (ok db-user)))
 
 (defn user->response [user]
   (if user
@@ -44,4 +45,4 @@
      :else (create-new-user user))))
 
 (defn activate-user-handler [token request]
-  (activate-user token request))
+  (response-handler :POST activate-user token request))

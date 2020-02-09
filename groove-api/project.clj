@@ -15,13 +15,15 @@
                  [com.sun.mail/smtp "1.6.3"]
                  [toucan "1.1.9"]
                  [clj-time "0.15.2"]
+                 [org.clojure/java.jdbc "0.7.11"]
                  [metosin/schema-tools "0.12.0"]
                  [org.postgresql/postgresql "42.2.4"]
                  [buddy/buddy-hashers "1.4.0"]
                  [buddy/buddy-auth "2.2.0"]
                  [http-kit "2.3.0"]
                  [environ "1.1.0"]]
-  :plugins [[lein-environ "1.1.0"]]
+  :plugins [[lein-environ "1.1.0"]
+            [lein-cloverage "1.1.2"]]
   :main ^:skip-aot groove-api.core
   :target-path "target/%s"
   :profiles { :dev [:project/dev :profiles/dev]

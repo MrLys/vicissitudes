@@ -7,13 +7,15 @@
 
 
 
+(defn create-activation-token []
+  (str (java.util.UUID/randomUUID)))
 
 (defn format-groove [groove]
   (assoc groove :state (.toLowerCase (:state groove))))
 
 (defn parseLong [s]
-  (println (str "this cannot be nil " s))
-  (if (instance? Long s)
+  (if (or (instance? Long s)
+          (instance? Integer s))
     s
     (if (re-matches #"\d+" s)
       (Long/valueOf s)
