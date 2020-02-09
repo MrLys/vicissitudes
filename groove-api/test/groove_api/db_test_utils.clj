@@ -11,7 +11,7 @@
 (def pg-db {:dbtype "postgresql"
             :dbname (env :dbname)
             :host "localhost"
-            :user  (env :user)
+            :user  (env :dbuser)
             :password (env :password)
             :ssl false})
 
