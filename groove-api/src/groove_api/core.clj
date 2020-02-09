@@ -17,6 +17,7 @@
   {:dbtype (env :dbtype)
    :dbname (env :dbname)
    :user (env :dbuser)
+   :subame (env :subname)
    :password (env :password)})
 
 (def swagger-config
