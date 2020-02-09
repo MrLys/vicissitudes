@@ -35,6 +35,13 @@ export default function (Vue, { router, head, isClient, appOptions}) {
             auth_error(state){
                 state.status = 'error'
             },
+            forgot_password(state) {
+              state.token = ''
+              state.status = "loading";
+            },
+          awaiting_recovery_link(state) {
+            state.status = "loading";
+          },
             register_success(state) {
               state.status = "success";
             },
@@ -79,7 +86,20 @@ export default function (Vue, { router, head, isClient, appOptions}) {
               delete Vue.prototype.$http.defaults.headers.common['Authorization']
               resolve()
             })
-
+          },
+          forgot_password({commit}, data) {
+            return new Promise((resolve, reject) => {
+              commit('forgot_password')
+              Vue.prototype.$http.post('/api/forgot?email='+data)
+                .then(resp => {
+                  commit('awaiting_recovery_link');
+                  resolve(resp);
+                })
+                .catch(err => {
+                  localStorage.removeItem('token')
+                  reject(err)
+                })
+            })
           },
           register({commit}, data) {
             return new Promise((resolve, reject) => {
