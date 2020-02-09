@@ -53,10 +53,10 @@
         (.put "mail.transport.protocol" "smtp")))
 
     (let  [authenticator (proxy [javax.mail.Authenticator] []
-    (getPasswordAuthentication []
-                            (javax.mail.PasswordAuthentication. 
-                             (:user mail) (:password mail))))
-            session (javax.mail.Session/getDefaultInstance props authenticator)
+                           (getPasswordAuthentication []
+                             (javax.mail.PasswordAuthentication. 
+                               (:user mail) (:password mail))))
+           session (javax.mail.Session/getDefaultInstance props authenticator)
            msg     (javax.mail.internet.MimeMessage. session)
            recipients (:to mail)]
 
@@ -67,4 +67,5 @@
                      (javax.mail.internet.InternetAddress. (str (:to mail))))
 
       (.setSubject msg (:subject mail))
-      (.setContent msg (:text mail) "text/html")javax.mail.Transport/send msg))))
+      (.setContent msg (:text mail) "text/html")
+      (javax.mail.Transport/send msg)))))
