@@ -1,6 +1,16 @@
 <template>
   <Layout>
     <div>
+      <div style="display:flex; justify-content: space-between">
+      <button class="bg-max_blue-light hover:bg-max_blue-dark text-white font-bold py-2
+      px-4 rounded my-2 " v-on:click="previousWeek()">
+        <icon_previous class="w-5"/>
+      </button>
+        <button class="bg-max_blue-light hover:bg-max_blue-dark text-white font-bold py-2
+        px-4 rounded my-2 " v-on:click="nextWeek()" v-if="isPreviousWeek">
+          <icon_next class="w-5" />
+        </button>
+      </div>
       <p class="h1 text-center" v-if="!hasHabits"> You don't track any habits yet! Click the
       button below to create your very first habit 🎉 </p>
       <button id="add-habit" class="bg-max_blue-light hover:bg-max_blue-dark text-white font-bold py-2
@@ -61,6 +71,8 @@ import icon_success from '~/assets/svgs/success.svg'
 import icon_fail from '~/assets/svgs/error.svg'
 import icon_pass from '~/assets/svgs/minus.svg'
 import icon_plus from '~/assets/svgs/plus.svg'
+import icon_next from '~/assets/svgs/fast-forward.svg'
+import icon_previous from '~/assets/svgs/rewind.svg'
 import handler from '../lib/responseHandler.js';
 export default {
   metaInfo: {
@@ -69,13 +81,17 @@ export default {
      icon_success,
      icon_fail,
      icon_pass,
+    icon_next,
+    icon_previous,
     icon_plus
     },
   data () {
     return {
       feedback: "",
       items:  [],
-      monday: dates.getMonday(new Date()),
+      current_monday: dates.getMonday(new Date()),
+      actual_monday: dates.getMonday(new Date()),
+      isPreviousWeek: false,
       creating: false,
       habitName: "",
       hasHabits: false,
@@ -100,22 +116,25 @@ export default {
     }
   },
   mounted () {
-    let startDate = this.monday.format("YYYY-MM-DD");
-    let endDate = dates.addDays(this.monday, 6).format("YYYY-MM-DD");
-    let url = '/api/habits?start_date=' + startDate + '&end_date=' + endDate;
-    console.log('Getting habits from ' + url);
-    this.$http.get(url)
-      .then(response => {
-        this.mapper(response);
-      }).catch((error) => {
-        console.log("An error has occured!");
-        console.log(error);
-        this.feedback = handler.handleError(error, "");
-        this.positive_feedback = false;
-        console.log(error.response);
-      });
+    this.getHabits();
   },
   methods: {
+    getHabits: function() {
+      let startDate = this.current_monday.format("YYYY-MM-DD");
+      let endDate = dates.addDays(this.current_monday, 6).format("YYYY-MM-DD");
+      let url = '/api/habits?start_date=' + startDate + '&end_date=' + endDate;
+      console.log('Getting habits from ' + url);
+      this.$http.get(url)
+        .then(response => {
+          this.mapper(response);
+        }).catch((error) => {
+          console.log("An error has occured!");
+          console.log(error);
+          this.feedback = handler.handleError(error, "");
+          this.positive_feedback = false;
+          console.log(error.response);
+        });
+    },
     newHabit: function() {
       this.creating = true;
     },
@@ -134,8 +153,20 @@ export default {
             "");
         });
     },
+    previousWeek: function () {
+      this.current_monday = dates.addDays(this.current_monday, -7);
+      this.isPreviousWeek = dates.isAfter(this.actual_monday, this.current_monday);
+      this.getHabits();
+    },
+    nextWeek: function () {
+      this.current_monday = dates.addDays(this.current_monday, 7);
+      this.isPreviousWeek = dates.isAfter(this.actual_monday,
+        this.current_monday) || !dates.sameDate(this.actual_monday,
+          this.current_monday);
+      this.getHabits();
+    },
     generateWeek: function (user_habit_id) {
-      let monday = this.monday;
+      let monday = this.current_monday;
       return [{day:'Monday', date: monday, clicked:false, groove: 'none',
         habit: user_habit_id}, 
       {day:'Tuesday', date: dates.addDays(monday, 1), clicked:false, groove:
@@ -171,19 +202,18 @@ export default {
     },
     mapper: function (data) {
       let items = data.data;
-      console.log(items);
       if (this.isWeekView) {
         this.mapHabitsResp(items);
         let keys = Object.keys(items); 
         for(let i = 0; i < keys.length; i++){
             for(let m = 0; m < items[keys[i]].grooves.length; m++) {
-                let current_date = this.$moment(items[keys[i]].grooves[m].date);
+                let current_date =
+                items[keys[i]].grooves[m].date = this.$moment(items[keys[i]].grooves[m].date);
                 let n = items[keys[i]].id;
                 let k = this.iMap[n];
                 for(let j = 0; j < this.items[k].length; j++) {
                     if(dates.sameDate(this.items[k][j].date, current_date)){
                         this.items[k][j].groove = items[keys[i]].grooves[m].state;
-                        console.log(items[keys[i]]);
                         break;
                     }
                 }
