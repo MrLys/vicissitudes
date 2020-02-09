@@ -27,4 +27,5 @@
   (println m)
   (reduce (fn [r [k v]] (assoc r k (apply codec/url-encode v args))) {} m))
 
+(def truthy? #{"true"})
 
