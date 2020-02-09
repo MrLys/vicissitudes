@@ -15,8 +15,8 @@
 
 (def db-spec
   {:dbtype (env :dbtype)
-   :dbname (env :dbname)
-   :user (env :user)
+   :dbname (env :DBNAME)
+   :user (env :DBUSER)
    :password (env :password)})
 
 (def swagger-config
