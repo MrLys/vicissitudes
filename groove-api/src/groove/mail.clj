@@ -37,7 +37,7 @@
 
     (doto props
       (.setProperty "mail.smtp.host" (:mailhost env))
-      (.setProperty "mail.smtp.port" (:mailport env))
+      (.setProperty "mail.smtp.port" (:mailport env)))
 
     (if (= (:ssl mail) true)
       (doto props
@@ -68,4 +68,5 @@
 
       (.setSubject msg (:subject mail))
       (.setContent msg (:text mail) "text/html")
-      (javax.mail.Transport/send msg)))))
+      (javax.mail.Transport/send msg))))
+
