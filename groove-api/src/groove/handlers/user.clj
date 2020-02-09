@@ -61,7 +61,7 @@
        (let [token (blwrk/new-password-token! (:id user) (.plusDays (java.time.LocalDate/now) 1) (create-activation-token))]
          (println (str "\n\n\n" "token" token))
          (when-not (truthy? (:istest env))
-           (mail :to (:email user) :subject "Password reset" :text (str "<h1>A request to reset the password for the account has been made.</h1>\n" "<p>The link below is valid for 24 hours.</p>\n""Please follow this link to create a new password \n" "<a href=\"http://localhost:8080/Password?token=" token"\">Click here</a>")))
+           (mail :to (:email user) :from "noreply@rutta.no" :user (:mailuser env) :password (:mailpassword env) :mailport (:mailport env) :mailhost (:mailhost env) :ssl true :port (:mailport) :subject "Password reset" :text (str "<h1>A request to reset the password for the account has been made.</h1>\n" "<p>The link below is valid for 24 hours.</p>\n""Please follow this link to create a new password \n" "<a href=\"http://localhost:8080/Password?token=" token"\">Click here</a>")))
           token)))
        {:error "Invalid email"}))
 
