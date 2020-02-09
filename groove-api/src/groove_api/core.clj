@@ -15,8 +15,8 @@
 
 (def db-spec
   {:dbtype (env :dbtype)
-   :dbname (env :DBNAME)
-   :user (env :DBUSER)
+   :dbname (env :dbname)
+   :user (env :dbuser)
    :password (env :password)})
 
 (def swagger-config
@@ -26,8 +26,10 @@
                  :securityDefinitions {:api_key {:type "apiKey" :name "Authorization" :in "header"}}}}})
 
 (defn setup-db []
+  (println db-spec)
   (db/set-default-db-connection! db-spec)
   (models/set-root-namespace! 'groove-api.models))
+
 (def app
   (api
     {:swagger swagger-config}
