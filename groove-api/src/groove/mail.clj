@@ -47,8 +47,8 @@
         (.setProperty "mail.smtp.socketFactory.port" (str (:port mail)))
         (.put "mail.smtp.starttls.enable" "true")
         (.put "mail.smtp.auth" "true")
-        ;(.put "mail.debug" "true")
-        ;(.put "mail.debug.auth" "true")
+        (.put "mail.debug" (:maildebug env))
+        (.put "mail.debug.auth" (:maildebugauth env))
         (.put "mail.store.protocol" "pop3")
         (.put "mail.transport.protocol" "smtp")))
 
