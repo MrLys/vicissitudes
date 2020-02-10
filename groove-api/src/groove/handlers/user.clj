@@ -17,10 +17,10 @@
         date (.plusDays (java.time.LocalDate/now) 1)
         db-user (blwrk/new-user user)]
     (blwrk/new-activation-token! activation-token (:id db-user) date)
-    (if (not (truthy? (:istest env)))
+    (when (not (truthy? (:istest env)))
       (do
         (println (str "sending mail to " (:email user)))
-        (mail :to (:email user) 
+        (future (mail :to (:email user) 
               :from "noreply@rutta.no" 
               :user (:mailuser env) 
               :password (:mailpassword env) 
@@ -29,7 +29,7 @@
               :ssl true 
               :port (:mailport env) 
               :subject "Welcome to Rutta!" 
-              :text (str "<h1>Welcome to Rutta!</h1>\n" "Please follow this link for activation\n" "<a href=\"http://localhost:8080/activation?token=" activation-token"\">Click here</a>"))))
+              :text (str "<h1>Welcome to Rutta!</h1>" "Please follow this link for activation<br/>" "<a href=\"http://localhost:8080/activation?token=" activation-token"\">Click here</a>")))))
     db-user))
 
 (defn create-user [user]
@@ -70,10 +70,10 @@
       (if (nil? user)
        {:error "Email not found"} 
        (let [token (blwrk/new-password-token! (:id user) (.plusDays (java.time.LocalDate/now) 1) (create-activation-token))]
-         (if (not (truthy? (:istest env)))
+         (when (not (truthy? (:istest env)))
            (do 
              (println (str "sending mail to " (:email user)))
-             (mail :to (:email user) 
+             (future (mail :to (:email user) 
                    :from "noreply@rutta.no" 
                    :user (:mailuser env) 
                    :password (:mailpassword env) 
@@ -81,7 +81,7 @@
                    :mailhost (:mailhost env) 
                    :ssl true 
                    :port (:mailport env) 
-                   :subject "Password reset" :text (str "<h1>A request to reset the password for the account has been made.</h1>\n" "<p>The link below is valid for 24 hours.</p>\n""Please follow this link to create a new password \n" "<a href=\"http://localhost:8080/Password?token=" token"\">Click here</a>"))))
+                   :subject "Password reset" :text (str "<h1>A request to reset the password for the account has been made.</h1>\n" "<p>The link below is valid for 24 hours.</p>\n""Please follow this link to create a new password \n" "<a href=\"http://localhost:8080/Password?token=" token"\">Click here</a>")))))
           token)))
        {:error "Invalid email"}))
 

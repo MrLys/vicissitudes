@@ -4,7 +4,7 @@
     :subname "//localhost:5432/groove_api"
     :password "password"
     :secret "password"
-    :istest false
+    :istest true
     :port 3000}}
   :profiles/test
   {:env
@@ -12,7 +12,7 @@
     :password "password"
     :subname "//localhost:5432/groove_api"
     :secret "password"
-    :istest true
-    :port 3001}}}
+    :istest true 
+    :port 3000}}}
 
 
