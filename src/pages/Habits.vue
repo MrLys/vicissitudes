@@ -2,11 +2,11 @@
   <Layout>
     <div>
       <div style="display:flex; justify-content: space-between">
-      <button class="bg-max_blue-light hover:bg-max_blue-dark text-white font-bold py-2
+      <button id="previousWeek" class="bg-max_blue-light hover:bg-max_blue-dark text-white font-bold py-2
       px-4 rounded my-2 " v-on:click="previousWeek()">
         <icon_previous class="w-5"/>
       </button>
-        <button class="bg-max_blue-light hover:bg-max_blue-dark text-white font-bold py-2
+        <button id="nextWeek" class="bg-max_blue-light hover:bg-max_blue-dark text-white font-bold py-2
         px-4 rounded my-2 " v-on:click="nextWeek()" v-if="isPreviousWeek">
           <icon_next class="w-5" />
         </button>

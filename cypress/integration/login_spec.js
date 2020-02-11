@@ -53,14 +53,44 @@ describe('My First Test', function () {
         cy.get('#habit-field').type('Exercising{enter}')
         // wait for the page to refresh
         cy.wait('@new-habit').should('have.property', 'status', 201)
-
+        cy.get('#nextWeek').should('not.exist')
         cy.contains('Exercising')
+        // Go to previous week to avoid problem with setting into future
+        cy.get('#previousWeek').click() 
+        // all should be unset.
+        cy.get('#Exercising-Monday-groove')
+        .should('have.class', 'bg-gray-200')
+        cy.get('#Exercising-Tuesday-groove')
+        .should('have.class', 'bg-gray-200')
+        cy.get('#Exercising-Wednesday-groove')
+        .should('have.class', 'bg-gray-200')
+        cy.get('#Exercising-Thursday-groove')
+        .should('have.class', 'bg-gray-200')
+        cy.get('#Exercising-Friday-groove')
+        .should('have.class', 'bg-gray-200')
+        cy.get('#Exercising-Saturday-groove')
+        .should('have.class', 'bg-gray-200')
+        cy.get('#Exercising-Sunday-groove')
+        .should('have.class', 'bg-gray-200')
+        // Same for first.
+        cy.get('#' + rand + '-Monday-groove')
+        .should('have.class', 'bg-gray-200')
+        cy.get('#' + rand + '-Tuesday-groove')
+        .should('have.class', 'bg-gray-200')
+        cy.get('#' + rand + '-Wednesday-groove')
+        .should('have.class', 'bg-gray-200')
+        cy.get('#' + rand + '-Thursday-groove')
+        .should('have.class', 'bg-gray-200')
+        cy.get('#' + rand + '-Friday-groove')
+        .should('have.class', 'bg-gray-200')
+        cy.get('#' + rand + '-Saturday-groove')
+        .should('have.class', 'bg-gray-200')
+        cy.get('#' + rand + '-Sunday-groove')
+        .should('have.class', 'bg-gray-200')
 
         // Mark monday groove ass successfull
         cy.get('#Exercising-Monday').click()
         cy.get('#success-button').click()
-        cy.get('#Exercising-Monday-groove')
-        .should('have.class', 'bg-ocean_green-light')
 
         cy.get('#Exercising-Tuesday').click()
         cy.get('#fail-button').click()
@@ -74,6 +104,8 @@ describe('My First Test', function () {
         .should('have.class', 'stripes')
 
         cy.visit('http://localhost:8080/habits')
+        cy.get('#nextWeek').should('not.exist')
+        cy.get('#previousWeek').click() 
         // make sure they persist on refresh
         cy.get('#Exercising-Monday-groove')
         .should('have.class', 'bg-ocean_green-light')
