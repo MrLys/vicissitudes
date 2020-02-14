@@ -111,11 +111,11 @@ export default {
       habits: [],
       grooves: {
         'default': 'py-4 border-2 ',
-        'none': 'bg-gray-200 ',
-        'selected': 'border-max_blue-dark ', 
-        'success': 'bg-ocean_green-light ',
-        'fail': 'bg-tango_pink-light ',
-        'pass': 'stripes ',
+        'none': 'bg-gray-200 cursor-pointer ',
+        'selected': 'border-max_blue-dark cursor-pointer ', 
+        'success': 'bg-ocean_green-light cursor-pointer ',
+        'fail': 'bg-tango_pink-light cursor-pointer ',
+        'pass': 'stripes cursor-pointer ',
         'disabled': 'bg-gray-400 '
         },
         grooveBorders: {
