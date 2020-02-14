@@ -74,8 +74,9 @@
       (st/dissoc :refresh_token)))
 
 ; Using user-id ensures the requester only receives data connected to the user
-(defn get-all-grooves-and-habits-by-date-range [req start end]
-  (db/get-all-grooves-and-habits-by-date-range (get-user-id req) start end))
+(defn get-all-grooves-and-habits-by-date-range 
+	([req start end] (db/get-all-grooves-and-habits-by-date-range (get-user-id req) start end))
+	([req] (db/get-all-grooves-and-habits-by-date-range (get-user-id req))))
 
 (defn update-user-password! [user]
   (let [digest (hashers/derive (:password user))]
@@ -88,7 +89,21 @@
   (get-password-token token))
 
 (defn get-user-by-field [field value]
-  (db/get-registered-user-by-field field value))
+	(let [user (db/get-registered-user-by-field field value)]
+		(when-not (nil? user)
+      {:user-data (-> user
+                      (st/dissoc :digest)
+                      (st/dissoc :refresh_token))})))
+  
 
 (defn new-password-token! [user-id expiration token]
   (db/new-password-token! user-id expiration token))
+
+
+(defn get-all-teams [request]
+		(db/get-all-teams-by-user-id (get-user-id request)))
+
+(defn create-team [request name]
+		(db/create-team (get-user-id request) name))
+(defn get-all-teams [request]
+		(db/get-all-teams-by-user-id (get-user-id request)))

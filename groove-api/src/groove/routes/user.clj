@@ -2,7 +2,7 @@
   (:require [groove.handlers.user :refer :all]
             [groove.util.validation :refer :all]
             [compojure.api.sweet :refer [GET POST PATCH]]
-            [groove.middleware :refer [auth-credentials-reponse wrap-basic-auth]]
+            [groove.middleware :refer [auth-credentials-reponse wrap-basic-auth wrap-token-auth]]
             [ring.util.http-response :refer [created ok]]
             [schema.core :as s]))
 
@@ -16,7 +16,12 @@
     :token (s/constrained s/Str valid-password-token?)})
 
 (def user-routes
-  [(-> (POST "/login" [:as request]
+  [(-> (GET "/all-data" [:as request]
+             :tags ["User"]
+             :header-params [authorization :- String]
+             :middleware [wrap-token-auth]
+             (get-all-data-handler request)))
+   (-> (POST "/login" [:as request]
              :tags ["User"]
              :header-params [authorization :- String]
              :middleware [wrap-basic-auth]

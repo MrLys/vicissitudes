@@ -6,7 +6,7 @@
             [groove.bulwark :as blwrk]
             [groove.models.user :refer [User]]
             [groove.mail :refer [mail]]
-            [groove.util.utils :refer [create-activation-token truthy?]]
+            [groove.util.utils :refer [create-activation-token truthy? build-grooves-by-habits]]
             [environ.core :refer [env]]
             [groove.util.validation :refer :all]))
 
@@ -20,15 +20,15 @@
     (when (not (truthy? (:istest env)))
       (do
         (println (str "sending mail to " (:email user)))
-        (future (mail :to (:email user) 
-              :from "noreply@rutta.no" 
-              :user (:mailuser env) 
-              :password (:mailpassword env) 
-              :mailport (:mailport env) 
-              :mailhost (:mailhost env) 
-              :ssl true 
-              :port (:mailport env) 
-              :subject "Welcome to Rutta!" 
+        (future (mail :to (:email user)
+              :from "noreply@rutta.no"
+              :user (:mailuser env)
+              :password (:mailpassword env)
+              :mailport (:mailport env)
+              :mailhost (:mailhost env)
+              :ssl true
+              :port (:mailport env)
+              :subject "Welcome to Rutta!"
               :text (str "<h1>Welcome to Rutta!</h1>" "Please follow this link for activation<br/>" "<a href=\"http://localhost:8080/activation?token=" activation-token"\">Click here</a>")))))
     db-user))
 
@@ -68,22 +68,42 @@
   (if (valid-email? email)
     (let [user (blwrk/get-user-by-field :email email)]
       (if (nil? user)
-       {:error "Email not found"} 
+       {:error "Email not found"}
        (let [token (blwrk/new-password-token! (:id user) (.plusDays (java.time.LocalDate/now) 1) (create-activation-token))]
          (when (not (truthy? (:istest env)))
-           (do 
+           (do
              (println (str "sending mail to " (:email user)))
-             (future (mail :to (:email user) 
-                   :from "noreply@rutta.no" 
-                   :user (:mailuser env) 
-                   :password (:mailpassword env) 
-                   :mailport (:mailport env) 
-                   :mailhost (:mailhost env) 
-                   :ssl true 
-                   :port (:mailport env) 
+             (future (mail :to (:email user)
+                   :from "noreply@rutta.no"
+                   :user (:mailuser env)
+                   :password (:mailpassword env)
+                   :mailport (:mailport env)
+                   :mailhost (:mailhost env)
+                   :ssl true
+                   :port (:mailport env)
                    :subject "Password reset" :text (str "<h1>A request to reset the password for the account has been made.</h1>\n" "<p>The link below is valid for 24 hours.</p>\n""Please follow this link to create a new password \n" "<a href=\"http://localhost:8080/Password?token=" token"\">Click here</a>")))))
           token)))
        {:error "Invalid email"}))
 
 (defn forgot-password [email]
   (response-handler :POST forgot-password-handler email))
+
+(defn get-all-data [request]
+		(let [user (blwrk/get-user-by-field :id (:id (:identity request)))
+								habits (build-grooves-by-habits (blwrk/get-all-grooves-and-habits-by-date-range request))
+								teams (blwrk/get-all-teams request)]
+								(if (or (nil? user) (empty? user))
+									{:error "Cannot find user"}
+									{:user 
+											{:username (:username user) 
+												:email (:email user)
+												:habits habits
+												:teams teams}})))
+
+(defn get-all-data-handler [request]
+  (response-handler :GET get-all-data request))
+
+
+
+
+

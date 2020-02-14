@@ -2,18 +2,11 @@
   (:require [ring.util.http-response :refer [ok not-found created]]
             [groove.models.habit :refer [Habit]]
             [groove.handlers.response :refer [response-handler]]
-            [groove.util.utils :refer [parseLong]]
+            [groove.util.utils :refer [parseLong build-grooves-by-habits]]
             [groove.bulwark :refer [create-habit get-habit get-habits get-all-grooves-and-habits-by-date-range]]))
 
 
-(defn build-grooves-by-habits [grooves]
-  (println grooves)
-  (reduce (fn [coll x]
-            (assoc coll
-                   (keyword (:name x))
-                   {:name (:name x) :id (:id x) :owner_id (:owner_id x) :grooves (vec (conj (:grooves ((keyword (:name x)) coll)) (dissoc x :name)))}))
-          {}
-          grooves))
+
 
 (defn- lower-habit-name [habit]
   (assoc habit :name (.toLowerCase (:name habit))))

@@ -6,26 +6,18 @@
             [groove.models.password_token :refer [Password_token]]
             [groove.models.habit :refer [Habit]]
             [groove.models.groove :refer [Groove]]
+            [groove.models.team :refer [Team]]
+            [groove.models.user_team :refer [User_team]]
             [groove.models.activation_token :refer [Activation_token]]
             [groove.util.validation :refer :all]
             [buddy.hashers :as hashers]
-            [schema-tools.core :as st]
-            [ring.util.http-response :refer [ok not-found conflict created]]))
-
-
-(defn user->created [user]
-  (created (str "/user/" (:id user)) user))
-
-(defn id->created [id]
-  (created (str "/users/" id) {:id id}))
+            [schema-tools.core :as st]))
 
 
 (defn new-user! [user]
   (let [digest (hashers/derive (:password user))]
     (db/insert! User (rename-keys (assoc user :password digest) {:password :digest}))))
 
-(defn new-user [user]
-  (user->created (new-user! user)))
 
 (defn update-refresh-token [user refresh-token]
   (db/update! User (:id user) :refresh_token refresh-token))
@@ -37,13 +29,20 @@
 (defn get-all-users []
   (db/select User))
 
-(defn get-all-grooves-and-habits-by-date-range [user-id start end]
+(defn get-all-grooves-and-habits-by-date-range 
+([user-id start end]
   (db/query {:select [:user_habit.owner_id :user_habit.id :habit.name :groove.date :groove.state]
 	     :from [:user_habit]
 	     :where [:= :user_habit.owner_id user-id]
 	     :join [:habit [:= :user_habit.habit_id :habit.id]]
-	     :left-join [:groove [:= :user_habit.id :groove.user_habit_id]]
+	     :left-join [:groove [:= :user_habit.id :groove.user_habit_id] [:>= :groove.date start] [:<= :groove.date end]]
              :order-by [:date]}))
+  ([user-id] (db/query {:select [:user_habit.owner_id :user_habit.id :habit.name :groove.date :groove.state]
+	     :from [:user_habit]
+	     :where [:= :user_habit.owner_id user-id]
+	     :join [:habit [:= :user_habit.habit_id :habit.id]]
+	     :left-join [:groove [:= :user_habit.id :groove.user_habit_id]]
+             :order-by [:date]})))
 	     ;:join [:groove [:= :groove.owner_id :user_habit.owner_id]]}))
 
 (defn get-grooves-by-date-range [user_id user-habit-id start end]
@@ -131,4 +130,13 @@
 
 (defn update-user! [user-id field value]
   (db/update! User :id user-id field value))
+
+(defn get-all-teams-by-user-id [user-id]
+		(db/select {:select [:user_team.id :team.name]
+             :from [:team]
+             :where [:= :user_team.owner_id user-id]
+             :join [:user_team [:= :team.id :user_team.team_id]]}))
+
+(defn create-team [user-id name]
+		(db/insert! User_team :owner_id user-id :team_id (:id (db/insert! Team :name name))))
 
