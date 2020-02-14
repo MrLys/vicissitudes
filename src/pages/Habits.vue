@@ -108,11 +108,19 @@ export default {
       habits: [],
       grooves: {
         'default': 'py-4 border-2 ',
-        'none': 'bg-gray-200 border-gray-200 ',
+        'none': 'bg-gray-200 ',
         'selected': 'border-max_blue-dark ', 
-        'success': 'bg-ocean_green-light border-ocean_green-light ',
-        'fail': 'bg-tango_pink-light border-tango_pink-light',
-        'pass': 'stripes border-white '}
+        'success': 'bg-ocean_green-light ',
+        'fail': 'bg-tango_pink-light ',
+        'pass': 'stripes '
+        },
+        grooveBorders: {
+        'none': ' border-gray-200 ',
+        'selected': 'border-max_blue-dark ', 
+        'success': ' border-ocean_green-light ',
+        'fail': ' border-tango_pink-light ',
+        'pass': ' border-white '
+        }
     }
   },
   mounted () {
@@ -226,12 +234,14 @@ export default {
       console.log(item.date);
     },
     computedClass: function(item) {
-
       let ret = this.grooves['default'];
       ret += this.grooves[item.groove];
       if(item.clicked) {
-        ret += this.grooves['selected'];
+        ret += this.grooveBorders['selected'];
+      } else {
+        ret += this.grooveBorders[item.groove];
       }
+      console.log(ret);
       return ret;
     },
     updateGroove: function(groove) {
