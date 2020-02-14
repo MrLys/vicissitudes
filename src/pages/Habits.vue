@@ -11,7 +11,7 @@
           <icon_next class="w-5" />
         </button>
       </div>
-      <p class="h1 text-center" v-if="!hasHabits"> You don't track any habits yet! Click the
+      <p id="no-habits" class="h1 text-center" v-if="!hasHabits"> You don't track any habits yet! Click the
       button below to create your very first habit 🎉 </p>
       <button id="add-habit" class="bg-max_blue-light hover:bg-max_blue-dark text-white font-bold py-2
       px-4 rounded my-2 mx-2 mx-auto" v-on:click="newHabit()">
