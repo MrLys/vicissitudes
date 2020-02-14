@@ -33,6 +33,9 @@
     <div class="flex container" v-if="hasHabits">
         <div class="py-2 w-1/6 block border-r last:border-r-0 text-center bg-gray-100" v-for="day in week">
           {{ day.day }} 
+            <p class="text-center">
+                {{ day.date.format('YYYY-MM-DD') }} 
+          </p>
         </div>
   </div>
 
@@ -97,13 +100,13 @@ export default {
       hasHabits: false,
       isWeekView: true,
       week: [
-        {day:'Monday'},
-        {day:'Tuesday'}, 
-        {day:'Wednesday'},
-        {day:'Thursday'}, 
-        {day:'Friday'}, 
-        {day:'Saturday'},
-        {day:'Sunday'}],
+        {day:'Monday',      date: this.current_monday},
+        {day:'Tuesday',     date: dates.addDays(this.current_monday, 1)}, 
+        {day:'Wednesday',   date: dates.addDays(this.current_monday, 2)},
+        {day:'Thursday',    date: dates.addDays(this.current_monday, 3)}, 
+        {day:'Friday',      date: dates.addDays(this.current_monday, 4)}, 
+        {day:'Saturday',    date: dates.addDays(this.current_monday, 5)},
+        {day:'Sunday',      date: dates.addDays(this.current_monday, 6)}],
       iMap: {},
       habits: [],
       grooves: {
@@ -112,18 +115,22 @@ export default {
         'selected': 'border-max_blue-dark ', 
         'success': 'bg-ocean_green-light ',
         'fail': 'bg-tango_pink-light ',
-        'pass': 'stripes '
+        'pass': 'stripes ',
+        'disabled': 'bg-gray-400 '
         },
         grooveBorders: {
         'none': ' border-gray-200 ',
         'selected': 'border-max_blue-dark ', 
         'success': ' border-ocean_green-light ',
         'fail': ' border-tango_pink-light ',
-        'pass': ' border-white '
+        'pass': ' border-white ',
+        'disabled': 'border-gray-400 '
         }
     }
   },
   mounted () {
+    this.current_monday = dates.getMonday(new Date()); 
+    this.updateWeek();
     this.getHabits();
   },
   methods: {
@@ -161,9 +168,16 @@ export default {
             "");
         });
     },
+    updateWeek: function () {
+        this.week[0]['date'] = this.current_monday;
+        for (let i = 1; i < 7; i++) {
+            this.week[i]['date'] = dates.addDays(this.current_monday, i)
+        }
+    },
     previousWeek: function () {
       this.current_monday = dates.addDays(this.current_monday, -7);
       this.isPreviousWeek = dates.isAfter(this.actual_monday, this.current_monday);
+      this.updateWeek();
       this.getHabits();
     },
     nextWeek: function () {
@@ -171,6 +185,7 @@ export default {
       this.isPreviousWeek = dates.isAfter(this.actual_monday,
         this.current_monday) || !dates.sameDate(this.actual_monday,
           this.current_monday);
+      this.updateWeek();
       this.getHabits();
     },
     generateWeek: function (user_habit_id) {
@@ -230,12 +245,21 @@ export default {
       }
     },
     select: function (item) {
-      item.clicked = !item.clicked;
-      console.log(item.date);
+        if (dates.isAfter(item.date, new Date())) {
+            console.log("User clicked a future groove.");
+            return;
+        } else {
+            item.clicked = !item.clicked;
+        }
     },
     computedClass: function(item) {
-      let ret = this.grooves['default'];
-      ret += this.grooves[item.groove];
+        let ret = this.grooves['default'];
+        if (dates.isAfter(item.date, new Date())) {
+            ret += this.grooves['disabled'];
+            ret += this.grooveBorders['disabled'];
+            return ret;
+        } 
+        ret += this.grooves[item.groove];
       if(item.clicked) {
         ret += this.grooveBorders['selected'];
       } else {

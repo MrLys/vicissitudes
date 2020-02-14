@@ -12,7 +12,7 @@ var dates = {
         return date.utc();
     },
     getMonday: function (d) {
-        d = moment(d).utc();
+        d = moment(d);//.utc();
         if (d.day() == 0) {// sunday
             d = this.addDays(d, -1);
         }
