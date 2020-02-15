@@ -30,20 +30,20 @@
   (db/select User))
 
 (defn get-all-grooves-and-habits-by-date-range 
-([user-id start end]
-  (db/query {:select [:user_habit.owner_id :user_habit.id :habit.name :groove.date :groove.state]
-	     :from [:user_habit]
-	     :where [:= :user_habit.owner_id user-id]
-	     :join [:habit [:= :user_habit.habit_id :habit.id]]
-	     :left-join [:groove [:= :user_habit.id :groove.user_habit_id] [:>= :groove.date start] [:<= :groove.date end]]
-             :order-by [:date]}))
+  ([user-id start end]
+   (db/query {:select [:user_habit.owner_id :user_habit.id :habit.name :groove.date :groove.state]
+              :from [:user_habit]
+              :where [:= :user_habit.owner_id user-id]
+              :join [:habit [:= :user_habit.habit_id :habit.id]]
+              :left-join [:groove [:= :user_habit.id :groove.user_habit_id] [:>= :groove.date start] [:<= :groove.date end]]
+              :order-by [:date]}))
   ([user-id] (db/query {:select [:user_habit.owner_id :user_habit.id :habit.name :groove.date :groove.state]
-	     :from [:user_habit]
-	     :where [:= :user_habit.owner_id user-id]
-	     :join [:habit [:= :user_habit.habit_id :habit.id]]
-	     :left-join [:groove [:= :user_habit.id :groove.user_habit_id]]
-             :order-by [:date]})))
-	     ;:join [:groove [:= :groove.owner_id :user_habit.owner_id]]}))
+                        :from [:user_habit]
+                        :where [:= :user_habit.owner_id user-id]
+                        :join [:habit [:= :user_habit.habit_id :habit.id]]
+                        :left-join [:groove [:= :user_habit.id :groove.user_habit_id]]
+                        :order-by [:date]})))
+;:join [:groove [:= :groove.owner_id :user_habit.owner_id]]}))
 
 (defn get-grooves-by-date-range [user_id user-habit-id start end]
   (db/select Groove :owner_id user_id :user_habit_id user-habit-id :date [:>= start] :date [:<= end] {:order-by [:date]}))
@@ -96,7 +96,7 @@
   (db/insert! User_habit :owner_id owner-id :habit_id (:id habit)))
 
 (defn get-user-habit-by-user-id-and-user-habit-id [user-id user-habit-id]
- (db/select-one User_habit :owner_id user-id :id user-habit-id))
+  (db/select-one User_habit :owner_id user-id :id user-habit-id))
 
 (defn get-user-habit
   ([user-id habit-id] (db/select-one User_habit :owner_id user-id :habit_id habit-id))
@@ -132,11 +132,11 @@
   (db/update! User :id user-id field value))
 
 (defn get-all-teams-by-user-id [user-id]
-		(db/select {:select [:user_team.id :team.name]
-             :from [:team]
-             :where [:= :user_team.owner_id user-id]
-             :join [:user_team [:= :team.id :user_team.team_id]]}))
+  (db/query {:select [:user_team.id :team.name]
+              :from [:team]
+              :where [:= :user_team.owner_id user-id]
+              :left-join [:user_team [:= :team.id :user_team.team_id]]}))
 
 (defn create-team [user-id name]
-		(db/insert! User_team :owner_id user-id :team_id (:id (db/insert! Team :name name))))
+  (db/insert! User_team :owner_id user-id :team_id (:id (db/insert! Team :name name))))
 
