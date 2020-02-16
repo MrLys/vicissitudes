@@ -28,6 +28,7 @@
         g5 (create-groove req h2 today 0 "fail") 
         g6 (create-groove req h2 today -22 "success")
         g7 (create-groove req2 h1 today -22 "success") ;; req 2 should not be able to create groove for habit 1.
+        g8 (create-groove req h1 today -23 "success") ;; should not be included in the request for getting all grooves (resp8)
         resp1 (groove/update-groove g1 req)
         resp2 (groove/update-groove g2 req) ;; should fail
         resp3 (groove/update-groove g3 req)
@@ -35,6 +36,7 @@
         resp5 (groove/update-groove g5 req)
         resp6 (groove/update-groove g6 req)
         resp7 (groove/update-groove g7 req2)
+        _ (groove/update-groove g7 req) ; should not be included
         resp8 (handler/get-all-grooves-by-habit req (.plusDays today -22) today)]
     (and
       (is (nil? (:error resp1)))
