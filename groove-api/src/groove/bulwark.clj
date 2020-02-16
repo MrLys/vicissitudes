@@ -89,8 +89,8 @@
   (get-password-token token))
 
 (defn get-user-by-field [field value]
-	(let [user (db/get-registered-user-by-field field value)]
-		(when-not (nil? user)
+  (let [user (db/get-registered-user-by-field field value)]
+    (when-not (nil? user)
       {:user-data (-> user
                       (st/dissoc :digest)
                       (st/dissoc :refresh_token))})))
@@ -101,9 +101,7 @@
 
 
 (defn get-all-teams [request]
-		(db/get-all-teams-by-user-id (get-user-id request)))
+  (db/get-all-teams-by-user-id (get-user-id request)))
 
 (defn create-team [request name]
-		(db/create-team (get-user-id request) name))
-(defn get-all-teams [request]
-		(db/get-all-teams-by-user-id (get-user-id request)))
+  (db/create-team (get-user-id request) name))
