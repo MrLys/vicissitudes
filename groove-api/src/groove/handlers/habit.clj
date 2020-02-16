@@ -1,7 +1,5 @@
 (ns groove.handlers.habit
-  (:require [ring.util.http-response :refer [ok not-found created]]
-            [groove.models.habit :refer [Habit]]
-            [groove.handlers.response :refer [response-handler]]
+  (:require [groove.handlers.response :refer [response-handler]]
             [groove.util.utils :refer [parseLong build-grooves-by-habits]]
             [groove.bulwark :refer [create-habit get-habit get-habits get-all-grooves-and-habits-by-date-range]]))
 
