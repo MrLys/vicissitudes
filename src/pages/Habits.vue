@@ -135,8 +135,9 @@ export default {
   },
   methods: {
     getHabits: function() {
-      let startDate = this.current_monday.format("YYYY-MM-DD");
-      let endDate = dates.addDays(this.current_monday, 6).format("YYYY-MM-DD");
+      let startDate = this.current_monday.utc().format('YYYY-MM-DD');
+      let endDate = dates.addDays(this.current_monday, 6).utc().format('YYYY-MM-DD');
+      console.log(endDate);
       let url = '/api/habits?start_date=' + startDate + '&end_date=' + endDate;
       console.log('Getting habits from ' + url);
       this.$http.get(url)
@@ -273,7 +274,7 @@ export default {
           {owner_id: parseInt(localStorage.getItem('user_id')), 
             state: groove.groove, 
             user_habit_id: parseInt(groove.habit),
-            date: groove.date.format("YYYY-MM-DD")}).then((response) => {
+            date: groove.date.utc().format("YYYY-MM-DD")}).then((response) => {
               console.log(response)
             }).catch((error) => {console.log(error.response)});
     },
