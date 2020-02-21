@@ -1,6 +1,6 @@
 (ns groove.auth.token
   (:require [clj-time.core :as time]
-            [clj-time.coerce :as c] 
+            [clj-time.coerce :as c]
             [buddy.sign.jwt :as jwt]
             [environ.core :refer [env]]
             [schema-tools.core :as st]))
@@ -11,8 +11,6 @@
                            (st/update-in [:username] str)
                            (st/update-in [:email] str)
                            (st/update-in [:id] str)
-                           (st/assoc     :exp (c/to-long exp))) 
+                           (st/assoc     :exp (c/to-long exp)))
         token-contents (st/select-keys formatted-user [:username :email :id :exp])]
-    (do
-      (println token-contents)
-    (jwt/sign token-contents (env :secret) {:alg :hs512}))))
+    (jwt/sign token-contents (env :secret) {:alg :hs512})))
