@@ -140,4 +140,5 @@
 
 (defn create-team [user-id name]
   (db/insert! User_team :owner_id user-id :team_id (:id (db/insert! Team :name name))))
-
+(defn get-user-count []
+  (db/count User))

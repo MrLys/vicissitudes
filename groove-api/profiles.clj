@@ -4,7 +4,7 @@
     :subname "//localhost:5432/groove_api"
     :password "password"
     :secret "password"
-    :istest true
+    :jvm-opts ["-Dclojure.tools.logging.factory=clojure.tools.logging.impl/slf4j-factory"]
     :port 3000}}
   :profiles/test
   {:env
@@ -12,7 +12,8 @@
     :password "password"
     :subname "//localhost:5432/groove_api"
     :secret "password"
-    :istest true 
+    :istest true
+    :jvm-opts ["-Dclojure.tools.logging.factory=clojure.tools.logging.impl/slf4j-factory"]
     :port 3000}}}
 
 

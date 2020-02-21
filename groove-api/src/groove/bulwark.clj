@@ -1,6 +1,7 @@
 (ns groove.bulwark
   (:require [groove.db :as db]
             [groove.models.groove :refer [Groove]]
+            [clojure.tools.logging :as log]
             [schema-tools.core :as st]
             [buddy.hashers :as hashers]
             [groove.util.validation :refer [valid-token?]]
@@ -12,8 +13,11 @@
 (defn get-user [user-id]
   (db/get-user user-id))
 
+(defn get-user-count []
+  (db/get-user-count))
+
 (defn- validate-permission [user id]
-  (println (str "Userid: " user " accessing data for user " id))
+  (log/info (str "Userid: " user " accessing data for user " id))
   (= (parseLong user) (parseLong id)))
 
 (defn- validate-user-permission [req id]

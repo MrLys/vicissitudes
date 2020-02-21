@@ -3,6 +3,7 @@
   (:require [compojure.api.sweet :refer [api context]]
             [groove.routes.groove :refer [groove-routes]]
             [groove.routes.user :refer [user-routes]]
+            [clojure.tools.logging :as log]
             [groove.routes.habit :refer [habit-routes]]
             [toucan.db :as db]
             [toucan.models :as models]
@@ -27,7 +28,7 @@
                  :securityDefinitions {:api_key {:type "apiKey" :name "Authorization" :in "header"}}}}})
 
 (defn setup-db []
-  (println db-spec)
+  (log/info (str "Setting up db " (:dbname db-spec)))
   (db/set-default-db-connection! db-spec)
   (models/set-root-namespace! 'groove.models))
 
