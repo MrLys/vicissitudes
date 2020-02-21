@@ -17,7 +17,7 @@
         date (.plusDays (java.time.LocalDate/now) 1)
         db-user (blwrk/new-user user)]
     (blwrk/new-activation-token! activation-token (:id db-user) date)
-    (when true;(not (truthy? (:istest env)))
+    (when-not (= (:istest env) "true")
       (do
         (println (str "sending mail to " (:email user)))
         (future (mail :to (:email user)
@@ -70,7 +70,7 @@
       (if (nil? user)
         {:error "Email not found"}
         (let [token (blwrk/new-password-token! (:id (:user-data  user)) (.plusDays (java.time.LocalDate/now) 1) (create-activation-token))]
-          (when false;(not (truthy? (:istest env)))
+          (when-not (= (:istest env) "true")
             (do
               (println (str "sending mail to " (:email user)))
               (future (mail :to (:email user)
