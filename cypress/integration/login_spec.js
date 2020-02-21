@@ -108,6 +108,8 @@ describe('My First Test', function () {
         .should('have.class', 'stripes')
 
         cy.visit('http://localhost:8080/habits')
+        cy.get('#nextWeek').should('exist')
+        cy.get('#nextWeek').click()
         cy.get('#nextWeek').should('not.exist')
         cy.get('#previousWeek').click()
         // make sure they persist on refresh
@@ -225,6 +227,8 @@ describe('My First Test', function () {
         .should('have.class', 'stripes')
 
         cy.visit('http://localhost:8080/habits')
+        cy.get('#nextWeek').should('exist')
+        cy.get('#nextWeek').click()
         cy.get('#nextWeek').should('not.exist')
         cy.get('#previousWeek').click()
         // make sure they persist on refresh
