@@ -1,6 +1,7 @@
 (ns groove.middleware
   (:require [schema-tools.core :as st]
             [environ.core :refer [env]]
+            [clojure.tools.logging :as log]
             [groove.models.user :refer :all]
             [groove.auth.token :refer :all]
             [groove.db :refer [update-refresh-token]]
@@ -53,12 +54,12 @@
 ;--(assoc (ok (:res data)) :cookies {"payload_cookie" {:value (:payload data)}
 ;--                          "signature_cookie" {:value (:signature data), :http-only true}})))
 (defn- activated? [user]
-  (println (str "\n\n\n" (:activated user) "\n\n\n"))
+  (log/info (str "\n\n\n" (:activated user) "\n\n\n"))
   (:activated user))
 
 (defn auth-mw-activated [handler]
   (fn [request]
-    (print request)
+    (log/info request)
     (if (authenticated? request)
       (let [user (get-user (:id (:identity request)))]
         (if (not (activated? user))
