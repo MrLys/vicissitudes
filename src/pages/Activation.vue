@@ -3,6 +3,10 @@
   <div class="container mt-16 text-center">
     <div class="rounded px-8 py-4 bg-glitter-light border-2">
       <p v-if="loading">Please wait while we activate your account! </p>
+      <p v-if="positive_feedback">Your account has been activated! 🎉 </br> You will be
+      redirected to the login page soon!</p>
+      <p v-if="!loading && !positive_feedback">Something went wrong with
+      activating your account! 😳 </p>
   </div>
   </div>
   </Layout>
@@ -12,7 +16,7 @@ export default {
   data () {
     return {
       feedback: "",
-      positive_feedback: true,
+      positive_feedback: false,
       loading: true,
     }
   },
@@ -25,8 +29,13 @@ export default {
         this.$http
           .post('/api/activate?' + param)
           .then(response => {
-            this.$router.push('/login');
-          }).catch((error) => {console.log(error.response); this.loading = false;});
+            this.loading = false;
+            this.positive_feedback = true;
+            setTimeout(() => this.$router.push('/login'), 4000);
+          }).catch((error) => {
+            console.log(error.response); 
+            this.loading = false;
+            });
       } else {
         this.loading = false;
       }
