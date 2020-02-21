@@ -10,9 +10,6 @@ describe('My First Test', function () {
         cy.contains('Register')
         cy.contains('Log in').click()
 
-        cy.server()
-        cy.route('POST', '/api/habit').as('new-habit')
-
         cy.url().should('include', '/login')
         cy.get("#forgot-password").click()
         cy.url().should('include', '/forgot-password')
