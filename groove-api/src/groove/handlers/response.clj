@@ -4,7 +4,7 @@
 
 (defn- valid-response? [value]
   (and
-    (not (empty? value)) 
+    (not (empty? value))
     (not (nil? value))
     (nil? (:error value))))
 
@@ -16,6 +16,4 @@
 ; call the getter/handler function with the args and pass the result to
 ; handler function from the map
 (defn response-handler [req-type f & args]
-  (println (req-type handler-map))
-  (println args)
   ((req-type handler-map) (apply f args)))

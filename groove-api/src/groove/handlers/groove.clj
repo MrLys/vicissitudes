@@ -4,10 +4,10 @@
 
 (defn update-groove [groove request]
   (let [date (:date groove)
-        tomorrow (.plusDays (java.time.LocalDate/now) 1)]
-    (if (.isAfter tomorrow date)
-      (blwrk/update-groove groove request)
-      {:error "Cannot update grooves into the future"})))
+        today (java.time.LocalDate/now java.time.ZoneOffset/UTC)]
+    (if (.isAfter date today)
+      {:error "Cannot update grooves into the future"}
+      (blwrk/update-groove groove request))))
 
 
 (defn update-groove-handler [groove request]
@@ -17,4 +17,4 @@
   (blwrk/get-by-dates request habit start end))
 
 (defn get-all-grooves-handler [request user start end]
-  (blwrk/get-all-by-dates request start end))
+  (blwrk/get-all-by-dates request start end));(java.time.Instant/ofEpochMilli  start) (java.time.Instant/ofEpochMilli  end)))

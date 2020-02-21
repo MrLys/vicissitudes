@@ -3,7 +3,7 @@
     <div>
       <div style="display:flex; justify-content: space-between">
       <button id="previousWeek" class="bg-max_blue-light hover:bg-max_blue-dark text-white font-bold py-2
-      px-4 rounded my-2 " v-on:click="previousWeek()">
+      px-4 rounded my-2 " v-on:click="previousWeek()" v-if="hasHabits">
         <icon_previous class="w-5"/>
       </button>
         <button id="nextWeek" class="bg-max_blue-light hover:bg-max_blue-dark text-white font-bold py-2
@@ -92,7 +92,7 @@ export default {
     return {
       feedback: "",
       items:  [],
-      current_monday: dates.getMonday(new Date()),
+      current_monday: undefined,
       actual_monday: dates.getMonday(new Date()),
       isPreviousWeek: false,
       creating: false,
@@ -129,22 +129,31 @@ export default {
     }
   },
   mounted () {
-    this.current_monday = dates.getMonday(new Date()); 
+    const start_date = localStorage.getItem('start_date');
+    if (start_date) {
+        console.log("Found current date in localStorage");
+        this.current_monday = this.$moment(start_date);
+    } else {
+        this.current_monday = dates.getMonday(new Date()); 
+    }
+    this.setIsPreviousWeek();
     this.updateWeek();
     this.getHabits();
   },
   methods: {
     getHabits: function() {
-      let startDate = this.current_monday.format("YYYY-MM-DD");
-      let endDate = dates.addDays(this.current_monday, 6).format("YYYY-MM-DD");
+      let startDate = this.current_monday.utc().format('YYYY-MM-DD');
+      let endDate = dates.addDays(this.current_monday, 6).utc().format('YYYY-MM-DD');
       let url = '/api/habits?start_date=' + startDate + '&end_date=' + endDate;
-      console.log('Getting habits from ' + url);
       this.$http.get(url)
         .then(response => {
           this.mapper(response);
         }).catch((error) => {
           console.log("An error has occured!");
           console.log(error);
+          this.hasHabits = false;
+          this.iMap = {};
+          this.habits = [];
           this.feedback = handler.handleError(error, "");
           this.positive_feedback = false;
           console.log(error.response);
@@ -173,18 +182,21 @@ export default {
         for (let i = 1; i < 7; i++) {
             this.week[i]['date'] = dates.addDays(this.current_monday, i)
         }
+        localStorage.setItem('start_date', this.current_monday);
+    },
+    setIsPreviousWeek: function() {
+      this.isPreviousWeek = dates.isAfter(this.actual_monday, this.current_monday) || !dates.sameDate(this.actual_monday,
+          this.current_monday);
     },
     previousWeek: function () {
       this.current_monday = dates.addDays(this.current_monday, -7);
-      this.isPreviousWeek = dates.isAfter(this.actual_monday, this.current_monday);
+      this.setIsPreviousWeek();
       this.updateWeek();
       this.getHabits();
     },
     nextWeek: function () {
       this.current_monday = dates.addDays(this.current_monday, 7);
-      this.isPreviousWeek = dates.isAfter(this.actual_monday,
-        this.current_monday) || !dates.sameDate(this.actual_monday,
-          this.current_monday);
+      this.setIsPreviousWeek();
       this.updateWeek();
       this.getHabits();
     },
@@ -273,7 +285,7 @@ export default {
           {owner_id: parseInt(localStorage.getItem('user_id')), 
             state: groove.groove, 
             user_habit_id: parseInt(groove.habit),
-            date: groove.date.format("YYYY-MM-DD")}).then((response) => {
+            date: groove.date.utc().format("YYYY-MM-DD")}).then((response) => {
               console.log(response)
             }).catch((error) => {console.log(error.response)});
     },

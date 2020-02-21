@@ -29,3 +29,11 @@
 
 (def truthy? #{"true"})
 
+(defn build-grooves-by-habits [grooves]
+  (println grooves)
+  (reduce (fn [coll x]
+            (assoc coll
+                   (keyword (:name x))
+                   {:name (:name x) :id (:id x) :owner_id (:owner_id x) :grooves (vec (conj (:grooves ((keyword (:name x)) coll)) (dissoc x :name)))}))
+          {}
+          grooves))

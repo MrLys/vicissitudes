@@ -80,7 +80,7 @@
         habit2 {:name "piano" :owner_id (parseLong (:id user1))}
         resp1 (blwrk/create-habit habit1 req1)
         resp2 (blwrk/create-habit habit2 req1)
-        today (java.time.LocalDate/now)
+        today (java.time.LocalDate/now java.time.ZoneOffset/UTC)
         g1 (create-groove req1 resp1 today -1 "success")
         _ (blwrk/update-groove g1 req1)
         g2 (create-groove req1 resp1 today -4 "success")
@@ -125,7 +125,7 @@
         habit2 {:name "piano" :owner_id (parseLong (:id user1))}
         resp1 (blwrk/create-habit habit1 req1)
         resp2 (blwrk/create-habit habit2 req1)
-        today (java.time.LocalDate/now)
+        today (java.time.LocalDate/now java.time.ZoneOffset/UTC)
         g1 (create-groove req1 resp1 today -1 "success")
         _ (blwrk/update-groove g1 req1)
         g2 (create-groove req1 resp1 today -4 "success")
@@ -148,7 +148,7 @@
       (is (reduce #(and %1 (test-long (:owner_id %2) (:id user1))) grooves)) ; all grooves belong to user1
       (is (reduce #(and %1 (or (test-long (:user_habit_id %2) (:id resp1)) (test-long (:user_habit_id %2) (:id resp2)))) grooves))))) ; all should be of user_habit1 or 2
 
-(deftest get-all-grooves-and-habits-by-date-range-test
+(deftest get-all-grooves-by-date-range-test
   (let [req1 (create-user)
         user1 (:identity req1)
         req2 (create-user 2)
@@ -159,7 +159,7 @@
         resp1 (blwrk/create-habit habit1 req1)
         resp2 (blwrk/create-habit habit2 req1)
         resp3 (blwrk/create-habit habit3 req2)
-        today (java.time.LocalDate/now)
+        today (java.time.LocalDate/now java.time.ZoneOffset/UTC)
         g1 (create-groove req1 resp1 today -1 "success")
         _ (blwrk/update-groove g1 req1)
         g2 (create-groove req1 resp1 today -4 "success")
@@ -174,13 +174,11 @@
         _ (blwrk/update-groove g6 req1)
         g7 (create-groove req2 resp3 today -3 "fail")
         _ (blwrk/update-groove g7 req2)
-        all (blwrk/get-all-grooves-and-habits-by-date-range req1 (.plusDays today -6) (.plusDays today 1))]
-    (println all)
+        all (blwrk/get-all-grooves-by-date-range req1 (.plusDays today -6) (.plusDays today 1))]
     (and
       (is (= (count all) 6))
-      (is (reduce #(and %1 (test-long (:owner_id %2) (:id user1))) all)) ; all grooves belong to user1
-      (is (reduce #(and %1 (or (test-long (:id %2) (:id resp1)) (test-long (:id %2) (:id resp2)))) all)) ; all should be of user_habit1 or 2
-      (is (reduce #(and %1 (or (= (str (:name %2)) (str (:name habit1))) (= (str (:name %2)) (str (:name habit2))))) all))))) ; all should be of user_habit1 or 2
+      (is (reduce #(and %1 (test-long (:owner_id %2) (:id user1))) true all)) ; all grooves belong to user1
+      (is (reduce #(and %1 (or (test-long (:user_habit_id %2) (:id resp1)) (test-long (:user_habit_id %2) (:id resp2)))) true all))))) ; all should be of user_habit1 or 2
 
 
 (deftest activation-token-test
@@ -189,7 +187,7 @@
   (let [token1 (create-activation-token)
         token2 (create-activation-token)
         req (create-user)
-        valid-token (blwrk/new-activation-token! token1 (:id (:identity req)) (.plusDays (java.time.LocalDate/now) 1))
+        valid-token (blwrk/new-activation-token! token1 (:id (:identity req)) (.plusDays (java.time.LocalDate/now java.time.ZoneOffset/UTC) 1))
         resp (blwrk/activate-user token1)]
     (and
      (is (nil? (:error resp)))

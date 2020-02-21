@@ -19,7 +19,9 @@ var dates = {
         return d.day(1); // First day of week is sunday -.-
     },
     isAfter: function (day1, day2) {
-        return moment(day1).isAfter(day2);
+        let _d1 = moment(day1);
+        let _d2 = moment(day2);
+        return _d1.isAfter(_d2, 'year') || _d1.isAfter(_d2, 'month') || _d1.isAfter(_d2, 'date');
     }
 };
 
