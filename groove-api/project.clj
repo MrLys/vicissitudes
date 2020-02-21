@@ -21,6 +21,9 @@
                  [buddy/buddy-hashers "1.4.0"]
                  [buddy/buddy-auth "2.2.0"]
                  [http-kit "2.3.0"]
+                 ;logging 
+                 [org.clojure/tools.logging "0.6.0"]
+                 ;environment
                  [environ "1.1.0"]]
   :plugins [[lein-environ "1.1.0"]
             [lein-cloverage "1.1.2"]]
@@ -33,6 +36,8 @@
              :profiles/test {}
              :project/dev {:source-paths ["src" "tool-src"]
                            :dependencies [[midje "1.6.3"]]
-                           :plugins [[lein-auto "0.1.3"]]}
+                           :plugins [[lein-auto "0.1.3"]]
+                           }
              :project/test {}
-             :uberjar {:aot :all}})
+             :uberjar {:aot :all :jvm-opts ["-Dclojure.tools.logging.factory=clojure.tools.logging.impl/slf4j-factory"]}}
+  )
