@@ -21,7 +21,7 @@
     (if (:slackurl env)
       (future (send-to-slack (:slackurl env) (str (when (= (:istest env) "false") "(THIS IS ONLY A TEST!)\n ") "A new user has created an account! 🎉 \n Total number of unique users is " (blwrk/get-user-count))))
       (log/debug "Slackurl not set"))
-    (when-not (= (:istest env) "true")
+    (when-not (= (:isdev env) "true")
       (do
         (log/info (str "sending mail to " (:email user)))
         (future (mail :to (:email user)
@@ -74,7 +74,7 @@
       (if (nil? user)
         (error ("(Fail) Email (" email ") does not exist!") {:error "Email not found"})
         (let [token (blwrk/new-password-token! (:id (:user-data  user)) (.plusDays (java.time.LocalDate/now java.time.ZoneOffset/UTC) 1) (create-activation-token))]
-          (when-not (= (:istest env) "true")
+          (when-not (= (:isdev env) "true")
             (do
               (log/info (str "(Success) Sending mail to " (:email user)))
               (future (mail :to (:email user)
