@@ -48,6 +48,8 @@ export default function (Vue, { router, head, isClient, appOptions}) {
             logout(state){
                 state.status = ''
                 state.token = ''
+                localStorage.setItem('token', '');
+                localStorage.setItem('start_date','');
             },
         },
         actions: {
