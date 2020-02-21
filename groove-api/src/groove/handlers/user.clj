@@ -6,7 +6,7 @@
             [groove.bulwark :as blwrk]
             [groove.models.user :refer [User]]
             [groove.mail :refer [mail]]
-            [groove.util.utils :refer [create-activation-token truthy? build-grooves-by-habits]]
+            [groove.util.utils :refer [create-activation-token truthy? build-grooves-by-habits parseLong]]
             [environ.core :refer [env]]
             [groove.util.validation :refer :all]))
 
@@ -17,7 +17,7 @@
         date (.plusDays (java.time.LocalDate/now) 1)
         db-user (blwrk/new-user user)]
     (blwrk/new-activation-token! activation-token (:id db-user) date)
-    (when false;(not (truthy? (:istest env)))
+    (when true;(not (truthy? (:istest env)))
       (do
         (println (str "sending mail to " (:email user)))
         (future (mail :to (:email user)
@@ -89,13 +89,13 @@
   (response-handler :POST forgot-password-handler email))
 
 (defn get-all-data [request]
-  (let [user (blwrk/get-user-by-field :id (:id (:identity request)))
+  (let [user (blwrk/get-user-by-field :id (parseLong (:id (:identity request))))
         habits (build-grooves-by-habits (blwrk/get-all-grooves-and-habits-by-date-range request))
         teams (blwrk/get-all-teams request)]
     (println user)
     (if (or (nil? user) (empty? user))
       {:error "Cannot find user"}
-      {:user 
+      {:user
        {:id (:id (:user-data user))
         :username (:username (:user-data user))
         :email (:email (:user-data user))

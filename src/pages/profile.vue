@@ -8,6 +8,7 @@
         </div>
         <div class="shadow-md px-2 py-2 bg-glitter-light">
           <div class="block">
+          <download class="w-6" v-on:click="getAllData()"/>
             <div class="w-full border-b border-glitter-dark">
               <label class="text-violet">Personal information:</label>
             </div>
@@ -72,13 +73,15 @@
 <script>
 import users from '~/assets/svgs/users.svg'
 import users1 from '~/assets/svgs/users-1.svg'
+import download from '~/assets/svgs/cloud-computing.svg'
 export default {
   metaInfo: {
     title: 'Welcome!'
   },
   components: {
     users,
-    users1
+    users1,
+    download
   },
   data () {
     return {
@@ -95,12 +98,55 @@ export default {
   },
   methods: {
     getProfile: function () {
-
     //this.$http
     //  .get('/api/user/' + id)
     //    .then(response => {
     //      this.habits = response.data;
     //    }).catch((error) => {console.log(error.response)});
+    },
+    getAllData: function () {
+    this.$http
+      .get('/api/all-data')
+        .then(response => {
+          let yourdata = response.data;
+          let filename = "yourdata.json";
+          let type = "application/json";
+          let blob;
+          if (typeof File === 'function') {
+            try {
+                blob = new File([JSON.stringify(response.data)], filename, { type: type });
+           } catch (e) { /* Edge */ }
+           }
+        if (typeof blob === 'undefined') {
+            blob = new Blob([JSON.stringify(response.data)], { type: type });
+        }
+
+        if (typeof window.navigator.msSaveBlob !== 'undefined') {
+            // IE workaround for "HTML7007: One or more blob URLs were revoked by closing the blob for which they were created. These URLs will no longer resolve as the data backing the URL has been freed."
+            window.navigator.msSaveBlob(blob, filename);
+        } else {
+            var URL = window.URL || window.webkitURL;
+            var downloadUrl = URL.createObjectURL(blob);
+
+            if (filename) {
+                // use HTML5 a[download] attribute to specify filename
+                var a = document.createElement("a");
+                // safari doesn't support this yet
+                if (typeof a.download === 'undefined') {
+                    window.location = downloadUrl;
+                } else {
+                    a.href = downloadUrl;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                }
+            } else {
+                window.location = downloadUrl;
+            }
+
+            setTimeout(function () { URL.revokeObjectURL(downloadUrl); }, 100);
+            }
+        }).catch((error) => {console.log(error.response)});
     }
   },
   mounted () {
