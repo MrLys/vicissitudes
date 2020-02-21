@@ -5,8 +5,8 @@
         <icon style="height:150px" v-on:click="toHome()"/>
         <nav class="nav">
           <g-link class="ml-2 text-violet" to="/">Home</g-link>
-          <a v-if="loggedIn" class="ml-2 cursor-pointer text-violet" v-on:click="logout()">Logout</a>
-          <a v-if="loggedIn" class="ml-2 cursor-pointer text-violet" v-on:click="toHabits()">Habits</a>
+          <a v-if="loggedIn" class="ml-2 cursor-pointer text-violet" id="logout" v-on:click="logout()">Logout</a>
+          <a v-if="loggedIn" class="ml-2 cursor-pointer text-violet" id="habits" v-on:click="toHabits()">Habits</a>
           <g-link class="ml-2 text-violet" to="/about/">About</g-link>
         </nav>
       </header>
