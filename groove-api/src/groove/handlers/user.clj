@@ -72,7 +72,7 @@
   (if (valid-email? email)
     (let [user (blwrk/get-user-by-field :email (.toLowerCase email))]
       (if (nil? user)
-        (error ("(Fail) Email (" email ") does not exist!") {:error "Email not found"})
+        (error (str "(Fail) Email (" email ") does not exist!") {:error "Email not found"})
         (let [token (blwrk/new-password-token! (:id (:user-data  user)) (.plusDays (java.time.LocalDate/now java.time.ZoneOffset/UTC) 1) (create-activation-token))]
           (when-not (= (:isdev env) "true")
             (do
