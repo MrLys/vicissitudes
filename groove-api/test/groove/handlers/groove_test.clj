@@ -7,7 +7,7 @@
             [groove.bulwark :as blwrk]
             [groove.db :as db]))
 
-(deftest update-groove-test 
+(deftest update-groove-test
   "Update grooves"
   (let [req (create-user)
         user1 (:identity req)
@@ -18,12 +18,12 @@
         habit3 {:name "exercise" :owner_id (parseLong (:id user2))}
         h1 (blwrk/create-habit habit1 req)
         h2 (blwrk/create-habit habit2 req)
-        today (java.time.LocalDate/now)
+        today (java.time.LocalDate/now java.time.ZoneOffset/UTC)
         g1 (create-groove req h1 today -5 "success")
         g2 (create-groove req h1 today 1 "fail") ;; invalid
         g3 (create-groove req h1 today -4 "success")
         g4 (create-groove req h2 today -3 "success")
-        g5 (create-groove req h2 today 0 "fail") 
+        g5 (create-groove req h2 today 0 "fail")
         g6 (create-groove req h2 today -22 "success")
         g7 (create-groove req2 h1 today -22 "success") ;; req 2 should not be able to create groove for habit 1.
         resp1 (handler/update-groove g1 req)

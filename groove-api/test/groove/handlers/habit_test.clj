@@ -8,7 +8,7 @@
             [groove.bulwark :as blwrk]
             [groove.db :as db]))
 
-(deftest create-habit-test 
+(deftest create-habit-test
   "Update grooves"
   (let [req (create-user)
         user1 (:identity req)
@@ -20,12 +20,12 @@
         h1 (blwrk/create-habit habit1 req)
         h2 (blwrk/create-habit habit2 req)
         h3 (handler/create-habit-handler habit3 req)
-        today (java.time.LocalDate/now)
+        today (java.time.LocalDate/now java.time.ZoneOffset/UTC)
         g1 (create-groove req h1 today -5 "success")
         g2 (create-groove req h1 today 1 "fail") ;; invalid
         g3 (create-groove req h1 today -4 "success")
         g4 (create-groove req h2 today -3 "success")
-        g5 (create-groove req h2 today 0 "fail") 
+        g5 (create-groove req h2 today 0 "fail")
         g6 (create-groove req h2 today -22 "success")
         g7 (create-groove req2 h1 today -22 "success") ;; req 2 should not be able to create groove for habit 1.
         g8 (create-groove req h1 today -23 "success") ;; should not be included in the request for getting all grooves (resp8)
@@ -55,9 +55,8 @@
       (is (= (:name ((keyword (:name habit3)) (:body resp8))) (:name habit3)))
       (is (= 2 (count (:grooves ((keyword (:name habit1)) (:body resp8))))))
       (is (= 3 (count (:grooves ((keyword (:name habit2)) (:body resp8))))))
-      (is (= 1 (count (:grooves ((keyword (:name habit3)) (:body resp8))))))
-      (is (nil? (:date (nth (:grooves ((keyword (:name habit3)) (:body resp8))) 0)))))))
-      
+      (is (= 0 (count (:grooves ((keyword (:name habit3)) (:body resp8)))))))))
+
 
 
 

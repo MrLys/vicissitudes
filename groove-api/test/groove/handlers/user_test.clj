@@ -46,11 +46,11 @@
         h1 (blwrk/create-habit habit1 r)
         h2 (blwrk/create-habit habit2 r)
         h3 (blwrk/create-habit habit3 r2)
-        today (java.time.LocalDate/now)
+        today (java.time.LocalDate/now java.time.ZoneOffset/UTC)
         g1 (create-groove r h1 today -5 "success")
         g2 (create-groove r h1 today -4 "success")
         g3 (create-groove r h2 today -3 "success")
-        g4 (create-groove r h2 today 0 "fail") 
+        g4 (create-groove r h2 today 0 "fail")
         g5 (create-groove r h2 today -22 "success")
         g6 (create-groove r2 h3 today -1 "success")
         _ (groove-handler/update-groove g1 r)
@@ -76,6 +76,6 @@
       (is (= (count (:grooves ((keyword (:name habit1)) (:habits (:user all-data))))) 2))
       (is (= (count (:grooves ((keyword (:name habit2)) (:habits (:user all-data))))) 3)))))
 
-        
+
 (use-fixtures :once once-fixture)
 (use-fixtures :each each-fixture)

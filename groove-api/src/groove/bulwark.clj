@@ -23,6 +23,9 @@
 (defn get-by-dates [request user-habit-id start-date end-date]
     (db/get-grooves-by-date-range (get-user-id request) user-habit-id start-date end-date))
 
+(defn get-grooves-by-dates-and-habits [request user-habit-id start-date end-date]
+    (db/get-grooves-by-date-range (get-user-id request) user-habit-id start-date end-date))
+
 (defn get-all-by-dates [request start-date end-date]
     (db/get-all-grooves-by-date-range (get-user-id request) start-date end-date))
 
@@ -74,10 +77,11 @@
       (st/dissoc :refresh_token)))
 
 ; Using user-id ensures the requester only receives data connected to the user
-(defn get-all-grooves-and-habits-by-date-range 
-	([req start end] (db/get-all-grooves-and-habits-by-date-range (get-user-id req) start end))
-	([req] (db/get-all-grooves-and-habits-by-date-range (get-user-id req))))
-
+(defn get-all-grooves-by-date-range
+  ([req start end]
+   (db/get-all-grooves-by-date-range (get-user-id req) start end))
+  ([req ]
+   (db/get-all-grooves-by-date-range (get-user-id req))))
 (defn update-user-password! [user]
   (let [digest (hashers/derive (:password user))]
     (db/update-user! (:user_id user) :digest digest)))
@@ -94,7 +98,7 @@
       {:user-data (-> user
                       (st/dissoc :digest)
                       (st/dissoc :refresh_token))})))
-  
+
 
 (defn new-password-token! [user-id expiration token]
   (db/new-password-token! user-id expiration token))

@@ -5,9 +5,9 @@
 (defn update-groove [groove request]
   (let [date (:date groove)
         today (java.time.LocalDate/now java.time.ZoneOffset/UTC)]
-    (if (.isAfter today date)
-      (blwrk/update-groove groove request)
-      {:error "Cannot update grooves into the future"})))
+    (if (.isAfter date today)
+      {:error "Cannot update grooves into the future"}
+      (blwrk/update-groove groove request))))
 
 
 (defn update-groove-handler [groove request]

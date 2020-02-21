@@ -29,26 +29,28 @@
 (defn get-all-users []
   (db/select User))
 
-(defn get-all-grooves-and-habits-by-date-range 
+
+(defn get-grooves-by-date-range [user-id user-habit-id start end]
+  (db/select Groove :owner_id user-id :user_habit_id user-habit-id :date [:>= start] :date [:<= end] {:order-by [:date]}))
+
+(defn get-all-grooves-by-date-range
   ([user-id start end]
-   (db/query {:select [:user_habit.owner_id :user_habit.id :habit.name :groove.date :groove.state] :from [:user_habit]
-              :where [:and [:= :user_habit.owner_id user-id] [:or [:and [:>= :groove.date start] [:<= :groove.date end]] [:= :groove.date nil]]]
-              :join [:habit [:= :user_habit.habit_id :habit.id]]
-              :left-join [:groove [:= :user_habit.id :groove.user_habit_id]]
-              :order-by [:date]}))
-  ([user-id] (db/query {:select [:user_habit.owner_id :user_habit.id :habit.name :groove.date :groove.state]
-                        :from [:user_habit]
-                        :where [:= :user_habit.owner_id user-id]
-                        :join [:habit [:= :user_habit.habit_id :habit.id]]
-                        :left-join [:groove [:= :user_habit.id :groove.user_habit_id]]
-                        :order-by [:date]})))
-;:join [:groove [:= :groove.owner_id :user_habit.owner_id]]}))
+   (db/select Groove :owner_id user-id  :date [:>= start] :date [:<= end] {:order-by [:date]}))
+  ([user-id]
+   (db/select Groove :owner_id user-id {:order-by [:date]})))
 
-(defn get-grooves-by-date-range [user_id user-habit-id start end]
-  (db/select Groove :owner_id user_id :user_habit_id user-habit-id :date [:>= start] :date [:<= end] {:order-by [:date]}))
 
-(defn get-all-grooves-by-date-range [user_id start end]
-  (db/select Groove :owner_id user_id :date [:>= start] :date [:<= end] {:order-by [:date]}))
+(defn get-grooves-by-date-range-and-habits ([user-id user-habit-ids start end]
+  (db/query {:select [:groove.owner_id :groove.user_habit_id :groove.date]
+             :from [:groove]
+             :where [:and
+                     [:and [:= :groove.owner_id user-id] [:and [:>= :groove.date start] [:<= :groove.date end]]]
+                     [:in :groove.user_habit_id {:select [:user_habit.user_habit_id] :from [:user_habit] :where [:= :user_habit.owner_id user-id]}]] :order-by [:date]}))
+  ([user-id] (db/query {:select [:groove.owner_id :groove.user_habit_id :groove.date]
+             :from [:groove]
+             :where [:and
+                     [:= :groove.owner_id user-id]
+                     [:in :groove.user_habit_id {:select [:user_habit.id] :from [:user_habit] :where [:= :user_habit.owner_id user-id]}]] :order-by [:date]})))
 
 (defn get-groove-by-user-habit-date [user-id user-habit-id date]
   (db/select Groove  :owner_id user-id :user_habit_id user-habit-id :date date))

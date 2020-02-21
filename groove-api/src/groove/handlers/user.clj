@@ -5,6 +5,7 @@
             [groove.handlers.response :refer [response-handler]]
             [groove.bulwark :as blwrk]
             [groove.models.user :refer [User]]
+            [groove.handlers.habit :refer [get-all-habits-with-grooves]]
             [groove.mail :refer [mail]]
             [groove.util.utils :refer [create-activation-token truthy? build-grooves-by-habits parseLong]]
             [environ.core :refer [env]]
@@ -14,7 +15,7 @@
 (defn create-new-user [user]
   (let [user (assoc user :email (.toLowerCase (:email user)) :username (.toLowerCase (:username user)))
         activation-token (create-activation-token)
-        date (.plusDays (java.time.LocalDate/now) 1)
+        date (.plusDays (java.time.LocalDate/now java.time.ZoneOffset/UTC) 1)
         db-user (blwrk/new-user user)]
     (blwrk/new-activation-token! activation-token (:id db-user) date)
     (when-not (= (:istest env) "true")
@@ -69,7 +70,7 @@
     (let [user (blwrk/get-user-by-field :email (.toLowerCase email))]
       (if (nil? user)
         {:error "Email not found"}
-        (let [token (blwrk/new-password-token! (:id (:user-data  user)) (.plusDays (java.time.LocalDate/now) 1) (create-activation-token))]
+        (let [token (blwrk/new-password-token! (:id (:user-data  user)) (.plusDays (java.time.LocalDate/now java.time.ZoneOffset/UTC) 1) (create-activation-token))]
           (when-not (= (:istest env) "true")
             (do
               (println (str "sending mail to " (:email user)))
@@ -90,7 +91,7 @@
 
 (defn get-all-data [request]
   (let [user (blwrk/get-user-by-field :id (parseLong (:id (:identity request))))
-        habits (build-grooves-by-habits (blwrk/get-all-grooves-and-habits-by-date-range request))
+        habits (get-all-habits-with-grooves request)
         teams (blwrk/get-all-teams request)]
     (println user)
     (if (or (nil? user) (empty? user))
