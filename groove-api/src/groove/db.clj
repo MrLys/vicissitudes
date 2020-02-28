@@ -1,6 +1,7 @@
 (ns groove.db
   (:require [toucan.db :as db]
             [clojure.set :refer [rename-keys]]
+            [clojure.tools.logging :as log]
             [groove.models.user :refer [User]]
             [groove.models.user_habit :refer [User_habit]]
             [groove.models.password_token :refer [Password_token]]
@@ -19,8 +20,8 @@
     (db/insert! User (rename-keys (assoc user :password digest) {:password :digest}))))
 
 
-(defn update-refresh-token [user refresh-token]
-  (db/update! User (:id user) :refresh_token refresh-token))
+(defn update-refresh-token [id refresh-token]
+  (db/update! User id :refresh_token refresh-token))
 
 (defn get-registered-user-by-field [field value]
   (db/select-one User field value)) ;; username and email must be unique
@@ -35,8 +36,13 @@
 
 (defn get-all-grooves-by-date-range
   ([user-id start end]
-   (db/select Groove :owner_id user-id  :date [:>= start] :date [:<= end] {:order-by [:date]}))
+    (log/info (str "inside db get--all-grooves" "params: " user-id start end))
+    (let [res (db/select Groove :owner_id user-id  :date [:>= start] :date [:<= end] {:order-by [:date]})]
+    (log/info (str "Result in db: " res))
+    res))
+
   ([user-id]
+    (log/info (str "inside db get--all-grooves" "params: " user-id))
    (db/select Groove :owner_id user-id {:order-by [:date]})))
 
 
@@ -142,3 +148,5 @@
   (db/insert! User_team :owner_id user-id :team_id (:id (db/insert! Team :name name))))
 (defn get-user-count []
   (db/count User))
+(defn get-refresh-token-by-user-id [user-id]
+  (db/select-one User :id user-id))

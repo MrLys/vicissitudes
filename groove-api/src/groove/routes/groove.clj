@@ -26,7 +26,7 @@
             :middleware [wrap-token-auth]
             :path-params [userId :- Long]
             :query-params [start_date :- java.time.LocalDate, end_date :- java.time.LocalDate]
-            (get-all-grooves-handler request userId start_date end_date))
+            (get-all-grooves-handler request start_date end_date))
    (PATCH "/groove" [:as request]
              :header-params [authorization :- String]
              :middleware [wrap-token-auth]

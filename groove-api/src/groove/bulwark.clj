@@ -31,7 +31,10 @@
     (db/get-grooves-by-date-range (get-user-id request) user-habit-id start-date end-date))
 
 (defn get-all-by-dates [request start-date end-date]
-    (db/get-all-grooves-by-date-range (get-user-id request) start-date end-date))
+    (log/info "inside bulwark and get-all-by-dates")
+    (let [res (db/get-all-grooves-by-date-range (get-user-id request) start-date end-date)]
+      (log/info (str "inside bulwark result is: " res))
+      res))
 
 (defn update-groove [groove request]
   (let [logged-in-user (get-user-id request)
@@ -107,9 +110,16 @@
 (defn new-password-token! [user-id expiration token]
   (db/new-password-token! user-id expiration token))
 
+(defn update-refresh-token [request token]
+  (db/update-refresh-token (get-user-id request) token))
 
 (defn get-all-teams [request]
   (db/get-all-teams-by-user-id (get-user-id request)))
 
 (defn create-team [request name]
   (db/create-team (get-user-id request) name))
+(defn valid-refresh-token [request]
+  (let [token (:value (:refresh_token (:cookies request)))]
+  (if (not (nil? token))
+    (= (db/get-refresh-token-by-user-id (get-user-id request)) token))))
+

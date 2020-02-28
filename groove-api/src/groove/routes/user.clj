@@ -1,6 +1,7 @@
 (ns groove.routes.user
   (:require [groove.handlers.user :refer :all]
             [groove.util.validation :refer :all]
+            [ring.middleware.cookies :refer [wrap-cookies]]
             [compojure.api.sweet :refer [GET POST PATCH]]
             [groove.middleware :refer [auth-credentials-reponse wrap-basic-auth wrap-token-auth]]
             [ring.util.http-response :refer [created ok]]

@@ -1,5 +1,6 @@
 (ns groove.handlers.groove
   (:require [groove.handlers.response :refer [response-handler]]
+            [clojure.tools.logging :as log]
             [groove.bulwark :as blwrk]))
 
 (defn update-groove [groove request]
@@ -16,5 +17,9 @@
 (defn get-grooves-handler [request habit start end]
   (blwrk/get-by-dates request habit start end))
 
-(defn get-all-grooves-handler [request user start end]
-  (blwrk/get-all-by-dates request start end));(java.time.Instant/ofEpochMilli  start) (java.time.Instant/ofEpochMilli  end)))
+(defn get-all-grooves-handler [request start end]
+  (log/info "inside get-all-grooves-handler")
+   (let [res (blwrk/get-all-by-dates request start end)]
+      (log/info (str "handler res: " res))
+      {}))
+     ;(java.time.Instant/ofEpochMilli  start) (java.time.Instant/ofEpochMilli  end)))

@@ -225,7 +225,8 @@ export default {
     mapHabitsResp: function (resp) {
       let habits = resp;
       let keys = Object.keys(habits);
-      let habit_array = []
+      let habit_array = [];
+      console.log(resp.body);
       for(let i = 0; i < keys.length; i++) {
         habits[keys[i]].name = this.capitalizeFirstLetter(habits[keys[i]].name);
         habit_array[i] = habits[keys[i]];
@@ -237,6 +238,7 @@ export default {
     },
     mapper: function (data) {
       let items = data.data;
+      console.log("mapper",items);
       if (this.isWeekView) {
         this.mapHabitsResp(items);
         let keys = Object.keys(items); 

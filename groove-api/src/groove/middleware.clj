@@ -5,16 +5,17 @@
             [groove.models.user :refer :all]
             [groove.auth.token :refer :all]
             [groove.db :refer [update-refresh-token]]
-            [groove.bulwark :refer [get-user]]
+            [groove.bulwark :as blwrk]
             [ring.util.http-response :refer [unauthorized]]
             [ring.util.http-response :refer [created ok not-found]]
+	    [ring.middleware.cookies :refer [wrap-cookies]]
             [buddy.hashers :as hashers]
             [buddy.auth :refer [authenticated?]]
             [buddy.auth.accessrules :refer [restrict]]
             [buddy.auth.backends.token :refer [jws-backend]]
             [buddy.auth.backends.httpbasic :refer [http-basic-backend]]
             [buddy.auth.middleware :refer [wrap-authentication wrap-authorization]]))
-
+(def ^:private max-age-refresh-token (* 60 60 24 31))
 
 (defn get-user-data [identifier]
   (let [user (User :username identifier)]
@@ -36,12 +37,20 @@
 
 (defn auth-credentials-reponse [request]
   (let [user          (:identity request)
-        refresh-token (str (java.util.UUID/randomUUID))
-        _ (update-refresh-token user refresh-token)]
-    (ok {:id (:id user)
-         :username      (:username user)
-         :token         (create-token user)
-         :refreshToken  refresh-token})))
+	refresh-token (str (java.util.UUID/randomUUID))
+	_ (blwrk/update-refresh-token  request refresh-token)]
+    {:status 200
+     :headers {}
+     :cookies {"refresh_token" {:value refresh-token :max-age max-age-refresh-token :http-only true}}
+     :body {:id (:id user)
+            :username (:username user)
+	    :token (create-token user)
+	    :expiry max-age-refresh-token}}
+    ))
+    ;(assoc (ok {:id (:id user)
+    ;     :username      (:username user)
+    ;     :token         (create-token user)
+    ;     }) :cookies {"refresh_token" {:value refresh-token :max-age max-age-refresh-token :http-only true}})))
 
 (defn- format-cookies [request]
   (let [token (:token request)
@@ -59,9 +68,8 @@
 
 (defn auth-mw-activated [handler]
   (fn [request]
-    (log/info request)
     (if (authenticated? request)
-      (let [user (get-user (:id (:identity request)))]
+      (let [user (blwrk/get-user (:id (:identity request)))]
         (if (not (activated? user))
           (unauthorized {:error "Account is not activated"})
           (handler request)))
@@ -69,9 +77,16 @@
 
 (defn auth-mw [handler]
   (fn [request]
+    (log/info (:cookies request))
     (if (authenticated? request)
-      (handler request)
-    (unauthorized {:error "Not authorized - invalid token"}))))
+      (do
+        (log/info (str "Yes, authenticated" handler))
+      (let [refresh-token (str (java.util.UUID/randomUUID))
+            isValidRefreshToken (blwrk/valid-refresh-token request)
+	    _ (blwrk/update-refresh-token request refresh-token)]
+          (when isValidRefreshToken
+            (handler request))))
+      (unauthorized {:error "Not authorized - invalid token"}))))
 
 
 ;; The jws-backend does a lot of magic.
@@ -86,7 +101,8 @@
     (-> handler
         (auth-mw)
         (wrap-authorization backend)
-        (wrap-authentication backend))))
+        (wrap-authentication backend)
+	(wrap-cookies))))
 
 
 (defn wrap-basic-auth [handler]
