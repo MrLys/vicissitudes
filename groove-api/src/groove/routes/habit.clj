@@ -19,7 +19,7 @@
 
    (GET "/habits" [:as request]
         :header-params [authorization :- String]
-        :tags ["habits"]
+        :tags ["Habits"]
         :middleware [wrap-token-auth]
         :query-params [start_date :- java.time.LocalDate, end_date :- java.time.LocalDate]
         (get-all-grooves-by-habit request start_date end_date))])
