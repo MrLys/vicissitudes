@@ -6,13 +6,31 @@ import AxiosPlugin from '~/axios.js';
 import Vuex from 'vuex';
 import moment from 'moment';
 
+function getItem(key) {
+    if (typeof window !== 'undefined' && window) {
+        return window.localStorage.getItem(key);
+    }
+}
+function setItem(key, value) {
+    if (typeof window !== 'undefined' && window) {
+        window.localStorage.setItem(key, value);
+    }
+
+}
+function removeItem(key) {
+    if (typeof window !== 'undefined' && window) {
+        return window.localStorage.removeItem(key);
+    }
+}
+
 export default function (Vue, { router, head, isClient, appOptions}) {
     // Set default layout as a global component
     Vue.component('Layout', DefaultLayout);
     Vue.use(AxiosPlugin);
     Vue.use(Vuex);
     Vue.prototype.$moment = moment;
-    const token = localStorage.getItem('token')
+    const windowGlobal = typeof window !== 'undefined' && window;
+    const token = getItem('token')
     if (token) {
       Vue.prototype.$http.defaults.headers.common['Authorization'] = 'Bearer ' + token
       console.log(Vue.prototype.$http.defaults.headers.common['Authorization']);
@@ -20,8 +38,8 @@ export default function (Vue, { router, head, isClient, appOptions}) {
     appOptions.store = new Vuex.Store({
         state: {
             status: '',
-            token:  localStorage.getItem('token') || '',
-            id: localStorage.getItem('user_id') || ''
+            token:  getItem('token') || '',
+            id: getItem('user_id') || ''
         },
         mutations: {
             auth_request(state){
@@ -48,8 +66,8 @@ export default function (Vue, { router, head, isClient, appOptions}) {
             logout(state){
                 state.status = ''
                 state.token = ''
-                localStorage.setItem('token', '');
-                localStorage.setItem('start_date','');
+                setItem('token', '');
+                setItem('start_date','');
             },
         },
         actions: {
@@ -67,15 +85,15 @@ export default function (Vue, { router, head, isClient, appOptions}) {
                   const token = resp.data.token
                   const user_id = resp.data.id
                   console.log(user_id);
-                  localStorage.setItem('token', token)
-                  localStorage.setItem('user_id', user_id)
+                  setItem('token', token)
+                  setItem('user_id', user_id)
                   Vue.prototype.$http.defaults.headers.common['Authorization'] = 'Bearer ' + token
                   commit('auth_success', { token: token, user_id: user_id})
                   resolve(resp)
                 })
                 .catch(err => {
                   commit('auth_error')
-                  localStorage.removeItem('token')
+                  removeItem('token')
                   reject(err)
                 })
             })
@@ -83,8 +101,8 @@ export default function (Vue, { router, head, isClient, appOptions}) {
           logout({commit}){
             return new Promise((resolve, reject) => {
               commit('logout')
-              localStorage.removeItem('token')
-              localStorage.removeItem('user_id')
+              removeItem('token')
+              removeItem('user_id')
               delete Vue.prototype.$http.defaults.headers.common['Authorization']
               resolve()
             })
@@ -98,7 +116,7 @@ export default function (Vue, { router, head, isClient, appOptions}) {
                   resolve(resp);
                 })
                 .catch(err => {
-                  localStorage.removeItem('token')
+                  removeItem('token')
                   reject(err)
                 })
             })
@@ -113,7 +131,7 @@ export default function (Vue, { router, head, isClient, appOptions}) {
                 })
                 .catch(err => {
                   commit('auth_error')
-                  localStorage.removeItem('token')
+                  removeItem('token')
                   reject(err)
                 })
             })

@@ -4,7 +4,7 @@
       <p class="text-center text-xl"> {{ response_h1 }}</p> 
       <p class="text-center"> {{ response }}</p> 
     </div>
-    <div class="flex container center" :class="computeBlur()"
+    <div class="flex container center" :class="computeBlur"
     v-if="!finished">
       <div class="rounded px-8 py-4 bg-glitter-light border-2 border-glitter-dark">
         <p class="px-4 py-2 text-center text-violet"> Please enter your new credentials below </p>
