@@ -37,8 +37,8 @@ export default function (Vue, { router, head, isClient, appOptions}) {
       Vue.prototype.$http.defaults.headers.common['Authorization'] = 'Bearer ' + token
       console.log(Vue.prototype.$http.defaults.headers.common['Authorization']);
     }
+    NProgress.configure();
     if (windowGlobal) {
-        NProgress.configure();
         router.beforeEach((to, from, next) => {
             NProgress.start()
             next()
