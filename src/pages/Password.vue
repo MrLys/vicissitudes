@@ -83,11 +83,12 @@ export default {
   methods: {
     activate: function () {
       let token = this.$route.query.token;
+      const url = process.env.GRIDSOME_API_RUTTA_URL;
       console.log(token);
       if(token !== undefined) {
         let param = 'activation_token='+token;
         this.$http
-          .post('/api/activate?' + param)
+          .post(url+'/api/activate?' + param)
           .then(response => {
             this.$router.push('/login');
           }).catch((error) => {console.log(error.response); this.loading = false;});

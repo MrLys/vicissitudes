@@ -33,7 +33,7 @@ export default function (Vue, { router, head, isClient, appOptions}) {
     Vue.prototype.$moment = moment;
     const windowGlobal = typeof window !== 'undefined' && window;
     const token = getItem('token')
-    const url = process.env.RUTTA_URL;
+    const url = process.env.GRIDSOME_API_URL;
     if (token) {
       Vue.prototype.$http.defaults.headers.common['Authorization'] = 'Bearer ' + token
       console.log(Vue.prototype.$http.defaults.headers.common['Authorization']);

@@ -90,6 +90,7 @@ export default {
     },
   data () {
     return {
+        rutta_url = process.env.GRIDSOME_API_RUTTA_URL,
       feedback: "",
       items:  [],
       current_monday: undefined,
@@ -144,7 +145,7 @@ export default {
     getHabits: function() {
       let startDate = this.current_monday.utc().format('YYYY-MM-DD');
       let endDate = dates.addDays(this.current_monday, 6).utc().format('YYYY-MM-DD');
-      let url = '/api/habits?start_date=' + startDate + '&end_date=' + endDate;
+      let url = this.rutta_url + '/api/habits?start_date=' + startDate + '&end_date=' + endDate;
       this.$http.get(url)
         .then(response => {
           this.mapper(response);
@@ -168,7 +169,7 @@ export default {
         return;
       }
       let id = localStorage.getItem('user_id');
-      this.$http.post('/api/habit',{owner_id: parseInt(id), name:
+      this.$http.post(this.rutta_url +'/api/habit',{owner_id: parseInt(id), name:
         this.habitName}).then(response => {
           location.reload();
         }).catch(err => {
@@ -281,7 +282,7 @@ export default {
       return ret;
     },
     updateGroove: function(groove) {
-      this.$http.patch('/api/groove', 
+      this.$http.patch(this.rutta_url + '/api/groove', 
           {owner_id: parseInt(localStorage.getItem('user_id')), 
             state: groove.groove, 
             user_habit_id: parseInt(groove.habit),
