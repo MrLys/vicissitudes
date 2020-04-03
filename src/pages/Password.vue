@@ -83,7 +83,7 @@ export default {
   methods: {
     activate: function () {
       let token = this.$route.query.token;
-      const url = process.env.GRIDSOME_API_RUTTA_URL;
+      const url = process.env.GRIDSOME_API_URL;
       console.log(token);
       if(token !== undefined) {
         let param = 'activation_token='+token;

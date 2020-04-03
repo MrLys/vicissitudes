@@ -90,7 +90,7 @@ export default {
     },
   data () {
     return {
-        rutta_url = process.env.GRIDSOME_API_RUTTA_URL,
+        rutta_url: process.env.GRIDSOME_API_URL,
       feedback: "",
       items:  [],
       current_monday: undefined,
