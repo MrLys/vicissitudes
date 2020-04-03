@@ -11,7 +11,7 @@ module.exports = function (api) {
         app.use(
             '/api',
             proxy({
-            target: 'http://localhost:3000',
+            target: process.env.RUTTA_URL,
             changeOrigin: true,
             pathRewrite: {
                 '^/api': '/api'
@@ -22,7 +22,7 @@ module.exports = function (api) {
 
   //api.loadSource(async actions => {
   //  const { data } = await axios.get('http://localhost:3000/api/choices');
-  //  
+  //
   //  const collection = actions.addCollection('Choices')
   //  const keys = Object.keys(data);
   //    console.log(keys);

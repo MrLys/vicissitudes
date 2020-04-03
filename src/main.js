@@ -5,6 +5,8 @@ import DefaultLayout from '~/layouts/Default.vue';
 import AxiosPlugin from '~/axios.js';
 import Vuex from 'vuex';
 import moment from 'moment';
+import NProgress from 'nprogress';
+import 'nprogress/nprogress.css';
 
 function getItem(key) {
     if (typeof window !== 'undefined' && window) {
@@ -25,6 +27,15 @@ function removeItem(key) {
 
 export default function (Vue, { router, head, isClient, appOptions}) {
     // Set default layout as a global component
+    NProgress.configure();
+    router.beforeEach((to, from, next) => {
+        NProgress.start()
+        next()
+    })
+
+    router.afterEach((to, from) => {
+        NProgress.done()
+    })
     Vue.component('Layout', DefaultLayout);
     Vue.use(AxiosPlugin);
     Vue.use(Vuex);
