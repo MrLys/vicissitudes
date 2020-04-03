@@ -27,15 +27,6 @@ function removeItem(key) {
 
 export default function (Vue, { router, head, isClient, appOptions}) {
     // Set default layout as a global component
-    NProgress.configure();
-    router.beforeEach((to, from, next) => {
-        NProgress.start()
-        next()
-    })
-
-    router.afterEach((to, from) => {
-        NProgress.done()
-    })
     Vue.component('Layout', DefaultLayout);
     Vue.use(AxiosPlugin);
     Vue.use(Vuex);
@@ -45,6 +36,17 @@ export default function (Vue, { router, head, isClient, appOptions}) {
     if (token) {
       Vue.prototype.$http.defaults.headers.common['Authorization'] = 'Bearer ' + token
       console.log(Vue.prototype.$http.defaults.headers.common['Authorization']);
+    }
+    if (windowGlobal) {
+        NProgress.configure();
+        router.beforeEach((to, from, next) => {
+            NProgress.start()
+            next()
+        })
+
+        router.afterEach((to, from) => {
+            NProgress.done()
+        })
     }
     appOptions.store = new Vuex.Store({
         state: {
