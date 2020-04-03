@@ -26,10 +26,26 @@ jobs:
             - run: sudo apt-get update
             - run: sudo apt-get install postgresql-client-9.6
               # So each command is run separately.
-            - run: sudo sudo -i psql -h localhost -U root -d groove_api -c "CREATE USER circleci WITH PASSWORD 'password'LOGIN SUPERUSER;"
+            - run: sudo -i psql -h localhost -U root -d groove_api -c "CREATE USER circleci WITH PASSWORD 'password'LOGIN SUPERUSER;"
             - run: cd groove-api && psql -h localhost -U circleci -d groove_api -f 'migrations/create_tables.sql'
               # Add a test user
               # Download and cache dependencies
+
+            - restore_cache:
+                keys:
+                    - v2-dependencies-{{ checksum "package-lock.json" }}
+                      # fallback to using the latest cache if no exact match is found
+                    - v2-dependencies-
+            - run:
+                name: npm install
+                command: npm install
+
+            - save_cache:
+                key: v2-cache-{{ checksum "package-lock.json" }}
+                paths:
+                    - ~/.npm
+                    - ~/.cache
+
 
             - restore_cache:
                 keys:
