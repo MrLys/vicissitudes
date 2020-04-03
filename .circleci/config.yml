@@ -67,27 +67,27 @@ jobs:
                 command: cd groove-api && lein run
                 background: true
 
-            - restore_cache:
-                keys:
-                    - v2-cache-{{ checksum "package.json" }}
-      # install npm dependencies and Cypress binary
+                #      - restore_cache:
+                #          keys:
+                #              - v2-cache-{{ checksum "package.json" }}
+                ## install npm dependencies and Cypress binary
       # if they were cached, this step is super quick
-            - run:
-                name: Install dependencies
-                command: npm ci
-            - run: npm run cy:verify
+      # - run:
+      #          name: Install dependencies
+      #          command: npm ci
+      #      - run: npm run cy:verify
       # save npm dependencies and Cypress binary for future runs
-            - save_cache:
-                key: v2-cache-{{ checksum "package.json" }}
-                paths:
-                    - ~/.npm
-                    - ~/.cache
+      #      - save_cache:
+      #          key: v2-cache-{{ checksum "package.json" }}
+      #          paths:
+      #              - ~/.npm
+      #              - ~/.cache
       # start server before starting tests
             - run:
                 command: npm run grdsm:run
                 background: true
 
-            - run: /bin/bash create_test_user.sh
+            #- run: /bin/bash create_test_user.sh
 
-            - run: npm run e2e:record
+            #- run: npm run e2e:record
 
