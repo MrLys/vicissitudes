@@ -33,6 +33,7 @@ export default function (Vue, { router, head, isClient, appOptions}) {
     Vue.prototype.$moment = moment;
     const windowGlobal = typeof window !== 'undefined' && window;
     const token = getItem('token')
+    const url = process.env.RUTTA_URL;
     if (token) {
       Vue.prototype.$http.defaults.headers.common['Authorization'] = 'Bearer ' + token
       console.log(Vue.prototype.$http.defaults.headers.common['Authorization']);
@@ -93,7 +94,7 @@ export default function (Vue, { router, head, isClient, appOptions}) {
                   'Content-Type': 'application/json',
                   'Authorization': "Basic " + data,
                 }}
-              Vue.prototype.$http('/api/login', options)
+              Vue.prototype.$http(url+'/api/login', options)
                 .then(resp => {
                   const token = resp.data.token
                   const user_id = resp.data.id
@@ -123,7 +124,7 @@ export default function (Vue, { router, head, isClient, appOptions}) {
           forgot_password({commit}, data) {
             return new Promise((resolve, reject) => {
               commit('forgot_password')
-              Vue.prototype.$http.post('/api/forgot?email='+data)
+              Vue.prototype.$http.post(url+'/api/forgot?email='+data)
                 .then(resp => {
                   commit('awaiting_recovery_link');
                   resolve(resp);
@@ -137,7 +138,7 @@ export default function (Vue, { router, head, isClient, appOptions}) {
           register({commit}, data) {
             return new Promise((resolve, reject) => {
               commit('auth_request')
-              Vue.prototype.$http.post('/api/register', data)
+              Vue.prototype.$http.post(url+'/api/register', data)
                 .then(resp => {
                   commit('register_success');
                   resolve(resp);
