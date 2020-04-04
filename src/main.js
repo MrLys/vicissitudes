@@ -24,7 +24,22 @@ function removeItem(key) {
         return window.localStorage.removeItem(key);
     }
 }
-
+function beforeRouting(to, from, next) {
+    if (typeof window !== 'undefined' && window) {
+            NProgress.start()
+            next()
+    }
+}
+function afterRouting(to, from) {
+    if (typeof window !== 'undefined' && window) {
+            NProgress.done()
+    }
+}
+function configureNProgress(router) {
+    NProgress.configure();
+    router.beforeEach(beforeRouting);
+    router.afterEach(afterRouting);
+}
 export default function (Vue, { router, head, isClient, appOptions}) {
     // Set default layout as a global component
     Vue.component('Layout', DefaultLayout);
@@ -34,21 +49,12 @@ export default function (Vue, { router, head, isClient, appOptions}) {
     const windowGlobal = typeof window !== 'undefined' && window;
     const token = getItem('token')
     const url = process.env.GRIDSOME_API_URL;
+    Vue.prototype.$http.defaults.withCredentials = true;
     if (token) {
       Vue.prototype.$http.defaults.headers.common['Authorization'] = 'Bearer ' + token
       console.log(Vue.prototype.$http.defaults.headers.common['Authorization']);
     }
-    NProgress.configure();
-    if (windowGlobal) {
-        router.beforeEach((to, from, next) => {
-            NProgress.start()
-            next()
-        })
-
-        router.afterEach((to, from) => {
-            NProgress.done()
-        })
-    }
+    //configureNProgress(router);
     appOptions.store = new Vuex.Store({
         state: {
             status: '',
