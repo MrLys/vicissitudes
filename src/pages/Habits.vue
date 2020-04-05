@@ -3,21 +3,21 @@
     <div>
       <div style="display:flex; justify-content: space-between">
       <button id="previousWeek" class="bg-max_blue-light hover:bg-max_blue-dark text-white font-bold py-2
-      px-4 rounded my-2 " v-on:click="previousWeek()" v-if="hasHabits">
+      px-4 rounded my-2 " v-on:click="previousWeek()" v-show="hasHabits">
         <icon_previous class="w-5"/>
       </button>
         <button id="nextWeek" class="bg-max_blue-light hover:bg-max_blue-dark text-white font-bold py-2
-        px-4 rounded my-2 " v-on:click="nextWeek()" v-if="isPreviousWeek">
+        px-4 rounded my-2 " v-on:click="nextWeek()" v-show="isPreviousWeek">
           <icon_next class="w-5" />
         </button>
       </div>
-      <p id="no-habits" class="h1 text-center" v-if="!hasHabits"> You don't track any habits yet! Click the
+      <p id="no-habits" class="h1 text-center" v-show="!hasHabits"> You don't track any habits yet! Click the
       button below to create your very first habit 🎉 </p>
       <button id="add-habit" class="bg-max_blue-light hover:bg-max_blue-dark text-white font-bold py-2
       px-4 rounded my-2 mx-2 mx-auto" v-on:click="newHabit()">
         <icon_plus class="w-5"/>
       </button>
-        <div class="block py-2" v-if="creating">
+        <div class="block py-2" v-show="creating">
           <div class="flex">
           <input id="habit-field" class="bg-white focus:outline-none focus:shadow-outline border
           border-gray-300 rounded-lg py-2 px-4 block w-full appearance-none
@@ -30,7 +30,7 @@
         <p class="text-red-500 m-2"> {{ feedback }}</p>
         </div>
     </div>
-    <div class="flex container" v-if="hasHabits">
+    <div class="flex container" v-show="hasHabits">
         <div class="py-2 w-1/6 block border-r last:border-r-0 text-center bg-gray-100" v-for="day in week">
           {{ day.day }} 
             <p class="text-center">
@@ -40,7 +40,7 @@
   </div>
 
   <div class="block container  py-2" v-for="(habit, habit_index) in habits"
-    v-if="hasHabits">  
+    v-show="hasHabits">  
     <p class="py-2"> {{ habit.name }}</p>
     <div class="flex container">
       <div v-bind:id="habit.name+'-'+week[index].day" class="w-1/6 block border-r last:border-r-0"
@@ -51,7 +51,7 @@
     </div>
     </div>
 
-    <div class="flex container" v-if="hasHabits">
+    <div class="flex container" v-show="hasHabits">
       <button id="success-button" class="bg-ocean_green-light hover:bg-ocean_green-dark  text-white font-bold py-2
       px-4 rounded my-2 mx-2 mx-auto" v-on:click="action('success')">
         <icon_success class="w-6"/>
