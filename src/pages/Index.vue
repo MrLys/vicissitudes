@@ -8,10 +8,10 @@
       <div class="flex container">
         <div class="py-2 w-1/6 block border-r-2 last:border-r-0 text-center
           bg-gray-100" v-for="(day,index) in week">
-            <p v-if="!xs">
+            <p v-show="!xs">
             {{ day.day }} 
             </p>
-            <p v-else>
+            <p v-show="x">
             {{ day.day_xs }} 
             </p>
         </div>
@@ -30,7 +30,7 @@
       <p class="h1"> Welcome to Rutta! </p>
       <p> This is a free and simple habit tracker. </p>
     </div>
-      <div class="my-4 flex mx-auto" v-if="!loggedIn">
+      <div class="my-4 flex mx-auto" v-show="!loggedIn">
         <button class="bg-ocean_green-light hover:bg-ocean_green-dark
         text-white font-bold py-2 x-4 rounded my-2 mx-2 mx-auto w-1/3" v-on:click="toLogin()">
           <p class="px-2">Log in</p>
