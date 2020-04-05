@@ -43,7 +43,6 @@
           </div>
         </div>
   </div>
-<!---
   <section class="block container  py-2" v-for="(habit, habit_index) in habits" v-show="hasHabits">  
     <p class="py-2"> {{ habit.name }}</p>
     <div class="flex container">
@@ -69,7 +68,7 @@
               v-on:click="action('pass')">
         <icon_pass class="w-6"/>
       </button>
-    </div> !-->
+    </div>
   </Layout>
 </template>
 <script>
