@@ -33,7 +33,7 @@
     <div class="flex container" v-if="hasHabits">
         <div class="py-2 w-1/6 block border-r last:border-r-0 text-center bg-gray-100" v-for="day in week">
           {{ day.day }} 
-            <p class="text-center">
+            <p class="text-center" v-if="day.date">
                 {{ day.date.format('YYYY-MM-DD') }} 
           </p>
         </div>
@@ -238,6 +238,7 @@ export default {
     },
     mapper: function (data) {
       let items = data.data;
+      console.log(items);
       if (this.isWeekView) {
         this.mapHabitsResp(items);
         let keys = Object.keys(items); 

@@ -52,7 +52,6 @@ export default function (Vue, { router, head, isClient, appOptions}) {
     Vue.prototype.$http.defaults.withCredentials = true;
     if (token) {
       Vue.prototype.$http.defaults.headers.common['Authorization'] = 'Bearer ' + token
-      console.log(Vue.prototype.$http.defaults.headers.common['Authorization']);
     }
     //configureNProgress(router);
     appOptions.store = new Vuex.Store({
