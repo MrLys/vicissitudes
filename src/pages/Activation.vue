@@ -24,7 +24,7 @@ export default {
       if(token !== undefined) {
         let param = 'activation_token='+token;
         this.$http
-          .post('/api/activate?' + param)
+          .post(url+'/api/activate?' + param)
           .then(response => {
             setTimeout(() => this.$router.push(url+'/login'), 3000);
           }).catch((error) => {console.log(error.response); this.loading = false;});
