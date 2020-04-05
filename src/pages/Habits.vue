@@ -30,7 +30,7 @@
         <p class="text-red-500 m-2"> {{ feedback }}</p>
         </div>
     </div>
-    <div class="flex container" v-if="hasHabits">
+    <div class="flex container" v-show="hasHabits">
         <div class="py-2 w-1/6 block border-r last:border-r-0 text-center bg-gray-100" v-for="day in week">
           {{ day.day }} 
             <p class="text-center" v-if="day.date">
@@ -40,7 +40,7 @@
   </div>
 
   <div class="block container  py-2" v-for="(habit, habit_index) in habits"
-    v-if="hasHabits">  
+    v-show="hasHabits">  
     <p class="py-2"> {{ habit.name }}</p>
     <div class="flex container">
       <div v-bind:id="habit.name+'-'+week[index].day" class="w-1/6 block border-r last:border-r-0"
