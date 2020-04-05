@@ -22,7 +22,7 @@ export default {
       const url = process.env.GRIDSOME_API_URL;
       console.log(token);
       if(token !== undefined) {
-        let param = 'activation_token='+token;
+        let param = 'activation-token='+token;
         this.$http
           .post(url+'/api/activate?' + param)
           .then(response => {
