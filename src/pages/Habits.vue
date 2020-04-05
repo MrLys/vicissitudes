@@ -36,6 +36,7 @@
             <p class="text-center" v-if="day.date">
                 {{ day.date.format('YYYY-MM-DD') }} 
           </p>
+          <p v-else> {{""}}</p>
         </div>
   </div>
 

@@ -7,11 +7,14 @@
 const axios = require('axios')
 var proxy = require("http-proxy-middleware");
 module.exports = function (api) {
+    api.chainWebpack(config => {
+        config.mode('development')
+    });
     api.configureServer(app => {
         app.use(
             '/api',
             proxy({
-            target: process.env.RUTTA_URL,
+                target: process.env.RUTTA_URL || "http://localhost:2999/api",
             changeOrigin: true,
             pathRewrite: {
                 '^/api': '/api'
