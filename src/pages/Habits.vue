@@ -36,7 +36,6 @@
             <p class="text-center" v-if="day.date">
                 {{ day.date.format('YYYY-MM-DD') }} 
           </p>
-          <p v-else> {{""}}</p>
         </div>
   </div>
 
@@ -91,7 +90,7 @@ export default {
     },
   data () {
     return {
-        rutta_url: process.env.GRIDSOME_API_URL,
+      rutta_url: process.env.GRIDSOME_API_URL,
       feedback: "",
       items:  [],
       current_monday: undefined,

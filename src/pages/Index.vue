@@ -1,13 +1,19 @@
 <template>
   <Layout>
   <div class="block">
-    <div class="container mx-auto  px-16">
-    <div class="block container px-4 bg-glitter-light rounded-lg shadow-xl my-12 py-6">
+    <div class="container px-auto">
+    <div class="block container px-4 bg-glitter-light rounded-lg shadow-xl
+      my-12 py-6">
       <p class="py-2"> Exercise </p>
       <div class="flex container">
         <div class="py-2 w-1/6 block border-r-2 last:border-r-0 text-center
           bg-gray-100" v-for="(day,index) in week">
+            <p v-if="!xs">
             {{ day.day }} 
+            </p>
+            <p v-else>
+            {{ day.day_xs }} 
+            </p>
         </div>
       </div>
 
@@ -53,13 +59,14 @@ export default {
         'fail': 'bg-red-500 border-red-500 ',
         'pass': 'stripes border-white '},
       week: [
-        {day:'Monday', style: "py-4 border-2 bg-ocean_green-dark border-ocean_green-dark"},
-        {day:'Tuesday', style: 'py-4 border-2 bg-gray-200 border-gray-200 '}, 
-        {day:'Wednesday', style: "py-4 border-2 bg-red-500 border-red-500 "},
-        {day:'Thursday', style: "py-4 border-2 bg-ocean_green-dark border-ocean_green-dark"}, 
-        {day:'Friday', style: "py-4 border-2 stripes border-gray-200"}, 
-        {day:'Saturday', style: "py-4 border-2 bg-ocean_green-dark border-ocean_green-dark"},
-        {day:'Sunday', style: "py-4 border-2 bg-ocean_green-dark border-ocean_green-dark"}],
+        {day_xs:'Mon', day:'Monday', style: "py-4 border-2 bg-ocean_green-dark border-ocean_green-dark"},
+        {day_xs:'Tue', day:'Tuesday', style: 'py-4 border-2 bg-gray-200 border-gray-200 '}, 
+        {day_xs:'Wed', day:'Wednesday', style: "py-4 border-2 bg-red-500 border-red-500 "},
+        {day_xs:'Thu', day:'Thursday', style: "py-4 border-2 bg-ocean_green-dark border-ocean_green-dark"}, 
+        {day_xs:'Fri', day:'Friday', style: "py-4 border-2 stripes border-gray-200"}, 
+        {day_xs:'Sat', day:'Saturday', style: "py-4 border-2 bg-ocean_green-dark border-ocean_green-dark"},
+        {day_xs:'Sun', day:'Sunday', style: "py-4 border-2 bg-ocean_green-dark border-ocean_green-dark"}],
+      xs: typeof window !== 'undefined' && window && window.screen.width < 960,
     } 
   },
   methods: {
@@ -78,6 +85,14 @@ export default {
         this.$router.push('/register')
       });
     }
+  },
+  mounted () {
+    window.addEventListener("resize", () => {
+      console.log("rezising");
+      if (typeof window !== 'undefined' && window) {
+        this.xs = window.screen.width < 960;
+      }
+    });
   }
 }
 </script>
