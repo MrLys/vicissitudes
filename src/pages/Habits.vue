@@ -32,9 +32,14 @@
     </div>
     <div class="flex container" v-show="hasHabits">
         <div class="py-2 w-1/6 block border-r last:border-r-0 text-center bg-gray-100" v-for="day in week">
+          <p v-if="!xs">
           {{ day.day }} 
-            <p class="text-center" v-if="day.date">
-                {{ day.date.format('YYYY-MM-DD') }} 
+          </p>
+          <p v-else>
+          {{ day.day_xs }} 
+          </p>
+            <p class="text-center" v-if="!xs">
+              {{ day.date.format('YYYY-MM-DD') }} 
           </p>
         </div>
   </div>
@@ -100,14 +105,16 @@ export default {
       habitName: "",
       hasHabits: false,
       isWeekView: true,
+      compiled: typeof window !== 'undefined' && window,
+      xs: this.compiled && window.screen.width < 960,
       week: [
-        {day:'Monday',      date: this.current_monday},
-        {day:'Tuesday',     date: dates.addDays(this.current_monday, 1)}, 
-        {day:'Wednesday',   date: dates.addDays(this.current_monday, 2)},
-        {day:'Thursday',    date: dates.addDays(this.current_monday, 3)}, 
-        {day:'Friday',      date: dates.addDays(this.current_monday, 4)}, 
-        {day:'Saturday',    date: dates.addDays(this.current_monday, 5)},
-        {day:'Sunday',      date: dates.addDays(this.current_monday, 6)}],
+        {day_xs:'Mon', day:'Monday',      date: this.current_monday},
+        {day_xs:'Tue', day:'Tuesday',     date: dates.addDays(this.current_monday, 1)}, 
+        {day_xs:'Wed', day:'Wednesday',   date: dates.addDays(this.current_monday, 2)},
+        {day_xs:'Thu', day:'Thursday',    date: dates.addDays(this.current_monday, 3)}, 
+        {day_xs:'Fri', day:'Friday',      date: dates.addDays(this.current_monday, 4)}, 
+        {day_xs:'Sat', day:'Saturday',    date: dates.addDays(this.current_monday, 5)},
+        {day_xs:'Sun', day:'Sunday',      date: dates.addDays(this.current_monday, 6)}],
       iMap: {},
       habits: [],
       grooves: {
