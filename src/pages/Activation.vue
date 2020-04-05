@@ -26,7 +26,7 @@ export default {
         this.$http
           .post(url+'/api/activate?' + param)
           .then(response => {
-            setTimeout(() => this.$router.push(url+'/login'), 3000);
+            setTimeout(() => this.$router.push('/login'), 3000);
           }).catch((error) => 
             {console.log(error.response); 
               this.loading = false;
