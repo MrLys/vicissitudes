@@ -8,12 +8,12 @@
       <div class="flex container">
         <div class="py-2 w-1/6 block border-r-2 last:border-r-0 text-center
           bg-gray-100" v-for="(day,index) in week">
-            <p v-show="!xs">
+            <div v-show="!xs">
             {{ day.day }} 
-            </p>
-            <p v-show="x">
+            </div>
+            <div v-show="xs">
             {{ day.day_xs }} 
-            </p>
+            </div>
         </div>
       </div>
 
@@ -106,7 +106,7 @@ export default {
    background: repeating-linear-gradient(
     45deg,
     transparent,
-    transparent 2px,
+    transparent 3px,
     #ccc 2px,
     #ccc 4px
   )

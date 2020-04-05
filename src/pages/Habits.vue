@@ -32,15 +32,15 @@
     </div>
     <div class="flex container" v-show="hasHabits">
         <div class="py-2 w-1/6 block border-r last:border-r-0 text-center bg-gray-100" v-for="day in week">
-          <p v-show="!xs">
+          <div v-show="!xs">
           {{ day.day }} 
-          </p>
-          <p v-show="xs">
+          </div>
+          <div v-show="xs">
           {{ day.day_xs }} 
-          </p>
-            <p class="text-center" v-show="day.date">
+          </div>
+            <div class="text-center" v-show="day.date">
               {{ day.date }} 
-          </p>
+          </div>
         </div>
   </div>
 
