@@ -43,9 +43,8 @@
           </div>
         </div>
   </div>
-
-  <div class="block container  py-2" v-for="(habit, habit_index) in habits"
-    v-show="hasHabits">  
+<!---
+  <section class="block container  py-2" v-for="(habit, habit_index) in habits" v-show="hasHabits">  
     <p class="py-2"> {{ habit.name }}</p>
     <div class="flex container">
       <div v-bind:id="habit.name+'-'+week[index].day" class="w-1/6 block border-r last:border-r-0"
@@ -54,7 +53,7 @@
         </div>
       </div>
     </div>
-    </div>
+    </section>
 
     <div class="flex container" v-show="hasHabits">
       <button id="success-button" class="bg-ocean_green-light hover:bg-ocean_green-dark  text-white font-bold py-2
@@ -70,7 +69,7 @@
               v-on:click="action('pass')">
         <icon_pass class="w-6"/>
       </button>
-  </div>
+    </div> !-->
   </Layout>
 </template>
 <script>
@@ -98,7 +97,7 @@ export default {
       rutta_url: process.env.GRIDSOME_API_URL,
       feedback: "",
       items:  [],
-      current_monday: undefined,
+      current_monday: dates.getMonday(new Date()),
       actual_monday: dates.getMonday(new Date()),
       isPreviousWeek: false,
       creating: false,
@@ -108,13 +107,13 @@ export default {
       compiled: typeof window !== 'undefined' && window,
       xs: this.compiled && window.screen.width < 960,
       week: [
-        {day_xs:'Mon', day:'Monday',      date: this.current_monday},
-        {day_xs:'Tue', day:'Tuesday',     date: dates.addDays(this.current_monday, 1)}, 
-        {day_xs:'Wed', day:'Wednesday',   date: dates.addDays(this.current_monday, 2)},
-        {day_xs:'Thu', day:'Thursday',    date: dates.addDays(this.current_monday, 3)}, 
-        {day_xs:'Fri', day:'Friday',      date: dates.addDays(this.current_monday, 4)}, 
-        {day_xs:'Sat', day:'Saturday',    date: dates.addDays(this.current_monday, 5)},
-        {day_xs:'Sun', day:'Sunday',      date: dates.addDays(this.current_monday, 6)}],
+        {day_xs:'Mon', day:'Monday',      date: dates.getMonday(new Date()).format("YYYY-MM-DD")},
+        {day_xs:'Tue', day:'Tuesday',     date: dates.addDays(dates.getMonday(new Date()), 1).format("YYYY-MM-DD")}, 
+        {day_xs:'Wed', day:'Wednesday',   date: dates.addDays(dates.getMonday(new Date()), 2).format("YYYY-MM-DD")},
+        {day_xs:'Thu', day:'Thursday',    date: dates.addDays(dates.getMonday(new Date()), 3).format("YYYY-MM-DD")}, 
+        {day_xs:'Fri', day:'Friday',      date: dates.addDays(dates.getMonday(new Date()), 4).format("YYYY-MM-DD")}, 
+        {day_xs:'Sat', day:'Saturday',    date: dates.addDays(dates.getMonday(new Date()), 5).format("YYYY-MM-DD")},
+        {day_xs:'Sun', day:'Sunday',      date: dates.addDays(dates.getMonday(new Date()), 6).format("YYYY-MM-DD")}],
       iMap: {},
       habits: [],
       grooves: {
@@ -186,9 +185,9 @@ export default {
         });
     },
     updateWeek: function () {
-        this.week[0]['date'] = this.current_monday;
+        this.week[0]['date'] = this.current_monday.format("YYYY-MM-DD");
         for (let i = 1; i < 7; i++) {
-            this.week[i]['date'] = dates.addDays(this.current_monday, i)
+            this.week[i]['date'] = dates.addDays(this.current_monday, i).format("YYYY-MM-DD");
         }
         localStorage.setItem('start_date', this.current_monday);
     },
