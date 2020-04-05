@@ -38,7 +38,7 @@
           <p v-else>
           {{ day.day_xs }} 
           </p>
-            <p class="text-center" v-if="!xs">
+            <p class="text-center" v-if="date.date && !xs">
               {{ day.date.format('YYYY-MM-DD') }} 
           </p>
         </div>
