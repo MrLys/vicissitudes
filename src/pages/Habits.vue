@@ -38,8 +38,8 @@
           <p v-else>
           {{ day.day_xs }} 
           </p>
-            <p class="text-center" v-if="day.date && !xs">
-              {{ day.date.format('YYYY-MM-DD') }} 
+            <p class="text-center" v-show="day.date">
+              {{ day.date }} 
           </p>
         </div>
   </div>
