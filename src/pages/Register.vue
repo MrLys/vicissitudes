@@ -1,11 +1,11 @@
 <template>
   <Layout class="justify-center">
-    <div v-if="finished" class="rounded my-12 px-8 py-4 bg-glitter-light border-2 border-glitter-dark mx-auto">
+    <div v-show="finished" class="rounded my-12 px-8 py-4 bg-glitter-light border-2 border-glitter-dark mx-auto">
       <p class="text-center text-xl"> {{ response_h1 }}</p> 
       <p class="text-center"> {{ response }}</p> 
     </div>
     <div class="flex container center" :class="computeBlur()"
-    v-if="!finished">
+    v-show="!finished">
       <div class="rounded px-8 py-4 bg-glitter-light border-2 border-glitter-dark">
         <p class="px-4 py-2 text-center text-violet"> Please enter your credentials below </p>
         <div class="container">
@@ -53,7 +53,7 @@
                   v-on:keyup.enter="register()">Register</button>
         </div>
         <div id="feedback" class="bg-red-100 border border-red-400 text-red-700
-        px-4 py-3 rounded relative" role="alert" v-if="!positive_feedback">
+        px-4 py-3 rounded relative" role="alert" v-show="!positive_feedback">
           <p class="block sm:inline">{{ feedback }}</p>
           <br/>
           <p class="block sm:inline">{{ feedback_suggestion }}</p>

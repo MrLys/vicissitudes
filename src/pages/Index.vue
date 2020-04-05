@@ -66,7 +66,7 @@ export default {
         {day_xs:'Fri', day:'Friday', style: "py-4 border-2 stripes border-gray-200"}, 
         {day_xs:'Sat', day:'Saturday', style: "py-4 border-2 bg-ocean_green-dark border-ocean_green-dark"},
         {day_xs:'Sun', day:'Sunday', style: "py-4 border-2 bg-ocean_green-dark border-ocean_green-dark"}],
-      xs: typeof window !== 'undefined' && window && window.screen.width < 960,
+      xs: typeof window !== 'undefined' && window && window.innerWidth < 960,
     } 
   },
   methods: {
@@ -87,10 +87,11 @@ export default {
     }
   },
   mounted () {
+    console.log("Finally mounted");
     window.addEventListener("resize", () => {
       console.log("rezising");
       if (typeof window !== 'undefined' && window) {
-        this.xs = window.screen.width < 960;
+        this.xs = window.innerWidth < 960;
       }
     });
   }

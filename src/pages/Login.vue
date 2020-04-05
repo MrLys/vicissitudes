@@ -40,7 +40,7 @@
         px-4 rounded my-2 mx-2" v-on:click="login()" v-on:keyup.enter="login()">Log in</button>
       </div>
       <div id="feedback" class="bg-red-100 border border-red-400 text-red-700
-        px-4 py-3 rounded relative" role="alert" v-if="!positive_feedback">
+        px-4 py-3 rounded relative" role="alert" v-show="!positive_feedback">
         <span class="block sm:inline">{{ feedback }}</span>
       </div>
       <p id="forgot-password" class="text-center text-xs text-violet" v-on:click="forgotPwd()">Forgot password?</p> 

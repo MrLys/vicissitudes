@@ -2,13 +2,12 @@
   <div class="container mx-auto rounded-lg shadow-xl">
     <div class="container my-4 p-6" >
       <header class="header flex-shrink-0">
-        <icon style="height:150px" v-on:click="toHome()"/>
+        <h1 style="font-size: 32px" v-on:click="toHome()"> Rutta</h1>
         <nav class="nav">
-          <g-link class="ml-2 text-violet" to="/">Home</g-link>
-          <a v-if="loggedIn" class="ml-2 cursor-pointer text-violet" id="logout" v-on:click="logout()">Logout</a>
-          <!---a v-if="loggedIn" class="ml-2 cursor-pointer text-violet"
-            id="habits" v-on:click="toHabits()">Habits</a!-->
           <g-link class="ml-2 text-violet" to="/about/">About</g-link>
+          <g-link class="ml-2 text-violet" to="/">Home</g-link>
+          <a v-show="loggedIn" class="ml-2 cursor-pointer text-violet" id="habits" v-on:click="toHabits()">Habits</a>         
+          <a v-show="loggedIn" class="ml-2 cursor-pointer text-violet" id="logout" v-on:click="logout()">Logout</a>
         </nav>
       </header>
       <slot class=""/>
@@ -29,14 +28,10 @@ query {
 }
 </static-query>
 <script>
-import icon from '~/assets/svgs/default.svg'
-/* <--g-image src="~/default.svg" alt="Rutta" width="100"/>*/
 export default {
   metaInfo: {
     title: 'Welcome!'
-  }, components: {
-     icon 
-    },
+  },
   data () {
     return {loggedIn: this.$store.getters.isLoggedIn}
   },

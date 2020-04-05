@@ -2,7 +2,7 @@
   <Layout>
   <div class="container mt-16 text-center">
     <div class="rounded px-8 py-4 bg-glitter-light border-2">
-      <p v-if="loading">Please wait while we activate your account! </p>
+      <p v-show="loading">Please wait while we activate your account! </p>
   </div>
   </div>
   </Layout>
@@ -26,7 +26,7 @@ export default {
         this.$http
           .post('/api/activate?' + param)
           .then(response => {
-            this.$router.push(url+'/login');
+            setTimeout(() => this.$router.push(url+'/login'), 3000);
           }).catch((error) => {console.log(error.response); this.loading = false;});
       } else {
         this.loading = false;
