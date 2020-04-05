@@ -12,10 +12,8 @@
 export default {
   data () {
     return {
-      feedback: "",
-      positive_feedback: true,
       loading: true,
-      error: false;
+      error: false,
     }
   },
   methods: {
