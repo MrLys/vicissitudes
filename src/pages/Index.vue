@@ -8,10 +8,10 @@
       <div class="flex container">
         <div class="py-2 w-1/6 block border-r-2 last:border-r-0 text-center
           bg-gray-100" v-for="(day,index) in week">
-            <div v-show="!xs">
+            <div v-show="xl">
             {{ day.day }} 
             </div>
-            <div v-show="xs">
+            <div v-show="!xl">
             {{ day.day_xs }} 
             </div>
         </div>
@@ -66,7 +66,7 @@ export default {
         {day_xs:'Fri', day:'Friday', style: "py-4 border-2 stripes border-gray-200"}, 
         {day_xs:'Sat', day:'Saturday', style: "py-4 border-2 bg-ocean_green-dark border-ocean_green-dark"},
         {day_xs:'Sun', day:'Sunday', style: "py-4 border-2 bg-ocean_green-dark border-ocean_green-dark"}],
-      xs: typeof window !== 'undefined' && window && window.innerWidth < 960,
+        xl: typeof window !== 'undefined' && window && window.innerWidth >= 960,
     } 
   },
   methods: {
@@ -91,7 +91,7 @@ export default {
     window.addEventListener("resize", () => {
       console.log("rezising");
       if (typeof window !== 'undefined' && window) {
-        this.xs = window.innerWidth < 960;
+        this.xl = window.innerWidth >= 960;
       }
     });
   }

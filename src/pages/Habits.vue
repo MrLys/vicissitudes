@@ -32,10 +32,10 @@
     </div>
     <div class="flex container" v-show="hasHabits">
         <div class="py-2 w-1/6 block border-r last:border-r-0 text-center bg-gray-100" v-for="day in week">
-          <div v-show="!xs">
+          <div v-show="xl">
           {{ day.day }} 
           </div>
-          <div v-show="xs">
+          <div v-show="!xl">
           {{ day.day_xs }} 
           </div>
             <div class="text-center" v-show="day.date">
@@ -104,15 +104,16 @@ export default {
       hasHabits: false,
       isWeekView: true,
       compiled: typeof window !== 'undefined' && window,
-      xs: this.compiled && window.innerWidth < 960,
+      xl: this.compiled && window.innerWidth >= 960,
       week: [
-        {day_xs:'Mon', day:'Monday',      date: dates.getMonday(new Date()).format("YYYY-MM-DD")},
-        {day_xs:'Tue', day:'Tuesday',     date: dates.addDays(dates.getMonday(new Date()), 1).format("YYYY-MM-DD")}, 
-        {day_xs:'Wed', day:'Wednesday',   date: dates.addDays(dates.getMonday(new Date()), 2).format("YYYY-MM-DD")},
-        {day_xs:'Thu', day:'Thursday',    date: dates.addDays(dates.getMonday(new Date()), 3).format("YYYY-MM-DD")}, 
-        {day_xs:'Fri', day:'Friday',      date: dates.addDays(dates.getMonday(new Date()), 4).format("YYYY-MM-DD")}, 
-        {day_xs:'Sat', day:'Saturday',    date: dates.addDays(dates.getMonday(new Date()), 5).format("YYYY-MM-DD")},
-        {day_xs:'Sun', day:'Sunday',      date: dates.addDays(dates.getMonday(new Date()), 6).format("YYYY-MM-DD")}],
+        {day_xs:'Mon', day:'Monday',      date: dates.getMonday(new
+          Date()).format("Do")},
+        {day_xs:'Tue', day:'Tuesday',     date: dates.addDays(dates.getMonday(new Date()), 1).format("Do")}, 
+        {day_xs:'Wed', day:'Wednesday',   date: dates.addDays(dates.getMonday(new Date()), 2).format("Do")},
+        {day_xs:'Thu', day:'Thursday',    date: dates.addDays(dates.getMonday(new Date()), 3).format("Do")}, 
+        {day_xs:'Fri', day:'Friday',      date: dates.addDays(dates.getMonday(new Date()), 4).format("Do")}, 
+        {day_xs:'Sat', day:'Saturday',    date: dates.addDays(dates.getMonday(new Date()), 5).format("Do")},
+        {day_xs:'Sun', day:'Sunday',      date: dates.addDays(dates.getMonday(new Date()), 6).format("Do")}],
       iMap: {},
       habits: [],
       grooves: {
@@ -138,7 +139,7 @@ export default {
     window.addEventListener("resize", () => {
       console.log("rezising");
       if (typeof window !== 'undefined' && window) {
-        this.xs = window.innerWidth < 960;
+        this.xl = window.innerWidth < 960;
       }
     });
     const start_date = localStorage.getItem('start_date');
@@ -190,9 +191,9 @@ export default {
         });
     },
     updateWeek: function () {
-        this.week[0]['date'] = this.current_monday.format("YYYY-MM-DD");
+        this.week[0]['date'] = this.current_monday.format("Do");
         for (let i = 1; i < 7; i++) {
-            this.week[i]['date'] = dates.addDays(this.current_monday, i).format("YYYY-MM-DD");
+            this.week[i]['date'] = dates.addDays(this.current_monday, i).format("Do");
         }
         localStorage.setItem('start_date', this.current_monday);
     },
