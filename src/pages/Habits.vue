@@ -105,7 +105,7 @@ export default {
       hasHabits: false,
       isWeekView: true,
       compiled: typeof window !== 'undefined' && window,
-      xs: this.compiled && window.screen.width < 960,
+      xs: this.compiled && window.innerWidth < 960,
       week: [
         {day_xs:'Mon', day:'Monday',      date: dates.getMonday(new Date()).format("YYYY-MM-DD")},
         {day_xs:'Tue', day:'Tuesday',     date: dates.addDays(dates.getMonday(new Date()), 1).format("YYYY-MM-DD")}, 
@@ -136,6 +136,12 @@ export default {
     }
   },
   mounted () {
+    window.addEventListener("resize", () => {
+      console.log("rezising");
+      if (typeof window !== 'undefined' && window) {
+        this.xs = window.innerWidth < 960;
+      }
+    });
     const start_date = localStorage.getItem('start_date');
     if (start_date) {
         console.log("Found current date in localStorage");
