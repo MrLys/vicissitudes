@@ -7,6 +7,7 @@ import Vuex from 'vuex';
 import moment from 'moment';
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
+import state from '~/lib/state.js';
 
 function getItem(key) {
     if (typeof window !== 'undefined' && window) {
@@ -25,13 +26,13 @@ function removeItem(key) {
     }
 }
 function beforeRouting(to, from, next) {
-    if (typeof window !== 'undefined' && window) {
+    if (!to.hash && typeof document !== "undefined") {
             NProgress.start()
-            next()
     }
+    next();
 }
 function afterRouting(to, from) {
-    if (typeof window !== 'undefined' && window) {
+     if (!to.hash && typeof document !== "undefined") {
             NProgress.done()
     }
 }
@@ -53,7 +54,7 @@ export default function (Vue, { router, head, isClient, appOptions}) {
     if (token) {
       Vue.prototype.$http.defaults.headers.common['Authorization'] = 'Bearer ' + token
     }
-    //configureNProgress(router);
+    configureNProgress(router);
     appOptions.store = new Vuex.Store({
         state: {
             status: '',
@@ -73,7 +74,7 @@ export default function (Vue, { router, head, isClient, appOptions}) {
                 state.status = 'error'
             },
             forgot_password(state) {
-              state.token = ''
+              state.token = '';
               state.status = "loading";
             },
           awaiting_recovery_link(state) {
