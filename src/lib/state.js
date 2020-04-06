@@ -1,4 +1,5 @@
 import dates from './dates.js';
+import moment from 'moment';
 
 const nextWeek = 'nextWeek';
 const previousWeek = 'previousWeek';
@@ -6,6 +7,7 @@ const currentWeek = 'currentWeek';
 const currentMonday = 'currentMonday';
 const actualMonday = 'actualMonday';
 const view = 'weekView';
+
 function getItem(key) {
     if (typeof window !== 'undefined' && window) {
         return window.localStorage.getItem(key);
@@ -40,40 +42,75 @@ let state = {
         return loggedIn;
     },
     getHabits: function () {
-        return JSON.parse(localStorage.getItem('habits'));
+      if (typeof window !== 'undefined' && window) {
+        return JSON.parse(getItem('habits'));
+      }
     },
     setHabits: function (habits) {
         setItem('habits', JSON.stringify(habits));
     },
     getGrooves: function (habit) {
-        return JSON.parse(localStorage.getItem(habit));
+      if (typeof window !== 'undefined' && window) {
+        return JSON.parse(getItem(habit));
+      }
     },
     setGrooves: function (habit, grooves) {
        setItem(habit, JSON.stringify(grooves));
     },
-    getWeek: function (which) {
-        if (which > 0) return getItem(nextWeek) || [];
-        else if (which < 0) return getItem(previousWeek) || [];
-        else  return getItem(currentWeek) || [];
+    getDefaultWeek: function (monday) {
+      let week = [{day_xs:'Mon', day:'Monday', date: monday.format("Do")},
+        {day_xs:'Tue', day:'Tuesday',     date: dates.addDays(monday, 1).format("Do")}, 
+        {day_xs:'Wed', day:'Wednesday',   date: dates.addDays(monday, 2).format("Do")},
+        {day_xs:'Thu', day:'Thursday',    date: dates.addDays(monday, 3).format("Do")}, 
+        {day_xs:'Fri', day:'Friday',      date: dates.addDays(monday, 4).format("Do")}, 
+        {day_xs:'Sat', day:'Saturday',    date: dates.addDays(monday, 5).format("Do")},
+        {day_xs:'Sun', day:'Sunday',      date: dates.addDays(monday, 6).format("Do")}];
+      return week;
     },
-    setWeek: function (week, which) {
-        if (which > 0 ) setItem(nextWeek, JSON.stringify(week));
-        else if (which < 0 ) setItem(previousWeek, JSON.stringify(week));
-        else setItem(currentWeek, JSON.stringify(week));
+    getCurrentWeek: function () {
+      if (typeof window !== 'undefined' && window) {
+        return JSON.parse(getItem(getItem(currentWeek) || '')) || this.getDefaultWeek(this.getCurrentMonday());
+      }
+    },
+    setCurrentWeek: function () {
+      let week = this.getDefaultWeek(this.getCurrentMonday());
+      const currentMon = moment(this.getCurrentMonday());
+      const weekYearNum = 'week' + currentMon.year() + currentMon.week();
+      setItem(currentWeek, weekYearNum);
+      setItem(weekYearNum, JSON.stringify(week));
+    },
+    getNextWeek: function () {
+      return getItem(getItem(nextWeek) || '') || [];
+    },
+    setNextWeek: function (week){
+      const currentMon = moment(this.getCurrentMonday()).add(7, 'd');
+      const weekYearNum = 'week' + currentMon.year() + currentMon.week();
+      setItem(nextWeek, weekYearNum);
+      setItem(weekYearNum, JSON.stringify(week));
+    },
+    getPreviousWeek: function () {
+      return getItem(getItem(previousWeek) || '') || [];
+    },
+    setPreviousWeek: function () {
+      let week = this.getDefaultWeek(this.getCurrentMonday());
+      const currentMon = moment(this.getCurrentMonday()).subtract(7, 'd');
+      const weekYearNum = 'week' + currentMon.year() + currentMon.week();
+      setItem(previousWeek, weekYearNum);
+      setItem(weekYearNum, JSON.stringify(week));
     },
     getActualMonday: function () {
-        const date = getItem(actualMonday) || dates.getMonday(new Date());
+        const date = getItem(actualMonday) || dates.getMonday(new Date().toISOString()).toISOString();
         setItem(actualMonday, date);
-        return date;
+        return moment(date);
     },
     getCurrentMonday: function () {
-        return getItem(currentMonday) || this.getActualMonday();
+        return moment(getItem(currentMonday) || this.getActualMonday());
     },
     setCurrentMonday: function (date) {
-        setItem(currentMonday, date || this.getActualMonday);
+        setItem(currentMonday, date.toISOString() || this.getActualMonday());
     },
     isWeekView: function () {
-        return getItem(view) === 'true';
+        return getItem(view) !== 'false';
     },
     setView: function (isWeek) {
         setItem(view, isWeek === 'true');
@@ -82,3 +119,5 @@ let state = {
         return this.hasHabits !== '';
     },
 }
+
+export {state as default};

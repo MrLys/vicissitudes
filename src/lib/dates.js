@@ -7,12 +7,14 @@ var dates = {
         return _d1.isSame(_d2, 'year') && _d1.isSame(_d2, 'month') && _d1.date() == _d2.date();
     },
     addDays: function (monday, days) {
-        var date = moment(monday).utc();
+        let date = moment(monday).utc();
         date.add(days, 'day');
         return date.utc();
     },
     getMonday: function (d) {
+        console.log(d);
         d = moment(d);//.utc();
+        console.log(d);
         if (d.day() == 0) {// sunday
             d = this.addDays(d, -1);
         }

@@ -11,7 +11,7 @@
           <icon_next class="w-5" />
         </button>
       </div>
-      <p id="no-habits" class="h1 text-center" v-show="!hasHabits"> You don't track any habits yet! Click the
+      <p id="no-habits" class="h2 text-center" v-show="!hasHabits"> You don't track any habits yet! Click the
       button below to create your very first habit 🎉 </p>
       <button id="add-habit" class="bg-max_blue-light hover:bg-max_blue-dark text-white font-bold py-2
       px-4 rounded my-2 mx-2 mx-auto" v-on:click="newHabit()">
@@ -31,7 +31,7 @@
         </div>
     </div>
     <div class="flex container" v-show="hasHabits">
-        <div class="py-2 w-1/6 block border-r last:border-r-0 text-center bg-gray-100" v-for="day in week">
+        <div class="py-2 w-1/6 block border-r last:border-r-0 text-center bg-gray-100" v-for="day in getWeek()">
           <div v-show="xl">
           {{ day.day }} 
           </div>
@@ -43,12 +43,12 @@
           </div>
         </div>
   </div>
-  <section class="block container  py-2" v-for="(habit, habit_index) in habits" v-show="hasHabits">  
+  <section class="block container  py-2" v-for="(habit, habit_index) in getHabits()" v-show="hasHabits">  
     <p class="py-2"> {{ habit.name }}</p>
     <div class="flex container">
-      <div v-bind:id="habit.name+'-'+week[index].day" class="w-1/6 block border-r last:border-r-0"
+      <div v-bind:id="habit.name+'-'+getWeek()[index].day" class="w-1/6 block border-r last:border-r-0"
         v-for="(item, index) in items[habit_index]">
-        <div v-bind:id="habit.name+'-'+week[index].day+'-groove'" v-on:click="select(item)" :class="computedClass(item)">
+        <div v-bind:id="habit.name+'-'+getWeek()[index].day+'-groove'" v-on:click="select(item)" :class="computedClass(item)">
         </div>
       </div>
     </div>
@@ -73,6 +73,7 @@
 </template>
 <script>
 import dates from '../lib/dates.js';
+import state from '../lib/state.js';
 import icon_success from '~/assets/svgs/success.svg'
 import icon_fail from '~/assets/svgs/error.svg'
 import icon_pass from '~/assets/svgs/minus.svg'
@@ -96,26 +97,15 @@ export default {
       rutta_url: process.env.GRIDSOME_API_URL,
       feedback: "",
       items:  [],
-      current_monday: dates.getMonday(new Date()),
-      actual_monday: dates.getMonday(new Date()),
+      current_monday: state.getCurrentMonday(), //dates.getMonday(new Date()),
+      actual_monday: state.getActualMonday(),//dates.getMonday(new Date()),
       isPreviousWeek: false,
       creating: false,
       habitName: "",
-      hasHabits: false,
-      isWeekView: true,
+      hasHabits: state.hasHabits(),
       compiled: typeof window !== 'undefined' && window,
       xl: this.compiled && window.innerWidth >= 960,
-      week: [
-        {day_xs:'Mon', day:'Monday',      date: dates.getMonday(new
-          Date()).format("Do")},
-        {day_xs:'Tue', day:'Tuesday',     date: dates.addDays(dates.getMonday(new Date()), 1).format("Do")}, 
-        {day_xs:'Wed', day:'Wednesday',   date: dates.addDays(dates.getMonday(new Date()), 2).format("Do")},
-        {day_xs:'Thu', day:'Thursday',    date: dates.addDays(dates.getMonday(new Date()), 3).format("Do")}, 
-        {day_xs:'Fri', day:'Friday',      date: dates.addDays(dates.getMonday(new Date()), 4).format("Do")}, 
-        {day_xs:'Sat', day:'Saturday',    date: dates.addDays(dates.getMonday(new Date()), 5).format("Do")},
-        {day_xs:'Sun', day:'Sunday',      date: dates.addDays(dates.getMonday(new Date()), 6).format("Do")}],
       iMap: {},
-      habits: [],
       grooves: {
         'default': 'py-4 border-2 ',
         'none': 'bg-gray-200 cursor-pointer ',
@@ -142,21 +132,14 @@ export default {
         this.xl = window.innerWidth >= 960;
       }
     });
-    const start_date = localStorage.getItem('start_date');
-    if (start_date) {
-        console.log("Found current date in localStorage");
-        this.current_monday = this.$moment(start_date);
-    } else {
-        this.current_monday = dates.getMonday(new Date()); 
-    }
     this.setIsPreviousWeek();
     this.updateWeek();
-    this.getHabits();
+    this.fetchHabits();
   },
   methods: {
-    getHabits: function() {
-      let startDate = this.current_monday.utc().format('YYYY-MM-DD');
-      let endDate = dates.addDays(this.current_monday, 6).utc().format('YYYY-MM-DD');
+    fetchHabits: function() {
+      let startDate = state.getCurrentMonday().utc().format('YYYY-MM-DD');
+      let endDate = dates.addDays(state.getCurrentMonday(), 6).utc().format('YYYY-MM-DD');
       let url = this.rutta_url + '/api/habits?start_date=' + startDate + '&end_date=' + endDate;
       this.$http.get(url)
         .then(response => {
@@ -164,13 +147,17 @@ export default {
         }).catch((error) => {
           console.log("An error has occured!");
           console.log(error);
-          this.hasHabits = false;
           this.iMap = {};
-          this.habits = [];
           this.feedback = handler.handleError(error, "");
           this.positive_feedback = false;
           console.log(error.response);
         });
+    },
+    getHabits: function() {
+      return state.getHabits();
+    },
+    getWeek: function() {
+      return state.getCurrentWeek();
     },
     newHabit: function() {
       this.creating = true;
@@ -191,30 +178,51 @@ export default {
         });
     },
     updateWeek: function () {
-        this.week[0]['date'] = this.current_monday.format("Do");
-        for (let i = 1; i < 7; i++) {
-            this.week[i]['date'] = dates.addDays(this.current_monday, i).format("Do");
-        }
-        localStorage.setItem('start_date', this.current_monday);
+        //let  
+        //this.week[0]['date'] = state.getCurrentMonday().format("Do");
+        //for (let i = 1; i < 7; i++) {
+        //    this.week[i]['date'] = dates.addDays(state.getCurrentMonday(), i).format("Do");
+        //}
+        //state.setCurrentWeek();
     },
     setIsPreviousWeek: function() {
-      this.isPreviousWeek = dates.isAfter(this.actual_monday, this.current_monday) || !dates.sameDate(this.actual_monday,
-          this.current_monday);
+      this.isPreviousWeek = dates.isAfter(state.getActualMonday(), state.getCurrentMonday()) || !dates.sameDate(state.getActualMonday(),
+          state.getCurrentMonday());
     },
     previousWeek: function () {
-      this.current_monday = dates.addDays(this.current_monday, -7);
+      state.setNextWeek(state.getCurrentWeek());
+      let previous = state.getPreviousWeek()
+      if (previous.length > 0) {
+        state.setCurrentWeek(previous);
+        state.setCurrentMonday(dates.addDays(state.getCurrentMonday(), -7));
+      } else {
+        state.setCurrentWeek(state.getDefaultWeek(dates.addDays(state.getCurrentMonday(), -7)));
+        state.setCurrentMonday(dates.addDays(state.getCurrentMonday(), -7));
+        state.setPreviousWeek(dates.addDays(state.getCurrentMonday(), -7));
+      }
       this.setIsPreviousWeek();
-      this.updateWeek();
-      this.getHabits();
+      this.fetchHabits();
     },
     nextWeek: function () {
-      this.current_monday = dates.addDays(this.current_monday, 7);
+      if (dates.sameDate(state.getCurrentMonday(), state.getActualMonday())) {
+        this.isPreviousWeek = false;
+        return;
+      }
+      state.setPreviousWeek(state.getCurrentWeek());
+      let next = state.getPreviousWeek();
+      if ( next.length > 0) {
+        state.setCurrentWeek(next);
+        state.setCurrentMonday(dates.addDays(state.getCurrentMonday(), 7));
+      } else {
+        state.setCurrentWeek(state.gerDefaultWeek(dates.addDays(state.getCurrentMonday(), 7)));
+        state.setCurrentMonday(dates.addDays(state.getCurrentMonday(), 7));
+        state.setNextWeek(dates.addDays(state.getCurrentMonday(), 7));
+      }
       this.setIsPreviousWeek();
-      this.updateWeek();
-      this.getHabits();
+      this.fetchHabits();
     },
     generateWeek: function (user_habit_id) {
-      let monday = this.current_monday;
+      let monday = state.getCurrentMonday();
       return [{day:'Monday', date: monday, clicked:false, groove: 'none',
         habit: user_habit_id}, 
       {day:'Tuesday', date: dates.addDays(monday, 1), clicked:false, groove:
@@ -243,15 +251,15 @@ export default {
         habits[keys[i]].name = this.capitalizeFirstLetter(habits[keys[i]].name);
         habit_array[i] = habits[keys[i]];
       }
-      this.habits = habit_array;
-      this.hasHabits = Object.keys(habits).length > 0;
+      state.setHabits(habit_array);
+      this.hasHabits = state.hasHabits();
       console.log(this.hasHabits);
       this.mapHabits(habits);
     },
     mapper: function (data) {
       let items = data.data;
       console.log(items);
-      if (this.isWeekView) {
+      if (state.isWeekView()) {
         this.mapHabitsResp(items);
         let keys = Object.keys(items); 
         for(let i = 0; i < keys.length; i++){
