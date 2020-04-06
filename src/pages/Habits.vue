@@ -139,7 +139,7 @@ export default {
     window.addEventListener("resize", () => {
       console.log("rezising");
       if (typeof window !== 'undefined' && window) {
-        this.xl = window.innerWidth < 960;
+        this.xl = window.innerWidth >= 960;
       }
     });
     const start_date = localStorage.getItem('start_date');
