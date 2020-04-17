@@ -44,7 +44,10 @@
         </div>
   </div>
   <section class="block container  py-2" v-for="(habit, habit_index) in habits" v-show="hasHabits">  
-    <p class="py-2"> {{ habit.name }}</p>
+    <span style="display:flex; justify-content: space-between">
+    <span class="py-2"> {{ habit.name }} </span>
+    <span class="mx-3" v-show="habit.current_streak>1">{{ habit.current_streak }}🔥</span>
+    </span>
     <div class="flex container">
       <div v-bind:id="habit.name+'-'+week[index].day" class="w-1/6 block border-r last:border-r-0"
         v-for="(item, index) in items[habit_index]">
