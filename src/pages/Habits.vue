@@ -43,15 +43,17 @@
           </div>
         </div>
   </div>
-  <section class="block container  py-2" v-for="(habit, habit_index) in habits" v-show="hasHabits">  
+  <section class="block container  py-2" v-for="habit in habits" v-show="hasHabits">  
     <span style="display:flex; justify-content: space-between">
     <span class="py-2"> {{ habit.name }} </span>
     <span class="mx-3" v-show="habit.current_streak>1">{{ habit.current_streak }}🔥</span>
     </span>
     <div class="flex container">
       <div v-bind:id="habit.name+'-'+week[index].day" class="w-1/6 block border-r last:border-r-0"
-        v-for="(item, index) in items[habit_index]">
-        <div v-bind:id="habit.name+'-'+week[index].day+'-groove'" v-on:click="select(item)" :class="computedClass(item)">
+        v-for="(item, index) in items[habit.name]">
+        <div v-bind:id="habit.name+'-'+week[index].day+'-groove'"
+             v-on:click="select(item)"
+             :class="computedClass(item)" :key="item.id">
         </div>
       </div>
     </div>
@@ -99,6 +101,7 @@ export default {
       rutta_url: process.env.GRIDSOME_API_URL,
       feedback: "",
       items:  [],
+      current_date: new Date(),
       current_monday: dates.getMonday(new Date()),
       actual_monday: dates.getMonday(new Date()),
       isPreviousWeek: false,
@@ -140,14 +143,14 @@ export default {
   },
   mounted () {
     window.addEventListener("resize", () => {
-      console.log("rezising");
+      //console.log("rezising");
       if (typeof window !== 'undefined' && window) {
         this.xl = window.innerWidth >= 960;
       }
     });
     const start_date = localStorage.getItem('start_date');
     if (start_date) {
-        console.log("Found current date in localStorage");
+        //console.log("Found current date in localStorage");
         this.current_monday = this.$moment(start_date);
     } else {
         this.current_monday = dates.getMonday(new Date()); 
@@ -216,70 +219,54 @@ export default {
       this.updateWeek();
       this.getHabits();
     },
-    generateWeek: function (user_habit_id) {
+    generateWeek: function (habit, id) {
       let monday = this.current_monday;
-      return [{day:'Monday', date: monday, clicked:false, groove: 'none',
-        habit: user_habit_id}, 
-      {day:'Tuesday', date: dates.addDays(monday, 1), clicked:false, groove:
-        'none', habit: user_habit_id}, 
-      {day:'Wednesday', date: dates.addDays(monday, 2), clicked:false, groove: 'none', habit: user_habit_id},
-      {day:'Thursday', date: dates.addDays(monday, 3), clicked:false, groove: 'none', habit: user_habit_id}, 
-      {day:'Friday', date: dates.addDays(monday, 4), clicked:false, groove: 'none', habit: user_habit_id}, 
-      {day:'Saturday',date: dates.addDays(monday, 5), clicked:false, groove: 'none', habit: user_habit_id},
-      {day:'Sunday',date: dates.addDays(monday, 6), clicked:false, groove: 'none', habit: user_habit_id}];
+      return [
+        {day:'Monday', date: monday, clicked:false, groove: 'none', habit: habit, user_habit_id: id, id: 0}, 
+        {day:'Tuesday', date: dates.addDays(monday, 1), clicked:false, groove: 'none', habit: habit, user_habit_id: id   ,id:0}, 
+        {day:'Wednesday', date: dates.addDays(monday, 2), clicked:false, groove: 'none', habit: habit, user_habit_id: id ,id:0},
+        {day:'Thursday', date: dates.addDays(monday, 3), clicked:false, groove: 'none', habit: habit, user_habit_id: id  ,id:0}, 
+        {day:'Friday', date: dates.addDays(monday, 4), clicked:false, groove: 'none', habit: habit, user_habit_id: id    ,id:0}, 
+        {day:'Saturday',date: dates.addDays(monday, 5), clicked:false, groove: 'none', habit: habit, user_habit_id: id  , id:0},
+        {day:'Sunday',date: dates.addDays(monday, 6), clicked:false, groove: 'none', habit: habit, user_habit_id: id     ,id:0}];
     },
-    mapHabits: function (habits) {
-      let items = [];
-      let i = 0;
-      let keys = Object.keys(habits);
-      for (let i = 0; i < keys.length; i++) {
-        items.push(this.generateWeek(habits[keys[i]].id));
-        this.iMap[habits[keys[i]].id] = i;
+    updateHabit(habit) {
+      //console.log(habit);
+      for(let i = 0; i < habit.grooves.length; i++) {
+        let current_date = this.$moment(habit.grooves[i].date);
+        for(let j = 0; j < this.items[habit.name].length; j++) {
+          if(dates.sameDate(this.items[habit.name][j].date, current_date)) {
+            this.items[habit.name][j].groove = habit.grooves[i].state || 'none';
+            break;
+          }
+        }
       }
-      this.items = items;
-    },
-    mapHabitsResp: function (resp) {
-      let habits = resp;
-      let keys = Object.keys(habits);
-      let habit_array = []
-      for(let i = 0; i < keys.length; i++) {
-        habits[keys[i]].name = this.capitalizeFirstLetter(habits[keys[i]].name);
-        habit_array[i] = habits[keys[i]];
-      }
-      this.habits = habit_array;
-      this.hasHabits = Object.keys(habits).length > 0;
-      console.log(this.hasHabits);
-      this.mapHabits(habits);
+      this.habits[habit.name].current_streak = habit.current_streak;
     },
     mapper: function (data) {
       let items = data.data;
-      console.log(items);
+      //console.log(items);
       if (this.isWeekView) {
-        this.mapHabitsResp(items);
-        let keys = Object.keys(items); 
-        for(let i = 0; i < keys.length; i++){
-            for(let m = 0; m < items[keys[i]].grooves.length; m++) {
-                let current_date =
-                items[keys[i]].grooves[m].date = this.$moment(items[keys[i]].grooves[m].date);
-                let n = items[keys[i]].id;
-                let k = this.iMap[n];
-                for(let j = 0; j < this.items[k].length; j++) {
-                    if(dates.sameDate(this.items[k][j].date, current_date)){
-                        this.items[k][j].groove = items[keys[i]].grooves[m].state;
-                        break;
-                    }
-                }
-            }
+        this.habitsNames = Object.keys(items);
+        this.habits = items;
+        this.hasHabits = Object.keys(items).length > 0;
+        for(let i = 0;i < this.habitsNames.length; i++) {
+          this.items[this.habitsNames[i]] = this.generateWeek(this.habitsNames[i], items[this.habitsNames[i]].id);
+          this.updateHabit(items[this.habitsNames[i]]);
         }
       }
+      //console.log(this.items);
     },
     select: function (item) {
-        if (dates.isAfter(item.date, new Date())) {
-            console.log("User clicked a future groove.");
-            return;
-        } else {
-            item.clicked = !item.clicked;
-        }
+      //console.log(this.items);
+      if (dates.isAfter(item.date, new Date())) {
+        console.log("User clicked a future groove.");
+        return;
+      } else {
+        item.clicked = !item.clicked;
+      }
+      item.id += 1;
+      this.$forceUpdate();
     },
     computedClass: function(item) {
         let ret = this.grooves['default'];
@@ -294,29 +281,36 @@ export default {
       } else {
         ret += this.grooveBorders[item.groove];
       }
-      console.log(ret);
       return ret;
     },
     updateGroove: function(groove) {
+      //console.log(groove);
       this.$http.patch(this.rutta_url + '/api/groove', 
           {owner_id: parseInt(localStorage.getItem('user_id')), 
             state: groove.groove, 
-            user_habit_id: parseInt(groove.habit),
-            date: groove.date.utc().format("YYYY-MM-DD")}).then((response) => {
-              console.log(response)
-            }).catch((error) => {console.log(error.response)});
+            user_habit_id: parseInt(groove.user_habit_id),
+            date: groove.date.utc().format("YYYY-MM-DD")}).then((_) => {
+              let startDate = this.current_monday.utc().format('YYYY-MM-DD');
+              let endDate = dates.addDays(this.current_monday, 6).utc().format('YYYY-MM-DD');
+              return this.$http.get(this.rutta_url + '/api/habit/' +
+                groove['user_habit_id']+'?start_date=' +startDate
+                +'&end_date='+endDate);}).then((response) => {
+                  //console.log(response);
+                  this.items[response.data.name] = this.generateWeek(response.data.name, response.data.id);
+                  this.updateHabit(response.data);
+                }).then((_) => this.$forceUpdate()).catch(error => {console.log(error.response)});
     },
     capitalizeFirstLetter: function (string) {
       return string.charAt(0).toUpperCase() + string.slice(1);
     },
     action: function (groove) {
-      console.log(this.items[0][0] + " " + groove);
-      for(let i = 0; i < this.items.length; i++) {
-        for(let j = 0; j < this.items[i].length; j++) {
-          if (this.items[i][j].clicked) {
-            this.items[i][j].groove = groove;
-            this.items[i][j].clicked = false;
-            this.updateGroove(this.items[i][j]);
+      let items = Object.keys(this.items);
+      for(let i = 0; i < items.length; i++) {
+        for(let j = 0; j < this.items[items[i]].length; j++) {
+          if (this.items[items[i]][j].clicked) {
+            this.items[items[i]][j].groove = groove;
+            this.items[items[i]][j].clicked = false;
+            this.updateGroove(this.items[items[i]][j]);
           }
         }
       }
