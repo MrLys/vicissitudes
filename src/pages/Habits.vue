@@ -310,6 +310,7 @@ export default {
           if (this.items[items[i]][j].clicked) {
             this.items[items[i]][j].groove = groove;
             this.items[items[i]][j].clicked = false;
+            this.$forceUpdate();
             this.updateGroove(this.items[items[i]][j]);
           }
         }
