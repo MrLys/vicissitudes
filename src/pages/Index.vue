@@ -4,7 +4,10 @@
     <div class="container px-auto">
     <div class="block container px-4 bg-glitter-light rounded-lg shadow-xl
       my-12 py-6">
-      <p class="py-2"> Exercise </p>
+    <span style="display:flex; justify-content: space-between">
+    <span class="py-2"> Exercise </span>
+    <span class="mx-3">3🔥</span>
+    </span>
       <div class="flex container">
         <div class="py-2 w-1/6 block border-r-2 last:border-r-0 text-center
           bg-gray-100" v-for="(day,index) in week">
@@ -60,10 +63,10 @@ export default {
         'pass': 'stripes border-white '},
       week: [
         {day_xs:'Mon', day:'Monday', style: "py-4 border-2 bg-ocean_green-dark border-ocean_green-dark"},
-        {day_xs:'Tue', day:'Tuesday', style: 'py-4 border-2 bg-gray-200 border-gray-200 '}, 
-        {day_xs:'Wed', day:'Wednesday', style: "py-4 border-2 bg-red-500 border-red-500 "},
-        {day_xs:'Thu', day:'Thursday', style: "py-4 border-2 bg-ocean_green-dark border-ocean_green-dark"}, 
-        {day_xs:'Fri', day:'Friday', style: "py-4 border-2 stripes border-gray-200"}, 
+        {day_xs:'Tue', day:'Tuesday', style: "py-4 border-2 stripes border-gray-200"}, 
+        {day_xs:'Wed', day:'Wednesday', style: "py-4 border-2 bg-gray-200 border-gray-200 "},
+        {day_xs:'Thu', day:'Thursday', style: "py-4 border-2 bg-red-500 border-red-500 "}, 
+        {day_xs:'Fri', day:'Friday', style: "py-4 border-2 bg-ocean_green-dark border-ocean_green-dark"}, 
         {day_xs:'Sat', day:'Saturday', style: "py-4 border-2 bg-ocean_green-dark border-ocean_green-dark"},
         {day_xs:'Sun', day:'Sunday', style: "py-4 border-2 bg-ocean_green-dark border-ocean_green-dark"}],
         xl: typeof window !== 'undefined' && window && window.innerWidth >= 960,
