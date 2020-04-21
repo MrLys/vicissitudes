@@ -45,7 +45,7 @@
   </div>
   <section class="block container  py-2" v-for="habit in habits" v-show="hasHabits">  
     <span style="display:flex; justify-content: space-between">
-    <span class="py-2"> {{ habit.name }} </span>
+    <span class="py-2"> {{ capitalizeFirstLetter(habit.name) }} </span>
     <span class="mx-3" v-show="habit.current_streak>1">{{ habit.current_streak }}🔥</span>
     </span>
     <div class="flex container">
