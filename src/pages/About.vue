@@ -1,14 +1,20 @@
 <template>
   <Layout>
-    <h1>About us</h1>
-    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Error doloremque omnis animi, eligendi magni a voluptatum, vitae, consequuntur rerum illum odit fugit assumenda rem dolores inventore iste reprehenderit maxime! Iusto.</p>
+    Rutta is a work in progress SPA I made mainly for educational purposes.
+    It is a free and extremely simple habit tracker. The frontend is made in Gridsome and the backend in Clojure. 
+    It's open source, so feel free to create PRs if there is any features
+    you're missing. The frontend can be found <a
+    href="https://www.github.com/mrlys/vicissitudes.git">here</a> and the
+    backend <a
+    href="https://www.github.com/mrlys/groove-api.git">here</a>. It will
+    probably me merged back into a monorepo soon.
   </Layout>
 </template>
 
 <script>
 export default {
   metaInfo: {
-    title: 'About us'
+    title: 'About Rutta'
   }
 }
 </script>
