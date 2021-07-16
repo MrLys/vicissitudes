@@ -4,7 +4,9 @@
   "scripts": {
     "grdsm:run": "gridsome develop",
     "cy:verify": "cypress verify",
-    "e2e:record": "cypress run --record"
+    "e2e:record": "cypress run --record",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "dependencies": {
     "axios": "^0.19.0",
@@ -14,7 +16,8 @@
     "serialize-javascript": ">=2.1.1",
     "tailwindcss": "^2.2.0",
     "vuex": "^3.1.2",
-    "zxcvbn": "^4.4.2"
+    "zxcvbn": "^4.4.2",
+    "snyk": "^1.316.1"
   },
   "devDependencies": {
     "cypress": "^3.8.0",
@@ -22,5 +25,6 @@
     "http-proxy-middleware": "^0.20.0",
     "serialize-javascript": ">=2.1.1",
     "vue-svg-loader": "^0.15.0"
-  }
+  },
+  "snyk": true
 }
